@@ -1,0 +1,15 @@
+{% load static %}
+
+<div    class="container" {% block container_stuff %}{% endblock %}
+        data-scroll-stage-id="{% block container_name %}{% endblock %}">
+    <div class="subtitle">{% block container_title %}{% endblock %}</div>
+    {% block deko-head %}
+        <div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
+    {% endblock%}
+
+    {% block container_content %}{% endblock %}
+
+    {% block deko-bottom %}
+        <div class="deko2"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
+    {% endblock %}
+</div>
