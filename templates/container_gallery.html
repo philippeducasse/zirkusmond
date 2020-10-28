@@ -1,0 +1,18 @@
+{% extends "container_base.html" %}
+{% load static %}
+
+{% block container_name %}
+    gallery
+{% endblock %}
+
+{% block container_title %}
+    GALLERY
+{% endblock %}
+
+{% block container_content %}
+    <div class="slider">
+        <div class=""> <img src="{% static "zm/img/bild-1.jpg" %}"></img> </div>
+        <div class=""> <img src="{% static "zm/img/bild-2.jpg" %}"></img> </div>
+        <div class=""> <img src="{% static "zm/img/bild-3.jpg" %}"></img> </div>
+    </div>
+{% endblock %}
