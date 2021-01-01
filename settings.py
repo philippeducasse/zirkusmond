@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'zirkusmond.wsgi.application'
+ASGI_APPLICATION = 'zirkusmond.asgi.application'
 
 
 # Database
