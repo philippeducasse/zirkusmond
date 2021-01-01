@@ -43,7 +43,7 @@
 
     new Scroll('#wrap', {
         stages: [{
-            id: 'basic',
+            id: 'intro',
             scrollNumber: 80,
             transition: 0,
             stageSwitchEasing: 'cubic-bezier(0, 0, 0, 0)',
@@ -83,6 +83,11 @@
                     end: 'translateY(-100px) scale(0.4)'
                 }]
             }]
+        }, {
+            id: 'events',
+            scrollNumber: 10,
+            transition: 0,
+            items: []
         }, {
             id: 'streams',
             scrollNumber: 10,
