@@ -1,4 +1,5 @@
 from django.db import models
+from markdownx.models import MarkdownxField
 
 
 class Show(models.Model):  # maybe call it an event?
@@ -6,7 +7,7 @@ class Show(models.Model):  # maybe call it an event?
         every showing of this show is an Event
     '''
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = MarkdownxField()
 
     banner_link = models.ImageField()
 

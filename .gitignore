@@ -2,3 +2,7 @@ __pycache__/*
 static/zm/node_modules/*
 */*__pycache__*
 *kate-swp
+static_/*
+media/*
+events/migrations/*
+test/*
