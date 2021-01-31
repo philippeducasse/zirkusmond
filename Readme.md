@@ -23,5 +23,13 @@
     python manage.py sqlmigrate 0001
 
     pip install django-markdownx
+    pip install markdown
 
 https://docs.djangoproject.com/en/3.1/intro/tutorial02/
+
+https://learndjango.com/tutorials/django-markdown-tutorial
+https://django-markdownify.readthedocs.io/en/latest/install_and_usage.html
+
+
+Mel
+BlaMaLaBla
