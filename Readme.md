@@ -22,4 +22,6 @@
     python manage.py shell
     python manage.py sqlmigrate 0001
 
+    pip install django-markdownx
+
 https://docs.djangoproject.com/en/3.1/intro/tutorial02/

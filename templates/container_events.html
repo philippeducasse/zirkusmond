@@ -8,10 +8,11 @@
 {% endblock %}
 
 {% block container_content %}
-    <!--<div class="slider">
-        <div class=""> Event1 </div>
-        <div class=""> Event2 </div>
-        <div class=""> Event3 </div>
-    </div>-->
-    events
+    <div class="slider">
+        {% for show in upcoming_shows %}
+            <a href="/events/{{show.id}}">
+                <div class=""><img src="{{ MEDIA_URL }}{{ show.banner_link }}"></img> </div>
+            </a>
+        {% endfor %}
+    </div>
 {% endblock %}
