@@ -16,6 +16,7 @@ class Show(models.Model):  # maybe call it an event?
 
 class Event(models.Model):
     """ An event
+        everything that people would come to
     """
     show = models.ForeignKey(Show, on_delete=models.SET_NULL, null=True)
     begin = models.DateTimeField('einlass')
