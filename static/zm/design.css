@@ -221,3 +221,8 @@ body {
 .contact a {
   color: #f6ae42;
 }
+
+.guest_counter {
+    font-size: large;
+    font-weight: bold;
+}

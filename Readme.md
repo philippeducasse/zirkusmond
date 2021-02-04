@@ -1,4 +1,11 @@
 
+- html_base
+  - index includes containers.html
+  - html_design
+    - show
+      - event (replace block show_details)
+
+
 - container_basic 
     - container_gallery
     - container_team
@@ -9,11 +16,6 @@
 
 ## TODO
 
-- `html_base.html` stage definition into modules (container_module.html)
-- `html_base.html` perspective.Scroll anpassen
-
-
-
 
 ## FAQ
 
@@ -23,9 +25,12 @@
     python manage.py sqlmigrate 0001
 
     pip install django-markdownx
+    python3 manage.py collectstatic
+
     pip install markdown
 
 https://docs.djangoproject.com/en/3.1/intro/tutorial02/
+https://docs.djangoproject.com/en/3.1/ref/models/fields/#django.db.models.ForeignKey.on_delete
 
 https://learndjango.com/tutorials/django-markdown-tutorial
 https://django-markdownify.readthedocs.io/en/latest/install_and_usage.html

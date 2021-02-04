@@ -1,0 +1,32 @@
+{% extends "show.html" %}
+{% load static %}
+
+{% block show_details %}
+    
+        {% if error_message %}
+            <p><strong>{{ error_message }}</strong></p>
+        {% endif %}
+
+        <form method="post">
+                {{ rForm.as_p }}
+            <h3>Deine Daten:</h3>
+            <table>
+                <tr><th colspan=2 class="guest_counter">Deine Daten</th></tr>
+
+                {{ pForm.as_table }}
+                {% csrf_token %}
+            </table>
+            {% if gForms %}
+                {{ gForms.management_form }}
+
+                <table>
+                    {% for form in gForms %}
+                        <tr><th colspan=2 class="guest_counter">GUEST</th></tr>
+                        {{ form.as_table }}
+                    {% endfor %}
+                </table>
+                
+            {% endif %}
+            <input type="submit" />
+        </form>
+{% endblock %}

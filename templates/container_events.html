@@ -10,7 +10,7 @@
 {% block container_content %}
     <div class="slider">
         {% for show in upcoming_shows %}
-            <a href="/events/{{show.id}}">
+            <a href="/show/{{show.id}}">
                 <div class=""><img src="{{ MEDIA_URL }}{{ show.banner_link }}"></img> </div>
             </a>
         {% endfor %}
