@@ -8,20 +8,22 @@
 
     <div style="margin-left: 20%; margin-right: 20%">
 
-    <!-- <div style="width: 100%;"> -->
-    <div>
-        <img src="{% static "zm/img/mond.png" %}"
-             style="width:30%;margin-left: 35%; margin-right: 35%;">
-    </div>
+        <!-- <div style="width: 100%;"> -->
+        <div>
+            <img src="{% static "zm/img/mond.png" %}"
+                style="width:30%;margin-left: 35%; margin-right: 35%;">
+        </div>
 
         <img src="{{ MEDIA_URL }}{{ show.banner_link }}"
             style="width:100%;"></img>
 
-    <div>
-        <h1>{{ show.title }}</h1>
-    </div>
-    <div>
-        {{ show.description | markdown | safe}}
-    </div>    </div>
+        <div>
+            <h1>{{ show.title }}</h1>
+        </div>
+        <div>
+            {% block show_details %}
+                {{ show.description | markdown | safe}}
+            {% endblock %}
+        </div>    </div>
     </div>
 {% endblock %}

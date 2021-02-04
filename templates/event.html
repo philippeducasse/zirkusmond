@@ -1,0 +1,19 @@
+{% extends "show.html" %}
+{% load static %}
+
+{% block show_details %}
+    {% if not event.reservation_open %}
+        We are sorry, No reservation possible.
+    {% else %}
+    
+        {% if error_message %}
+            <p><strong>{{ error_message }}</strong></p>
+        {% endif %}
+
+        <form action="{% url 'event:reserve' event.id %}"
+              method="post">
+            {% csrf_token %}
+            <input type="text"
+    {% endif %}
+
+{% endblock %}

@@ -24,8 +24,11 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('', views.plain),
     path('show/<int:show_id>', views.show, name='show'),
+    path('reserve/<int:show_id>', views.reserve, name='reserve'),
+    path('event/<int:event_id>', views.event, name='event'),
 
     url(r'^markdownx/', include('markdownx.urls')),
 ]
