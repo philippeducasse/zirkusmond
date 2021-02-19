@@ -29,8 +29,13 @@ urlpatterns = [
     path('show/<int:show_id>', views.show, name='show'),
     path('reserve/<int:show_id>', views.reserve, name='reserve'),
     path('event/<int:event_id>', views.event, name='event'),
+    path('payment/<int:payment_id>', views.payment, name='payment'),
+    path('payment/<int:payment_id>/success', views.payment_success),
+    path('payment/<int:payment_id>/failure', views.payment_fail),
+    path('payment/<int:payment_id>/<str:payment_variant>', views.payment, name='payment'),
 
     url(r'^markdownx/', include('markdownx.urls')),
+    path('payments/', include('payments.urls')),
 ]
 
 

@@ -19,7 +19,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
-                 '127.0.0.1']
+                 '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'zirkusmond.events',
 
     'markdownx',
+    'payments',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -69,6 +70,13 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'zirkusmond.asgi.application'
+
+
+PAYMENT_HOST = 'localhost:8000'
+PAYMENT_USES_SSL = False
+PAYMENT_MODEL = 'events.Payment'
+PAYMENT_VARIANTS = {
+    'default': ('payments.dummy.DummyProvider', {})}
 
 
 # Database

@@ -1,5 +1,5 @@
 from django.forms import ModelForm, Form, ModelChoiceField, IntegerField
-from .models import Person, Event, Show
+from .models import Person, Event, Show, Guest
 
 
 class ReservationForm(Form):
@@ -21,5 +21,14 @@ class PersonForm(ModelForm):
     '''
     class Meta:
         model = Person
+        fields = ['firstname', 'surname', 'street', 'zipcode',
+                  'town', 'email', 'phonenumber']
+
+
+class GuestForm(ModelForm):
+    ''' Person Form
+    '''
+    class Meta:
+        model = Guest
         fields = ['firstname', 'surname', 'street', 'zipcode',
                   'town', 'email', 'phonenumber']
