@@ -1,6 +1,8 @@
 {% extends "show.html" %}
 {% load static %}
 
+{% block title %}Zirkus Mond Reservierung - {{ show.title }}{% endblock %}
+
 {% block show_details %}
     
         {% if error_message %}
@@ -8,21 +10,32 @@
         {% endif %}
 
         <form method="post">
-                {{ rForm.as_p }}
-            <h3>Deine Daten:</h3>
             <table>
+                {{ rForm.as_table }}
                 <tr><th colspan=2 class="guest_counter">Deine Daten</th></tr>
 
                 {{ pForm.as_table }}
                 {% csrf_token %}
-            </table>
+
             {% if gForms %}
                 {{ gForms.management_form }}
 
-                <table>
                     {% for form in gForms %}
                         <tr><th colspan=2 class="guest_counter">GUEST</th></tr>
-                        {{ form.as_table }}
+                        {% for field in form %}
+                            <tr>
+                                <th>{{ field.label_tag }}</th>
+                                <td>{{ field }} </td>
+                                <td>
+                                {% for err in field.errors %}
+                                    {{ err }}
+                                {% endfor %}
+                                </td>
+                                {% if field.help_text %}
+                                    <td>{{ field.help_text }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
                 </table>
                 

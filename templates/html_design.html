@@ -2,5 +2,12 @@
 {% load static %}
 
 {% block body %}
-    <img src="{% static "zm/img/mond.png" %}">
+
+    <div id="wrap" class="wrap">
+        <div style="margin-left: 20%; margin-right: 20%">
+        {% block content %}
+        <img src="{% static "zm/img/mond.png" %}">
+        {% endblock %}
+        </div>
+    </div>
 {% endblock %}

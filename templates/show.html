@@ -2,12 +2,9 @@
 {% load static %}
 {% load markdown %}
 
-{% block body %}
-    <div id="wrap" class="wrap">
+{% block title %}Zirkus Mond - {{ show.title }}{% endblock %}
 
-
-    <div style="margin-left: 20%; margin-right: 20%">
-
+{% block content %}
         <!-- <div style="width: 100%;"> -->
         <div>
             <img src="{% static "zm/img/mond.png" %}"
@@ -24,6 +21,5 @@
             {% block show_details %}
                 {{ show.description | markdown | safe}}
             {% endblock %}
-        </div>    </div>
-    </div>
+        </div>
 {% endblock %}

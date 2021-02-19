@@ -94,6 +94,7 @@ from django.template.response import TemplateResponse
 from payments import get_payment_model, RedirectNeeded
 from .events.models import ReservationPayment
 
+
 def payment(request, payment_id, payment_variant=None):
     ''' handle payment
     '''
@@ -114,7 +115,7 @@ def payment_success(request, payment_id):
 
 
 def payment_fail(request, payment_id):
-    p = get_object_or_404(ReservationPayment, payment_id)
+    p = get_object_or_404(ReservationPayment, id=payment_id)
     return HttpResponse('Failed to pay %s, status: %s' % (payment_id, p.status))
 
 # class CreateReservationView(CreateView):

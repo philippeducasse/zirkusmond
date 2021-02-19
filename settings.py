@@ -74,7 +74,7 @@ ASGI_APPLICATION = 'zirkusmond.asgi.application'
 
 PAYMENT_HOST = 'localhost:8000'
 PAYMENT_USES_SSL = False
-PAYMENT_MODEL = 'events.Payment'
+PAYMENT_MODEL = 'events.ReservationPayment'
 PAYMENT_VARIANTS = {
     'default': ('payments.dummy.DummyProvider', {})}
 
