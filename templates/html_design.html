@@ -4,10 +4,19 @@
 {% block body %}
 
     <div id="wrap" class="wrap">
-        <div style="margin-left: 20%; margin-right: 20%">
+        <div style="margin-left: 20%; margin-right: 20%;">
+        {% block content-header %}
+        <div>
+            <img src="{% static "zm/img/mond.png" %}"
+                style="width:30%;margin-left: 35%; margin-right: 35%;margin-top:.3em;margin-bottom:1.7em;">
+        </div>
+        {% endblock %}
         {% block content %}
-        <img src="{% static "zm/img/mond.png" %}">
+        {% endblock %}
+        {% block content-footer %}
+        <div class="deko" style="margin-top:8em;"> <img src="/static/zm/img/copy.png"> </div>
         {% endblock %}
         </div>
+
     </div>
 {% endblock %}
