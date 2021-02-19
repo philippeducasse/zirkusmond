@@ -102,10 +102,10 @@ class ReservationPayment(BasePayment):
                                     on_delete=models.SET_NULL)
 
     def get_failure_url(self):
-        return './failure/' #% self.reservation.pk
+        return '/payment-failure/%s' % self.pk
 
     def get_success_url(self):
-        return './success/' #% self.reservation.pk
+        return '/payment-success/%s' % self.pk
 
     def get_purchased_items(self):
         ''' yield a list of PurchasedItems
@@ -132,4 +132,5 @@ class ReservationPayment(BasePayment):
         self.total = self.reservation.guest_count() * self.reservation.event.reservation_price
         self.currency = 'EUR'
 
+        return self
         # customer_ip_address

@@ -1,7 +1,7 @@
 
 - html_base
   - index includes containers.html
-  - html_design
+  - html_design (block content)
     - show
       - event (replace block show_details)
 
@@ -35,6 +35,4 @@ https://docs.djangoproject.com/en/3.1/ref/models/fields/#django.db.models.Foreig
 https://learndjango.com/tutorials/django-markdown-tutorial
 https://django-markdownify.readthedocs.io/en/latest/install_and_usage.html
 
-
-Mel
-BlaMaLaBla
+https://stackoverflow.com/questions/501719/dynamically-adding-a-form-to-a-django-formset-with-ajax

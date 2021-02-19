@@ -222,7 +222,20 @@ body {
   color: #f6ae42;
 }
 
-.guest_counter {
+.input_label {
     font-size: large;
     font-weight: bold;
+    line-height: 2;
+}
+
+input {
+    background-color: #6ba1d0;
+    border: none;
+    padding: 4px;
+}
+
+select{
+    background-color: #6ba1d0;
+    border: none;
+    padding: 4px;
 }
