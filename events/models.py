@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from markdownx.models import MarkdownxField
 
@@ -24,8 +26,10 @@ class Event(models.Model):
     end = models.DateTimeField('schluss')
 
     # how many people can come
-    reservation_capacity = models.PositiveIntegerField(default=True)
+    reservation_capacity = models.PositiveIntegerField(default=150)
     open_for_reservation = models.BooleanField(default=True)
+    reservation_price = models.DecimalField(decimal_places=2, max_digits=4,
+                                            default=5)
 
     def __str__(self):
         return '%s at %s' % (self.show, self.begin)
@@ -59,10 +63,17 @@ class Person(models.Model):
 class Reservation(models.Model):
     ''' People have to register for an event and provide their data
     '''
+    # https://docs.djangoproject.com/en/3.1/ref/models/fields/#primary-key
+    # TODO
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
     # the person making the reservation
     reservant = models.ForeignKey(Person, on_delete=models.CASCADE)
-    # def guest_count(self): TODO
+
+    def guest_count(self):
+        ''' for how many people do we reserve?
+        '''
+        return 3  # TODO TODO TODO
 
     # notizen, nachricht an uns
     # def __str__(self):
@@ -76,3 +87,49 @@ class Guest(Person):
     '''
     event_reservation = models.ForeignKey(Reservation,
                                           on_delete=models.CASCADE)
+
+
+from decimal import Decimal
+
+from payments import PurchasedItem
+from payments.models import BasePayment
+
+
+class ReservationPayment(BasePayment):
+    # TODO
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reservation = models.ForeignKey(Reservation, null=True,
+                                    on_delete=models.SET_NULL)
+
+    def get_failure_url(self):
+        return './failure/' #% self.reservation.pk
+
+    def get_success_url(self):
+        return './success/' #% self.reservation.pk
+
+    def get_purchased_items(self):
+        ''' yield a list of PurchasedItems
+        '''
+        yield PurchasedItem(name=str(self.reservation.event),
+                            sku=self.reservation.event.pk,
+                            quantity=self.reservation.guest_count(),
+                            price=self.reservation.event.reservation_price,
+                            currency='EUR')
+
+    def from_reservation(reservation: Reservation, *args, **kwargs):
+        self = ReservationPayment(*args, **kwargs)
+        import pdb
+        pdb.set_trace()
+        self.reservation = reservation
+        r = reservation.reservant
+        self.billing_first_name = r.firstname
+        self.billing_last_name = r.surname
+        self.billing_address_1 = r.street
+        self.billing_postcode = r.zipcode
+        self.billing_city = r.town
+        self.billing_email = r.email
+        self.description = 'Reservations for %s' % reservation.event
+        self.total = self.reservation.guest_count() * self.reservation.event.reservation_price
+        self.currency = 'EUR'
+
+        # customer_ip_address
