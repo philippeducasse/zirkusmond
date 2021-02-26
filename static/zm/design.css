@@ -228,14 +228,37 @@ body {
     line-height: 2;
 }
 
-input {
+input, select {
     background-color: #6ba1d0;
     border: none;
     padding: 4px;
+    border-radius: 3px;
 }
 
-select{
-    background-color: #6ba1d0;
-    border: none;
-    padding: 4px;
+a.button:link, a.button:visited, input.button {
+    color: #f6ae42;
+    border: #f6ae42;
+    padding-left: 30px;
+    border-style: double;
+    padding-right: 30px;
+    padding-top: 12px;
+    padding-bottom: 6px;
+    font-size: xx-large;
+    font-weight: bold;
+    font-stretch: ultra-expanded;
+    text-decoration: none
+}
+
+a.button:hover, a.button:active {
+    text-decoration: none
+    color: #f6ae42;
+    border: #f6ae42;
+    padding-left: 30px;
+    border-style: double;
+    padding-right: 30px;
+    padding-top: 12px;
+    padding-bottom: 6px;
+    font-size: xx-large;
+    font-weight: bold;
+    font-stretch: ultra-expanded;
 }

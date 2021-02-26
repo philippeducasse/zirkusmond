@@ -19,7 +19,7 @@ SECRET_KEY = '9gg)@^#6+3&r33*#gszht&v=7-88^fqn-d3#2l3*sh^b*tfm3l'
 DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
-                 '127.0.0.1', 'localhost']
+                 '127.0.0.1', 'localhost', '192.168.188.154']
 
 
 # Application definition

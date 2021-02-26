@@ -30,5 +30,4 @@ class GuestForm(ModelForm):
     '''
     class Meta:
         model = Guest
-        fields = ['firstname', 'surname', 'street', 'zipcode',
-                  'town', 'email', 'phonenumber']
+        fields = ['firstname', 'surname', 'email', 'phonenumber']
