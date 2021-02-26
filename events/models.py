@@ -52,12 +52,12 @@ class Person(models.Model):
     firstname = models.CharField(max_length=25)
     surname = models.CharField(max_length=25)
 
-    street = models.CharField(max_length=50)
-    zipcode = models.PositiveIntegerField()
-    town = models.CharField(max_length=25)
+    street = models.CharField(max_length=50, null=True)
+    zipcode = models.PositiveIntegerField(null=True)
+    town = models.CharField(max_length=25, null=True)
 
-    email = models.EmailField()
-    phonenumber = models.CharField(max_length=25)
+    email = models.EmailField(null=True, blank=True)
+    phonenumber = models.CharField(max_length=25, null=True, blank=True)
 
 
 class Reservation(models.Model):
