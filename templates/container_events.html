@@ -1,18 +1,20 @@
-{% extends "container_base.html" %}
 {% load static %}
 
-{% block container_name %}events{% endblock %}
 
-{% block container_title %}
-    EVENTS
-{% endblock %}
-
-{% block container_content %}
-    <div class="slider">
-        {% for show in upcoming_shows %}
-            <a href="/show/{{show.id}}">
-                <div class=""><img src="{{ MEDIA_URL }}{{ show.banner_link }}"></img> </div>
-            </a>
-        {% endfor %}
+<div class="container ">
+    <div class="row">
+    {% for show in upcoming_shows %}
+        <div class="col-md">
+        <a href="/show/{{show.id}}">
+        <div class="card">
+            <img class="card-img-top" src="{{MEDIA_URL}}{{show.banner_link}}" />
+            <div class="card-body">
+                <h3 class="card-title">{{ show.title }}</h3>
+                <p class="card-text">{{ show.dates_text }}</p>
+            </div>
+        </div>
+        </a>
+        </div>
+    {% endfor %}
     </div>
-{% endblock %}
+</div>
