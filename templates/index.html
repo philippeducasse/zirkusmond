@@ -1,96 +1,24 @@
 {% extends "html_base.html" %}
+{% load static %}
 
 {% block body %}
 
-    <div id="wrap" class="wrap">
+{% include "container_intro.html" %}
 
-        {% block containers %}
-            {% include "containers.html" %}
-        {% endblock %}
+<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
 
-    </div>
+{% include "container_events.html" %}
 
-<script>
+<div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
 
-    $(".slider").slick({
-        infinite: true,
-        slidesToShow: 1,
-        slidesToScroll: 1
-    });
+{% include "container_streams.html" %}
 
-    // using CDN
-    const Scroll = perspective.Scroll
+<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
 
-    new Scroll('#wrap', {
-        stages: [{
-            id: 'intro',
-            scrollNumber: 10,
-            transition: 0,
-            stageSwitchEasing: 'cubic-bezier(0, 0, 0, 0)',
-            items: [{
-                id: 'zeltstage',
-                effects: [{
-                    property: 'transform',
-                    start: 'translateY(0px)',
-                    end: 'translateY(-200px)'
-                }]
-            }, {
-                id: 'baumstage',
-                effects: [{
-                    property: 'transform',
-                    start: 'translateY(0px)',
-                    end: 'translateY(-50px)'
-                }]
-            }, {
-                id: 'sternestage',
-                effects: [{
-                    property: 'transform',
-                    start: 'scale(1)',
-                    end: 'scale(1.3)'
-                }]
-            }, {
-                id: 'buschstage',
-                effects: [{
-                    property: 'transform',
-                    start: 'translateY(0px)',
-                    end: 'translateY(-500px)'
-                }]
-            }, {
-                id: 'mondstage',
-                effects: [{
-                    property: 'transform',
-                    start: 'translateY(0px) scale(0.8)',
-                    end: 'translateY(-100px) scale(0.4)'
-                }]
-            }]
-        }, {
-            id: 'events',
-            scrollNumber: 10,
-            transition: 0,
-            items: []
-        }, {
-            id: 'streams',
-            scrollNumber: 10,
-            transition: 0,
-            items: []
-        }, {
-            id: 'gallery',
-            scrollNumber: 10,
-            transition: 0,
-            items: []
-        }, {
-            id: 'team',
-            scrollNumber: 10,
-            transition: 0,
-            items: []
-        }, {
-            id: 'slider',
-            scrollNumber: 10,
-            transition: 0,
-            items: []
-        }]
-    })
+{% include "container_gallery.html" %}
 
-</script>
+<div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
+
+{% include "container_last.html" %}
 
 {% endblock %}

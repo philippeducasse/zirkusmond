@@ -16,6 +16,10 @@ class Show(models.Model):  # maybe call it an event?
     def __str__(self):
         return self.title
 
+    def dates_text(self):
+        # TODO
+        return "Fr 6 Mar - Su 8 Mar"
+
 
 class Event(models.Model):
     """ An event
