@@ -18,7 +18,7 @@ class Show(models.Model):  # maybe call it an event?
 
     def dates_text(self):
         # TODO
-        return "Fr 6 Mar - Su 8 Mar"
+        return "No Shows Possible"
 
 
 class Event(models.Model):
