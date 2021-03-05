@@ -7,6 +7,7 @@ ADD . .
 COPY manage.py ..
 
 RUN python ../manage.py makemigrations
+RUN python ../manage.py makemigrations events
 RUN python ../manage.py migrate
 RUN python ../manage.py collectstatic
 EXPOSE 8000
