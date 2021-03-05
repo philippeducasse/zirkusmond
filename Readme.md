@@ -36,3 +36,9 @@ https://learndjango.com/tutorials/django-markdown-tutorial
 https://django-markdownify.readthedocs.io/en/latest/install_and_usage.html
 
 https://stackoverflow.com/questions/501719/dynamically-adding-a-form-to-a-django-formset-with-ajax
+
+## docker
+
+    sudo docker build -t zirkusmond_de .
+    sudo docker run --name zm_de -p 9000:8000 zirkusmond_de
+    sudo docker exec -it zm_de /bin/bash

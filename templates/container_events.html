@@ -5,7 +5,6 @@
     <div class="row row-cols-md-1 row-cols-lg-3 g-3">
     {% for show in upcoming_shows %}
         <div class="col-md4">
-        <a class="card-link" href="/show/{{show.id}}">
         <div class="card">
             <img class="card-img-top" style="height:180px;" src="{{MEDIA_URL}}{{show.banner_link}}" />
             <div class="card-body">
@@ -13,7 +12,6 @@
                 <p class="card-text">{{ show.dates_text }}</p>
             </div>
         </div>
-        </a>
         </div>
     {% endfor %}
     </div>
