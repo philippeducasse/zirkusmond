@@ -1,3 +1,19 @@
+Seitenbetreiber/ Verantwortlicher
+
+Name und Vorname des Seitenbetreibers
+Anschrift des Seitenbetreibers
+Kontaktdaten des Seitenbetreibers
+
+E-Mail-Adresse
+Telefon-Nummer
+ggf. Fax-Nummer
+Bei Unternehmen kommen dann weitere Pflichtangaben dazu
+
+Die Rechtsform (GmbH, GbR...)
+Wer vertritt das Unternehmen?
+Registereintrag, wenn vorhanden
+USt-ID wenn vorhanden
+
 
 - html_base
   - index includes containers.html
