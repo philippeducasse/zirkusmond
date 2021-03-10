@@ -1,0 +1,23 @@
+{% extends "html_design.html" %}
+
+{% block content %}
+<div class="container-fluid">
+
+</div>
+<div class="container">
+    <div class="row row-cols-3 g-1">
+        {% for album in alben %}
+            <a href="/gallery/{{album.pk}}">
+                <div class="card">
+                    <img class="card-img-top ratio ratio-16x9" width="200px" src="{{MEDIA_URL}}{{album.cover.image}}">
+                    <div class="card-body">
+                        <h3>{{album.name}}</h3>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+    
+Hier kommen unsere alben Hin!
+{% endblock %}
