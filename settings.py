@@ -30,6 +30,9 @@ INSTALLED_APPS = [
     'markdownx',
     'payments',
 
+    'easy_thumbnails',
+    'image_cropping',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
