@@ -26,6 +26,7 @@ ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
 # Application definition
 INSTALLED_APPS = [
     'zirkusmond.events',
+    'zirkusmond.gallery',
 
     'markdownx',
     'payments',

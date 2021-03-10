@@ -5,4 +5,5 @@ static/zm/node_modules/*
 static_/*
 media/*
 events/migrations/*
+gallery/migrations/*
 test/*

@@ -1,0 +1,24 @@
+{% extends "html_design.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <img class="img-fluid" src="{{MEDIA_URL}}{{foto.image}}">
+</div>
+
+<div class="container">
+    <div>
+        <h1>{{album.name}}</h1>
+    <div class="row row-cols-6">
+    {% for foto in fotos %}
+        <a href="/gallery/{{album.id}}/{{foto.id}}">
+        <div class="card">
+            <img src="{{MEDIA_URL}}{{foto.image}}">
+        </div>
+        </a>
+    {% endfor %}
+    </div>
+
+</div>
+    
+Hier kommen unsere alben Hin!
+{% endblock %}
