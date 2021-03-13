@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from markdownx.models import MarkdownxField
+from image_cropping import ImageRatioField
 
 
 class Show(models.Model):  # maybe call it an event?
@@ -12,6 +13,7 @@ class Show(models.Model):  # maybe call it an event?
     description = MarkdownxField()
 
     banner_link = models.ImageField()
+    head_img = ImageRatioField('banner_link', '400x225')
 
     def __str__(self):
         return self.title

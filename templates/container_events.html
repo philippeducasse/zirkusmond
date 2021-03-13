@@ -1,4 +1,5 @@
 {% load static %}
+{% load cropping %}
 
 
 <div class="container ">
@@ -6,7 +7,7 @@
     {% for show in upcoming_shows %}
         <div class="col-md4">
         <div class="card">
-            <img class="card-img-top ratio ratio-16x9" src="{{MEDIA_URL}}{{show.banner_link}}" />
+            <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
             <div class="card-body">
                 <h3 class="card-title">{{ show.title }}</h3>
                 <p class="card-text">{{ show.dates_text }}</p>
