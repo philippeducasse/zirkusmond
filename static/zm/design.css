@@ -212,3 +212,64 @@ a.card-link  {
 .shadowed-content {
     box-shadow: inset 0 0 300px black;
 }
+
+.ls-first {
+    font-family: "Island Roman";
+    font-size: 300%;
+    font-weight: bold;
+    
+    background-color: #00000000;
+    border: none;
+}
+.ls-first h2,h3 {
+    color: white;
+}
+
+.ls-first-heading {
+    margin-top: 1.2em;
+    transform: rotate(10deg);
+}
+
+.ls-live-stream-box-box {
+    width: 100%;
+    margin-top: 2.2em;
+    text-align: center;
+}
+.ls-live-stream-box {
+    color: white;
+    
+    margin-left: 30%;
+    width: 40%;
+    padding: 20px; 
+    background-color: #db0c05;
+    border: none;
+    border-radius: 10px;
+    color: white important!;
+}
+.ls-live-stream-box h1,h2 {
+    color: white;
+}
+.ls-counter {
+    margin-top: 2em;
+}
+#ls-counter-h1 {
+}
+
+
+.ls-support h1 {
+    transform: rotate(-10deg);
+}
+
+.ls-betterplace {
+    margin-top: 50px;
+
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border: 2px solid;
+}
+
+.ls-betterplace h4 {
+    color: white;
+    text-align: left;
+    padding-left: 20px;
+}
