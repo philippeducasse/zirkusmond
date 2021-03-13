@@ -75,6 +75,21 @@ body {
   width: 70%;
 }
 
+.section-outro {
+    font-size: x-large;
+    padding: 3m important!;
+}
+
+.anfahrt {
+    font-size: x-large;
+    line-height: 1.2
+}
+
+.office-contact {
+    font-size: x-large;
+    line-height: 1.2;
+    margin-top: 2em;
+}
 
 .contact {
   text-align: center;
@@ -83,8 +98,7 @@ body {
   color:  #f6ae42;
   font-family: 'Spirited Serif Regular', serif;
   line-height: 1.2;
-  margin-top: 3em;
-  
+  margin-top: 2em;
 }
 
 .contact a {
