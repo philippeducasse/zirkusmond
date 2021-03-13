@@ -77,6 +77,12 @@ TEMPLATES = [
 ASGI_APPLICATION = 'zirkusmond.asgi.application'
 
 
+from easy_thumbnails.conf import Settings as thumbnail_settings
+THUMBNAIL_PROCESSORS = (
+    'image_cropping.thumbnail_processors.crop_corners',
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+
 PAYMENT_HOST = 'localhost:8000'
 PAYMENT_USES_SSL = False
 PAYMENT_MODEL = 'events.ReservationPayment'
