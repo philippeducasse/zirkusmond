@@ -17,7 +17,12 @@
 
 {% include "container_gallery.html" %}
 
-<div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
+<div id="outro">
+    <div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
+    {% include "section_outro.html" %}
+</div>
+
+<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
 
 {% include "container_last.html" %}
 
