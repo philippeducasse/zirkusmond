@@ -21,6 +21,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from . import views
+from .gallery import views as gviews
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,9 +30,9 @@ urlpatterns = [
     path('', views.plain),
     path('show/<int:show_id>', views.show, name='show'),
 
-    path('gallery', views.gallery, name='gallery'),
-    path('gallery/<int:pk>', views.album),
-    path('gallery/<int:album_id>/<int:foto_id>', views.foto),
+    path('gallery', gviews.gallery, name='gallery'),
+    path('gallery/<int:pk>', gviews.album),
+    path('gallery/<int:album_id>/<int:foto_id>', gviews.foto),
     path('reserve/<int:show_id>', views.reserve, name='reserve'),
     path('event/<int:event_id>', views.event, name='event'),
     path('payment/<int:payment_id>', views.payment, name='payment'),

@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
 # from django import forms
 from django.views.generic.edit import CreateView
-from .gallery.models import Foto, Album
 
 
 # from .models import Article
@@ -17,29 +16,6 @@ def plain(request):
                   {'upcoming_shows': us})
 
 
-def gallery(request):
-    alben = Album.objects.all()
-    return render(request, 'gallery.html', {'alben': alben})
-
-
-def album(request, pk):
-    album = get_object_or_404(Album, id=pk)
-    fotos = Foto.objects.filter(album_ref=album)
-
-    return render(request, "album.html",
-                  {"album": album,
-                   "fotos": fotos})
-
-
-def foto(request, album_id, foto_id):
-    album = get_object_or_404(Album, id=album_id)
-    fotos = Foto.objects.filter(album_ref=album)
-    foto = get_object_or_404(Foto, id=foto_id)
-
-    return render(request, "foto.html",
-                  {"album": album,
-                   "fotos": fotos,
-                   "foto": foto})
 def show(request, show_id):
     ''' show show details page for a given id
     '''
