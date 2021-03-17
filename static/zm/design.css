@@ -235,11 +235,17 @@ a.card-link  {
     margin-top: 2.2em;
     text-align: center;
 }
+.ls-live-stream-box-box button {
+    background-color: #db0c05;
+    padding:20px;
+    padding-right: 30px;
+    padding-left: 30px;
+}
 .ls-live-stream-box {
     color: white;
-    
-    margin-left: 30%;
-    width: 40%;
+    margin: 0 auto;
+/*    margin-left: 30%; */
+/*    width: 40%; */
     padding: 20px; 
     background-color: #db0c05;
     border: none;
@@ -248,6 +254,9 @@ a.card-link  {
 }
 .ls-live-stream-box h1,h2 {
     color: white;
+}
+.ls-live-stream-box-box h1 {
+    margin-bottom: 0px;
 }
 .ls-counter {
     margin-top: 2em;
