@@ -126,3 +126,14 @@ def payment_fail(request, payment_id):
 #     form_class =
 # #    def form_valid(self, form):
 # #        return super().form_valid(form)
+
+
+def handle404(request, exception):
+    '''
+    '''
+    return render(request, '404.html')
+
+def handle500(request, exception):
+    '''
+    '''
+    return render(request, '500.html')

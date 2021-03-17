@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 from . import views
 from .gallery import views as gviews
 
+handler404 = views.handle404
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -46,6 +47,6 @@ urlpatterns = [
 ]
 
 
-if settings.DEBUG:
+if settings.DEBUG or True:  # TODO no actual http server deployment
     urlpatterns = urlpatterns + static(settings.MEDIA_URL,
                                        document_root=settings.MEDIA_ROOT)
