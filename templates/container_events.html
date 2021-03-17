@@ -12,10 +12,10 @@
         </div>
 
         <div class="ls-live-stream-box-box text-center">
-          <div class="ls-live-stream-box">
-            <h1>LIVE <img style="height: 3rem; padding-bottom: 0.5rem;" src="/static/zm/livestreaming320/youtube.svg"><h1>
-            <h2>Streaming</h2>
-          </div>
+          <button class="btn btn-danger" onclick="window.location.href='https://youtu.be/tOnxilQTe-M%20%20'">
+            <h1>LIVE <img style="height: 3rem; padding-bottom: 0.5rem;" src="/static/zm/livestreaming320/youtube.svg"><br />
+                Streaming</h1>
+          </button>
         </div>
         
         <div class="ls-counter">
@@ -84,8 +84,8 @@
     <script type="text/javascript">
             $("#ls-counter-h1")
             .countdown("2021/03/20 20:00", function(event) {
-                $(this).text(
-                event.strftime('%D days %H Hours %M minutes %S Seconds')
+                $(this).html(
+                event.strftime('%-d days %-H Hours <nobr>%-M minutes</nobr> <nobr>%-S Seconds</nobr>')
                 );
             });
         </script>
