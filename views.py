@@ -5,12 +5,18 @@ from django.views.generic.edit import CreateView
 
 
 from .events.models import Show
+from .zm.models import Visitor
 
 
 def plain(request):
     ''' Give em our index, without doing much
     '''
     us = Show.objects.all()
+    print(request.META.keys())
+    v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
+                ip=request.META['REMOTE_ADDR'],
+                referer=request.META['HTTP_REFERER'] if 'HTTP_REFERER' in request.META.keys() else '')
+    v.save()
     return render(request, 'index.html',
                   {'upcoming_shows': us})
 
