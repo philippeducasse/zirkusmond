@@ -18,7 +18,6 @@ SECRET_KEY = '9gg)@^#6+3&r33*#gszht&v=7-88^fqn-d3#2l3*sh^b*tfm3l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
                  '127.0.0.1', 'localhost', '192.168.188.154', '192.168.1.137',
                  'zirkusmond.de', 'www.zirkusmond.de']
@@ -28,6 +27,7 @@ ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
 INSTALLED_APPS = [
     'zirkusmond.events',
     'zirkusmond.gallery',
+    'zirkusmond.zm',
 
     'markdownx',
     'payments',
