@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from . import views
+from .events import views as event_views
 from .gallery import views as gviews
 
 
@@ -28,24 +29,30 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', views.plain),
-    path('show/<int:show_id>', views.show, name='show'),
+    path('show/<int:show_id>', event_views.show, name='show'),
+    path('reserve/<int:show_id>', event_views.reserve, name='reserve'),
+    path('payment/<int:payment_id>', event_views.payment, name='payment'),
+    path('payment-success/<int:payment_id>', event_views.payment_success),
+    path('payment-failure/<int:payment_id>', event_views.payment_fail),
+    path('payment/<int:payment_id>/<str:payment_variant>', event_views.payment,
+         name='payment'),
+    # TODO Opps response for payment
+
 
     path('gallery', gviews.gallery, name='gallery'),
     path('gallery/<int:pk>', gviews.album),
     path('gallery/<int:album_id>/<int:foto_id>', gviews.foto),
-    path('reserve/<int:show_id>', views.reserve, name='reserve'),
-    path('event/<int:event_id>', views.event, name='event'),
-    path('payment/<int:payment_id>', views.payment, name='payment'),
-    path('payment-success/<int:payment_id>', views.payment_success),
-    path('payment-failure/<int:payment_id>', views.payment_fail),
-    path('payment/<int:payment_id>/<str:payment_variant>', views.payment, name='payment'),
-    # TODO Opps response for payment
 
     url(r'^markdownx/', include('markdownx.urls')),
     path('payments/', include('payments.urls')),
 ]
 
 
-if settings.DEBUG:
+if settings.DEBUG or True:  # TODO no actual http server deployment
     urlpatterns = urlpatterns + static(settings.MEDIA_URL,
                                        document_root=settings.MEDIA_ROOT)
+
+handler404 = views.handle404
+handler500 = views.server_error
+handler403 = views.permission_denied
+handler400 = views.bad_request
