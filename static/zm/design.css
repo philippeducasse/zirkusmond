@@ -130,7 +130,7 @@ a.button:link, a.button:visited, input.button {
     border-style: double;
     padding-right: 30px;
     padding-top: 12px;
-    padding-bottom: 6px;
+    padding-bottom: 12px;
     font-size: xx-large;
     font-weight: bold;
     font-stretch: ultra-expanded;
@@ -145,10 +145,12 @@ a.button:hover, a.button:active {
     border-style: double;
     padding-right: 30px;
     padding-top: 12px;
-    padding-bottom: 6px;
+    padding-bottom: 12px;
+    /* transition: all ease-in-out 28s; padding: 1300px; */
     font-size: xx-large;
     font-weight: bold;
     font-stretch: ultra-expanded;
+    background-color: #00000040;
 }
 
 .card {
@@ -281,4 +283,12 @@ a.card-link  {
     color: white;
     text-align: left;
     padding-left: 20px;
+}
+
+.form label {
+    display: block;
+} /* make labels appear above inputs */
+
+.form input, .form select {
+    width: 100%;
 }

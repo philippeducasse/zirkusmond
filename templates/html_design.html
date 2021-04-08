@@ -3,8 +3,7 @@
 
 {% block body %}
 
-    <div id="wrap" class="wrap">
-        <div style="margin-left: 20%; margin-right: 20%;">
+    <div class="container">
         {% block content-header %}
         <div>
             <img src="{% static "zm/img/mond.png" %}"
@@ -16,7 +15,5 @@
         {% block content-footer %}
         <div class="deko" style="margin-top:8em;"> <img src="/static/zm/img/copy.png"> </div>
         {% endblock %}
-        </div>
-
     </div>
 {% endblock %}

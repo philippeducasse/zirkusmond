@@ -24,6 +24,11 @@ class PersonForm(ModelForm):
         fields = ['firstname', 'surname', 'street', 'zipcode',
                   'town', 'email', 'phonenumber']
 
+    def line_tuples(self):
+        return ((self['firstname'], self['surname']),
+                (self['street'], self['zipcode'], self['town']),
+                (self['email'], self['phonenumber']))
+
 
 class GuestForm(ModelForm):
     ''' Person Form
@@ -31,3 +36,8 @@ class GuestForm(ModelForm):
     class Meta:
         model = Guest
         fields = ['firstname', 'surname', 'email', 'phonenumber']
+
+    def line_tuples(self):
+        return ((self['firstname'], self['surname']),
+                # (self['street'], self['zipcode'], self['town']),
+                (self['email'], self['phonenumber']))
