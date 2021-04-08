@@ -61,23 +61,24 @@
 </div>
 </div>
 
-<!--
+
 <div class="container ">
     <div class="row row-cols-md-1 row-cols-lg-3 g-3">
     {% for show in upcoming_shows %}
-        <div class="col-md4">
-        <div class="card">
-            <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
-            <div class="card-body">
-                <h3 class="card-title">{{ show.title }}</h3>
-                <p class="card-text">{{ show.dates_text }}</p>
+        <a href="/show/{{ show.id }}">
+            <div class="col-md4">
+                <div class="card">
+                    <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
+                    <div class="card-body">
+                        <h3 class="card-title">{{ show.title }}</h3>
+                        <p class="card-text">{{ show.dates_text }}</p>
+                    </div>
+                </div>
             </div>
-        </div>
-        </div>
+        </a>
     {% endfor %}
     </div>
 </div>
--->
 
 
 <script src="/static/zm/livestreaming320/jquery.countdown.min.js"></script>
