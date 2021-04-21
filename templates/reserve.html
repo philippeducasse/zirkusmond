@@ -11,7 +11,20 @@
 
     <form method="post">
         {% csrf_token %}
-        <div class="row form">
+        <div class="row form row-padding">
+
+            <div class="col-md-4 ticket-form">
+                    <h3>Tickets</h3>
+                    {{ rForm.event.label_tag }}
+                    {{ rForm.event }}
+
+                    {{ rForm.attendee_count.label_tag }}
+                    {{ rForm.attendee_count }}
+
+                    Reservierung kostet 5Eur pro Platz, Eintritt wird an der Abendkasse bezahlt.
+
+            </div>
+
             <div class="col-md-8 input-form">
                 <h3>Kontaktdaten/Rechnungsaddresse</h3>
                 {% for attr_list in pForm.line_tuples %}
@@ -28,23 +41,12 @@
                 {% endfor %}
             </div>
 
-            <div class="col-md-4 ticket-form">
-                    <h3>Tickets</h3>
-                    {{ rForm.event.label_tag }}
-                    {{ rForm.event }}
-
-                    {{ rForm.attendee_count.label_tag }}
-                    {{ rForm.attendee_count }}
-
-                    Reservierung kostet 5Eur pro Platz, Eintritt wird an der Abendkasse bezahlt.
-
-            </div>
         </div>
 
 
             {% if gForms %}
             <br />
-            <div class="row form">
+            <div class="row form row-padding">
                 {{ gForms.management_form }}
 
                     {% for form in gForms %}
@@ -75,6 +77,24 @@
             </div>
             {% endif %}
 
-            <input class="button" style="margin-top: 20px; background: none; font-family: inherit;border-radius: 0;" type="submit" />
+            <div class="row row-padding">
+                <h3>Pay with</h3>
+            </div>
+            <div class="row mb-3">
+                <div class="col col-padding">
+                    <input type="submit" style="width: 100%;" class="button" id="klarna" name="payment-method" value="klarna">
+                </div>
+                <div class="col col-padding">
+                    <input type="submit" style="width: 100%;" class="button" id="paypal" name="payment-method" value="paypal">
+                </div>
+                <div class="col col-padding">
+                    <input type="submit" style="width: 100%;" class="button" id="coinbase" name="payment-method" value="coinbase">
+                </div>
+
+                <div class="col col-padding">
+                    <input type="submit" style="width: 100%;" class="button" id="test" name="payment-method" value="default">
+                </div>
+            </div>
+
         </form>
 {% endblock %}

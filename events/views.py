@@ -64,6 +64,7 @@ def reserve(request, show_id):
                             g.instance.event_reservation = r
                             g.save()
                         pass  # pay
+                        variant = request.POST['payment-method']
                         rP = ReservationPayment.from_reservation(r,
                                  variant='default',  # TODO
                                  customer_ip_address=request.META['REMOTE_ADDR'])

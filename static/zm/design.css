@@ -125,6 +125,7 @@ a:link, a:visited, a:hover, a:active, input.button {
 
 a.button:link, a.button:visited, input.button {
     color: #f6ae42;
+    background-color: #00000000;
     border: #f6ae42;
     padding-left: 30px;
     border-style: double;
@@ -137,7 +138,7 @@ a.button:link, a.button:visited, input.button {
     text-decoration: none
 }
 
-a.button:hover, a.button:active {
+a.button:hover, a.button:active, .button:hover {
     text-decoration: none
     color: #f6ae42;
     border: #f6ae42;
@@ -291,4 +292,18 @@ a.card-link  {
 
 .form input, .form select {
     width: 100%;
+}
+
+.col-padding, .row-padding {
+    padding-top: 1em;
+}
+
+.ticket-form {
+        /*border-right: 2px solid yellow;*/
+    }
+
+@media only screen and (min-width: 768px) {
+    .ticket-form {
+        border-right: 2px solid #E7B548;
+    }
 }
