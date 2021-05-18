@@ -43,3 +43,15 @@ def bad_request(request, exception):
     return render(request, 'error_message.html',
                   {'error_code': 400,
                    'error_message': "Bad Request"})
+
+
+def impressum(request):
+    ''' display impressum
+    '''
+    return render(request, 'impressum.html')
+
+
+def robot(request):
+    ''' display impressum
+    '''
+    return render(request, 'robot.txt')

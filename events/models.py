@@ -38,7 +38,8 @@ class Event(models.Model):
                                             default=5)
 
     def __str__(self):
-        return '%s at %s' % (self.show, self.begin)
+        # return '%s at %s' % (self.show, self.begin.strftime('%D %H:%M'))
+        return self.begin.strftime('%d.%m.%y at %H:%M')
 
     def reservation_open(self) -> bool:
         ''' can you register, still open spots?
