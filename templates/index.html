@@ -5,25 +5,26 @@
 
 {% include "container_intro.html" %}
 
-<div class="deko" id="livestream"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
+
+<div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
+
+{% include "container_gallery.html" %}
 
 {% include "container_events.html" %}
+
+<div id="outro">
+    <div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
+    {% include "section_about_text.html" %}
+</div>
 
 <div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
 
 {% include "container_streams.html" %}
 
-<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
+<div class="deko" id="livestream"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
 
-{% include "container_gallery.html" %}
-
-<div id="outro">
-    <div class="deko"> <img src="{% static "zm/img/deko-1.png" %}"></img> </div>
-    {% include "section_outro.html" %}
-</div>
-
-<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
 
 {% include "container_last.html" %}
+
 
 {% endblock %}

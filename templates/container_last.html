@@ -2,43 +2,103 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12 col-lg-9">
-            <div id="map"> </div>
+
+        <div class="col-md-12 col-lg-6 col-xl-4 g-3">
+
+            <div class="last-blocks">
+                <div class="ls-first-heading text-center">
+                    <h1 class="">Contact</h1>
+                </div>
+
+
+                <div class="office-contact">
+                    <div class="text-center ">
+                        <a href="mailto:zirkusmond@posteo.de">zirkusmond@posteo.de</a>
+                    </div>
+                </div>
+
+                <div class="social text-center" style="">
+                    <a href="https://www.youtube.com/channel/UCa4CK1Fl7ZpTA6mz04wH6CA">
+                        <img src="/static/zm/icons/youtube.svg" height="30" color="yellow">
+                    </a>
+                    <a href="https://de-de.facebook.com/zirkusmond">
+                        <img src="/static/zm/icons/facebook.svg" height="30">
+                    </a>
+
+                    <a href="https://de-de.facebook.com/zirkusmond">
+                        <img src="/static/zm/icons/instagram.svg" height="30">
+                    </a>
+                    <a href="https://www.patreon.com/zirkusmond">
+                        <img src="/static/zm/icons/patreon_yellow.png" height="30"></a>
+                </div>
+
+                <div class="office-contact">
+                    If you have a show or event and would like to present it at our venue, reach us at
+                    <a href="mailto:venue@zirkusmond.de">venue@zirkusmond.de</a>
+                    <br><br>
+                    If you are an Artist and want to get touch with us, drop us a line at
+                    <a href="mailto:talent@zirkusmond.de">talent@zirkusmond.de</a>
+                    <br><br>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-12 col-lg-3">
-            <div class="anfahrt">
+        <div class="col-md-12 col-lg-6 col-xl-4 g-3">
+
+            <div class="last-blocks">
+                <h1 class="text-center">Impressum</h1>
+                <div class="office-contact">
+                    {% include "impressum_text.html" %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-lg-12 col-xl-4 text-center ls-support g-3" >
+            <div class="last-blocks">
+                <h1>Support Us On</h1>
+
+                <a href="https://www.betterplace.me/make-zirkus-mond-survive">
+                    <div class="ls-betterplace">
+                        <h2>Crowdfunding</h2>
+                        <h3>on BetterPlace.me</h3>
+                    </div>
+                </a>
+
+                <div class="ls-betterplace ls-iban">
+                    <h2>BankTransfer/Überweisung</h2>
+                    <h4>IBAN: DE34 4306 0967 1226 9437 00</h4>
+                    <h4>BIC: GENODEM1GLS</h4>
+                </div>
+
+                <div class="ls-betterplace">
+                    <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E"><h2>Donate via Paypal</h2></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
+
+
+    <div class="row row-padding">
+        <div class="col-md-12" style="padding:0px;">
+            <div id="map"> </div>
+        </div>
+        <!--
+        <div class="anfahrt">
                 S Greifswalder Straße<br />
                 In die Lili-Henoch Straße, abbiegen kleine Greifswalder Straße
                 bis zum Tor von `von Greifswald` und links
-            </div>
-            <div class="contact">
-                <a href="mailto:zirkusmond@posteo.de">zirkusmond@posteo.de</a>
-                <br>
-                <br>
-                <div class="social">
-                    <a href="https://www.youtube.com/channel/UCa4CK1Fl7ZpTA6mz04wH6CA">Youtube</a>
-                    <a href="https://de-de.facebook.com/zirkusmond">Facebook</a>
-                    <a href="https://www.patreon.com/zirkusmond">Patreon</a>
-                </div>
-            </div>
-
-            <div class="office-contact">
-                Zirkus Mond Office:<br/>
-                Kultstätte 58 UG<br/>
-                Körtestraße 38<br/>
-                10967 Berlin<br/>
-            </div>
-        </div>
-
+        </div> -->
     </div>
-</div>
 
-<div class="deko"> <img src="{% static "zm/img/copy.png" %}"></img> </div>
+    <div class="deko"> <img src="{% static "zm/img/copy.png" %}"></img> </div>
+
+</div>
 
 
 <script>
-    var map = L.map('map').setView([52.54, 13.435], 17);
+    var map = L.map('map', {"scrollWheelZoom": false}).setView([52.54, 13.435], 17);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
