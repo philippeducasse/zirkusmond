@@ -29,6 +29,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', views.plain),
+    url(r'^impressum.*', views.impressum),
+    url(r'.*robot.txt', views.robot),
     path('show/<int:show_id>', event_views.show, name='show'),
     path('reserve/<int:show_id>', event_views.reserve, name='reserve'),
     path('payment/<int:payment_id>', event_views.payment, name='payment'),

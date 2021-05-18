@@ -1,0 +1,9 @@
+{% extends "show.html" %}
+{% load static %}
+
+{% block title %}Zirkus Mond Reservation Status - {{ show.title }} {% endblock %}
+
+{% block show_details %}
+    <h1>Payment {{ payment.status }}</h1><!-- center -->
+    
+{% endblock %}

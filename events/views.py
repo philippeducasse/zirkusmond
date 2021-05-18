@@ -42,6 +42,8 @@ def reserve(request, show_id):
     if request.method == 'POST':
         rForm = ReservationForm(show, request.POST, prefix='res')
         pForm = PersonForm(request.POST, prefix='pers')
+        import pdb
+        # pdb.set_trace()
         try:
             gCount = int(rForm.data['res-attendee_count']) - 1
 
@@ -62,6 +64,7 @@ def reserve(request, show_id):
                             g.instance.event_reservation = r
                             g.save()
                         pass  # pay
+                        variant = request.POST['payment-method']
                         rP = ReservationPayment.from_reservation(r,
                                  variant='default',  # TODO
                                  customer_ip_address=request.META['REMOTE_ADDR'])
@@ -101,6 +104,14 @@ def payment(request, payment_id, payment_variant=None):
         return redirect(str(redirect_to))
     return TemplateResponse(request, 'payment.html',
                             {'form': form, 'payment': payment})
+
+
+def reservation_status(request, payment_id):
+    payment = get_object_or_404(ReservationPayment, id=payment_id)
+    show = payment.reservation.event.show
+    return TemplateResponse(request, 'reservation_status.html',
+                            {'payment': payment,
+                             'show': show})
 
 
 def payment_success(request, payment_id):

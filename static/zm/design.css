@@ -77,7 +77,10 @@ body {
 
 .section-outro {
     font-size: x-large;
-    padding: 3m important!;
+    padding: 1em;
+    margin: 2em;
+    background-color: #00000040;
+    border-radius: 32px;
 }
 
 .anfahrt {
@@ -85,20 +88,34 @@ body {
     line-height: 1.2
 }
 
+.social {
+}
+.social a {
+    text-decoration: none;
+}
+
 .office-contact {
     font-size: x-large;
     line-height: 1.2;
+    padding: 2em;
+}
+
+.last-blocks {
+    background-color: #00000040;
+    border-radius: 6px;
+    height: 100%;
     margin-top: 2em;
+    padding-top: 3em;
 }
 
 .contact {
-  text-align: center;
+/*  text-align: center;
   font-size: xx-large;
   font-weight: bold;
   color:  #f6ae42;
   font-family: 'Spirited Serif Regular', serif;
   line-height: 1.2;
-  margin-top: 2em;
+  margin-top: 2em;*/
 }
 
 .contact a {
@@ -125,19 +142,20 @@ a:link, a:visited, a:hover, a:active, input.button {
 
 a.button:link, a.button:visited, input.button {
     color: #f6ae42;
+    background-color: #00000000;
     border: #f6ae42;
     padding-left: 30px;
     border-style: double;
     padding-right: 30px;
     padding-top: 12px;
-    padding-bottom: 6px;
+    padding-bottom: 12px;
     font-size: xx-large;
     font-weight: bold;
     font-stretch: ultra-expanded;
     text-decoration: none
 }
 
-a.button:hover, a.button:active {
+a.button:hover, a.button:active, .button:hover {
     text-decoration: none
     color: #f6ae42;
     border: #f6ae42;
@@ -145,10 +163,12 @@ a.button:hover, a.button:active {
     border-style: double;
     padding-right: 30px;
     padding-top: 12px;
-    padding-bottom: 6px;
+    padding-bottom: 12px;
+    /* transition: all ease-in-out 28s; padding: 1300px; */
     font-size: xx-large;
     font-weight: bold;
     font-stretch: ultra-expanded;
+    background-color: #00000040;
 }
 
 .card {
@@ -206,7 +226,7 @@ a.card-link  {
 }
 
 #map {
-    height: 550px;
+    height: 700px;
 }
 
 .shadowed-content {
@@ -225,8 +245,8 @@ a.card-link  {
     color: white;
 }
 
-.ls-first-heading {
-    margin-top: 1.2em;
+.ls-first-heading h1 {
+ /*   margin-top: 1.2em; */
     transform: rotate(10deg);
 }
 
@@ -270,15 +290,44 @@ a.card-link  {
 }
 
 .ls-betterplace {
-    margin-top: 50px;
+    margin-top: 30px;
 
-    padding-top: 30px;
-    padding-bottom: 30px;
-    border: 2px solid;
+    padding-top: 20px;
+    padding-bottom: 20px;
+/*    border: 2px solid;
+    background-color: #00000040; */
 }
 
 .ls-betterplace h4 {
     color: white;
     text-align: left;
-    padding-left: 20px;
+    /*padding-left: 20px;*/
+}
+.ls-iban {
+    padding: 1em;
+    text-align: left;
+    margin: auto;
+    width: fit-content;
+}
+
+.form label {
+    display: block;
+} /* make labels appear above inputs */
+
+.form input, .form select {
+    width: 100%;
+}
+
+.col-padding, .row-padding {
+    padding-top: 1em;
+}
+
+.ticket-form {
+        /*border-right: 2px solid yellow;*/
+    }
+
+@media only screen and (min-width: 768px) {
+    .ticket-form {
+        border-right: 2px solid #E7B548;
+    }
 }
