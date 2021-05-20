@@ -2,3 +2,4 @@ django-markdownx
 markdown
 django-payments
 django-image-cropping
+easy_thumbnails
