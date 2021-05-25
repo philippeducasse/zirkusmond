@@ -1,4 +1,5 @@
 __pycache__/*
+*/*/__pycache__
 static/zm/node_modules/*
 */*__pycache__*
 *kate-swp
@@ -7,3 +8,4 @@ media/*
 events/migrations/*
 gallery/migrations/*
 test/*
+db.sqlite*
