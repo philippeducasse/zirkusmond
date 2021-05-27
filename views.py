@@ -51,7 +51,13 @@ def impressum(request):
     return render(request, 'impressum.html')
 
 
-def robot(request):
+def robots(request):
     ''' display impressum
     '''
-    return render(request, 'robot.txt')
+    return render(request, 'robots.txt')
+
+
+def sitemap(request):
+    ''' sitemap.xml
+    '''
+    return render(request, 'sitemap.xml')
