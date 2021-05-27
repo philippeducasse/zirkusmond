@@ -12,10 +12,17 @@
       name="viewport"
       content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
-    <meta name="description"    content="Zirkus Mond is a contemporary Circus, Theater and Venue{% block head_description %}{% endblock %}">
+    <meta name="description"    content="Zirkus Mond is a contemporary Circus, Theater and Venue. {% block head_description %}{% endblock %}">
+    <link rel="canonical" href="https://zirkusmond.de/">
+
     <meta name="keywords"       content="circus performing arts {% block head_keywords %}{% endblock %}">
     <link rel="shortcut icon" href="{% static "zm/img/logo.png" %}">
     <title>{% block title %}Zirkus Mond{% endblock %}</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Zirkus Mond" />
+    <meta property="og:url" content="https://zirkusmond.de" />
+    <meta property="og:image" content="https://zirkusmond.de/static/zm/img/zm_square.jpg" />
 
     {% endblock %}
     {% block head_js %}
