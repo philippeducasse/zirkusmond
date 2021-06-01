@@ -1,9 +1,11 @@
 import uuid
 
 from django.db import models
+from django.contrib import admin
+
 from markdownx.models import MarkdownxField
 from image_cropping import ImageRatioField
-
+from payments import PaymentError, PaymentStatus
 
 class Show(models.Model):  # maybe call it an event?
     ''' This is a show, with it's description, picture blablabla
@@ -15,12 +17,19 @@ class Show(models.Model):  # maybe call it an event?
     banner_link = models.ImageField()
     head_img = ImageRatioField('banner_link', '400x225')
 
+    last_modified = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.title
 
     def dates_text(self):
         # TODO
-        return "No Shows Possible"
+        return '/'.join(map(str, Event.objects.filter(show=self)))
+
+    def lastmod(self):
+        ''' lastmod string for sitemap
+        '''
+        return self.last_modified.strftime('%Y-%m-%d')
 
 
 class Event(models.Model):
@@ -28,8 +37,9 @@ class Event(models.Model):
         everything that people would come to
     """
     show = models.ForeignKey(Show, on_delete=models.SET_NULL, null=True)
-    begin = models.DateTimeField('einlass')
-    end = models.DateTimeField('schluss')
+    admission = models.DateTimeField('Admission')
+    begin = models.DateTimeField('Show Begins')
+    end = models.DateTimeField('schluss', null=True)
 
     # how many people can come
     reservation_capacity = models.PositiveIntegerField(default=150)
@@ -39,20 +49,25 @@ class Event(models.Model):
 
     def __str__(self):
         # return '%s at %s' % (self.show, self.begin.strftime('%D %H:%M'))
-        return self.begin.strftime('%d.%m.%y at %H:%M')
+        return self.admission.astimezone().strftime('%d.%m.%y at %H:%M')
+
+    def time_and_date(self):
+         return self.admission.astimezone().strftime('%d.%m.%y at %H:%M')
 
     def reservation_open(self) -> bool:
         ''' can you register, still open spots?
         '''
         if not self.open_for_reservation:
             return False
+        print('reservation_count: ', self.reservation_count())
+        if self.reservation_count() > self.reservation_capacity:
+            return False
 
-        # TODO how many people registered, free spaces?
         # TODO is the event in the future?
-        print('WARNING: '
-              + 'Reservations not counted '
-              + '[events.models.Event.reservation_open]')
         return True
+
+    def reservation_count(self):
+        return sum(map(lambda x: x.reservation.ticket_count(), ReservationPayment.objects.filter(reservation__event=self, status=PaymentStatus.CONFIRMED),))
 
 
 class Person(models.Model):
@@ -66,26 +81,44 @@ class Person(models.Model):
     email = models.EmailField(null=True, blank=True)
     phonenumber = models.CharField(max_length=25, null=True, blank=True)
 
+    @admin.display
+    def event(self):
+        r = Reservation.objects.filter(reservant=self)
+        if len(r) == 0:
+            r = Guest.objects.filter(id=self.id)
+            if len(r) == 0:
+                #import pdb
+                #pdb.set_trace()
+                return None
+            return r[0].event_reservation.event
+        return r[0].event
+
+    def __str__(self):
+        return '%s %s' % (self.firstname, self.surname)
 
 class Reservation(models.Model):
     ''' People have to register for an event and provide their data
     '''
     # https://docs.djangoproject.com/en/3.1/ref/models/fields/#primary-key
     # TODO
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
     # the person making the reservation
     reservant = models.ForeignKey(Person, on_delete=models.CASCADE)
 
-    def guest_count(self):
+    def guests(self):
+        return Guest.objects.filter(event_reservation=self)
+
+    @admin.display
+    def ticket_count(self):
         ''' for how many people do we reserve?
         '''
-        return 3  # TODO TODO TODO
+        return len(Guest.objects.filter(event_reservation=self)) + 1
 
     # notizen, nachricht an uns
-    # def __str__(self):
-    #     return 'Reg %s, %s for %s' % (
-    #         self.surname, self.firstname, self.event)
+    def __str__(self):
+        return 'Reg %s, %s, %s Tickets for %s' % (
+            self.reservant.surname, self.reservant.firstname, self.ticket_count(), self.event)
 
 
 class Guest(Person):
@@ -103,8 +136,7 @@ from payments.models import BasePayment
 
 
 class ReservationPayment(BasePayment):
-    # TODO
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reservation = models.ForeignKey(Reservation, null=True,
                                     on_delete=models.SET_NULL)
 
@@ -117,16 +149,16 @@ class ReservationPayment(BasePayment):
     def get_purchased_items(self):
         ''' yield a list of PurchasedItems
         '''
-        yield PurchasedItem(name=str(self.reservation.event),
+        yield PurchasedItem(name=self.reservation.event.show.title + str(self.reservation.event),
                             sku=self.reservation.event.pk,
-                            quantity=self.reservation.guest_count(),
+                            quantity=self.reservation.ticket_count(),
                             price=self.reservation.event.reservation_price,
                             currency='EUR')
 
     def from_reservation(reservation: Reservation, *args, **kwargs):
         self = ReservationPayment(*args, **kwargs)
         import pdb
-        pdb.set_trace()
+        #pdb.set_trace()
         self.reservation = reservation
         r = reservation.reservant
         self.billing_first_name = r.firstname
@@ -136,8 +168,7 @@ class ReservationPayment(BasePayment):
         self.billing_city = r.town
         self.billing_email = r.email
         self.description = 'Reservations for %s' % reservation.event
-        self.total = self.reservation.guest_count() * self.reservation.event.reservation_price
+        self.total = self.reservation.ticket_count() * self.reservation.event.reservation_price
         self.currency = 'EUR'
 
         return self
-        # customer_ip_address

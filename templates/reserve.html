@@ -1,7 +1,7 @@
 {% extends "show.html" %}
 {% load static %}
 
-{% block title %}Zirkus Mond Reservierung - {{ show.title }}{% endblock %}
+{% block title %}Zirkus Mond Reservation - {{ show.title }}{% endblock %}
 
 {% block show_details %}
 
@@ -17,11 +17,12 @@
                     <h3>Tickets</h3>
                     {{ rForm.event.label_tag }}
                     {{ rForm.event }}
+                    {{ rForm.event.error}}
 
                     {{ rForm.attendee_count.label_tag }}
                     {{ rForm.attendee_count }}
 
-                    Reservierung kostet 5Eur pro Platz, Eintritt wird an der Abendkasse bezahlt.
+                    Reservation costs 5Eur per Ticket, additional 10Eur entrance fee will be payed at the box office.
 
             </div>
 
@@ -78,6 +79,19 @@
             {% endif %}
 
             <div class="row row-padding">
+                <div style="background-color: #FFFFFF30;margin: 0.3em;">
+                    <input type="checkbox" name="res-covid_stuff" required="" id="id_res-covid_stuff" style="
+                        margin: 0;
+                        vertical-align: baseline;
+                        display:  inline;
+                        width: fit-content;
+                        vertical-align: center;
+                        margin-top: 0.4em;
+                        margin-right: 1em;">
+                    I hereby acknowledge that my Guests and I can only attend with an official negative Test, Vaccination or Recovery Attest.
+            </div></div>
+
+            <div class="row row-padding">
                 <h3>Pay with</h3>
             </div>
             <div class="row mb-3">
@@ -86,13 +100,6 @@
                 </div>
                 <div class="col col-padding">
                     <input type="submit" style="width: 100%;" class="button" id="paypal" name="payment-method" value="paypal">
-                </div>
-                <div class="col col-padding">
-                    <input type="submit" style="width: 100%;" class="button" id="coinbase" name="payment-method" value="coinbase">
-                </div>
-
-                <div class="col col-padding">
-                    <input type="submit" style="width: 100%;" class="button" id="test" name="payment-method" value="default">
                 </div>
             </div>
 

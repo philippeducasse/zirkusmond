@@ -34,10 +34,11 @@ urlpatterns = [
     path('sitemap.xml', views.sitemap),
     path('show/<int:show_id>', event_views.show, name='show'),
     path('reserve/<int:show_id>', event_views.reserve, name='reserve'),
-    path('payment/<int:payment_id>', event_views.payment, name='payment'),
-    path('payment-success/<int:payment_id>', event_views.payment_success),
-    path('payment-failure/<int:payment_id>', event_views.payment_fail),
-    path('payment/<int:payment_id>/<str:payment_variant>', event_views.payment,
+    path('reservation_status/<uuid:payment_id>', event_views.reservation_status),
+    path('payment/<uuid:payment_id>', event_views.payment, name='payment'),
+    path('payment-success/<uuid:payment_id>', event_views.payment_success),
+    path('payment-failure/<uuid:payment_id>', event_views.payment_fail),
+    path('payment/<uuid:payment_id>/<str:payment_variant>', event_views.payment,
          name='payment'),
     # TODO Opps response for payment
 

@@ -1,0 +1,11 @@
+{% extends "html_design.html" %}
+{% load static %}
+
+{% block content %}
+    <h2>Sorry - Payment failed</h2>
+
+    <div><a href="/reserve/{{payment.reservation.event.show.id}}">Try again?</a></div>
+    <p>If you think this has been a mistake on our side, write a mail to 
+    <a href="mailto:reservation@zirkusmond.de?subject=Payment error for {{payment.id}}">reservation@zirkusmond.de</a> and mention your ID: <span style="background-color: #00000030">{{payment.id}}</span></p>
+    <p>Hope to see you soon</p>
+{% endblock %}
