@@ -71,4 +71,6 @@ def robots(request):
 def sitemap(request):
     ''' sitemap.xml
     '''
-    return render(request, 'sitemap.xml')
+    shows = Show.objects.all()
+    return render(request, 'sitemap.xml',
+                  {'shows': shows})

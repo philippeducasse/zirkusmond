@@ -3,6 +3,8 @@ from .models import Show, Event, Reservation, Guest
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
+from django.core.mail import send_mail
+
 from .forms import ReservationForm, PersonForm, GuestForm
 from django.forms import formset_factory
 
@@ -11,7 +13,12 @@ from django.template.response import TemplateResponse
 from payments import get_payment_model, RedirectNeeded
 from .models import ReservationPayment
 
-# Create your views here.
+
+def _get_ip(request):
+    ''' fetches the user ip
+    '''
+    key = 'HTTP_X_REAL_IP' if 'HTTP_X_REAL_IP' in request.META.keys() else 'REMOTE_ADDR'
+    return request.META[key]
 
 
 def show(request, show_id):
@@ -66,8 +73,8 @@ def reserve(request, show_id):
                         pass  # pay
                         variant = request.POST['payment-method']
                         rP = ReservationPayment.from_reservation(r,
-                                 variant='default',  # TODO
-                                 customer_ip_address=request.META['REMOTE_ADDR'])
+                                 variant=variant,
+                                 customer_ip_address=_get_ip(request))
                         rP.save()
                         return redirect('/payment/%s' % rP.pk)
             else:
@@ -109,18 +116,65 @@ def payment(request, payment_id, payment_variant=None):
 def reservation_status(request, payment_id):
     payment = get_object_or_404(ReservationPayment, id=payment_id)
     show = payment.reservation.event.show
+    
     return TemplateResponse(request, 'reservation_status.html',
                             {'payment': payment,
                              'show': show})
 
 
 def payment_success(request, payment_id):
+    payment = get_object_or_404(ReservationPayment, id=payment_id)
+    show = payment.reservation.event.show
+    p = payment.reservation.reservant
+    if payment.status == 'confirmed':
+        attendants = '%s %s\n%s %s %s\n%s %s'% (
+                            p.firstname, p.surname,
+                            p.street, p.zipcode, p.town,
+                            p.email, p.phonenumber)
+        for a in payment.reservation.guests():
+            attendants += '\n%s %s\n%s %s %s\n%s %s' % (
+                a.firstname, a.surname,
+                a.street, a.zipcode, a.town,
+                a.email, a.phonenumber)
+        s_title = payment.reservation.event.time_and_date()
+
+        send_mail(
+                            'Thank you for your Reservation for %s' % show.title,
+"""Dear %s,
+
+thank you for your reservation to %s!
+
+You have booked your visit for %s with the following personal information:
+%s
+
+We open our gates at %s, the Show will start at %s.
+
+Please note the following:
+- Be on time, make sure that you have a valid Covid-19 test (24h fresh) or confirmation that you are fully vaccinated.
+- Also please remember that we dont have a box office for later registration and due to the Covid-19 rules of Berlin we can’t let in more than 150 people. So tell your friends that they have to register through this form!
+
+See you at Zirkus Mond and have fun.
+ <3
+ """ % ( #  - On the site you are allowed to wander freely around but please remember to wear your mask at all times when distance to others can not be garanteed
+        p.firstname,
+        show.title,
+        s_title,
+        attendants,
+        payment.reservation.event.admission.astimezone().strftime('%H:%M'),
+        payment.reservation.event.begin.astimezone().strftime('%H:%M')),
+            'reservation@zirkusmond.de',
+            [p.email])
+    return redirect('/reservation_status/%s' % payment.id)
+    return TemplateResponse(request, 'reservation_status.html',
+                            {'payment': payment,
+                             'show': show})
     return HttpResponse('Successfully payed %s' % payment_id)
 
 
 def payment_fail(request, payment_id):
     p = get_object_or_404(ReservationPayment, id=payment_id)
-    return HttpResponse('Failed to pay %s, status: %s' % (payment_id, p.status))
+    return TemplateResponse(request, 'payment_failure.html',
+                            {'payment': p})
 
 # class CreateReservationView(CreateView):
 #     ''' make a reservation for a show

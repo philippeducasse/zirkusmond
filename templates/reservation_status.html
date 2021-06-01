@@ -1,9 +1,17 @@
 {% extends "show.html" %}
 {% load static %}
 
-{% block title %}Zirkus Mond Reservation Status - {{ show.title }} {% endblock %}
 
 {% block show_details %}
-    <h1>Payment {{ payment.status }}</h1><!-- center -->
-    
+    <div style="color: white;">
+        <h2>Thank you for your reservation</h2><!-- center -->
+        <div style="margin-top:1em;">
+            <p>A Mail has been sent to {{ payment.reservation.reservant.email }}, We Are looking forward to seeing 
+                you!
+            </p>
+            <p>Please remember to bring your official Corona-Test document, Vaccination- or Recovery Attest and remind your friends to do so too.</p>
+            <p>We open our gates at {{payment.reservation.event.admission}}, the Show will start at 
+                {{payment.reservation.event.begin}}.</p>
+        </div>
+    </div>
 {% endblock %}

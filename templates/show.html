@@ -4,17 +4,17 @@
 
 {% block title %}Zirkus Mond - {{ show.title }}{% endblock %}
 
-{% block content %}
+{% block content-header %}
         <img src="{{ MEDIA_URL }}{{ show.banner_link }}"
-            style="width:100%;"></img>
+            style="width:100%; margin-bottom: 1.5em;"></img>
+{% endblock %}
 
-        <div>
-            <h1>{{ show.title }}</h1>
-        </div>
-        <div>
+{% block content %}
+        <div style="margin-top: 2em;">
             {% block show_details %}
-                {{ show.description | markdown | safe}}
-
+                <div style="color: white;">
+                    {{ show.description | markdown | safe}}
+                </div>
                 <div style="margin-top:2em;">
                 <a class="button" href="/reserve/{{show.pk}}">Zur Reservierung</a>
                 </div>

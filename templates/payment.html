@@ -2,9 +2,13 @@
 {% load static %}
 
 {% block content %}
+    {% if form.variant == 'klarna' %}
+        {% autoescape off %} {{ form.inner_html }} {% endautoescape %}
+    {% else %}
     <form action="{{ form.action }}" method="{{ form.method }}">
         {% csrf_token %}
         {{ form.as_p }}
         <p><input type="submit" value="Proceed" /></p>
     </form>
+    {% endif %}
 {% endblock %}
