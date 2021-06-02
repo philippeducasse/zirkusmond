@@ -2,9 +2,22 @@
 {% load cropping %}
 
 
-<!--
-
 <div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"></img> </div>
+{% for show in upcoming_shows %}
+    <a href="/show/{{ show.id }}">
+        <div class="col-md4">
+            <div class="card">
+                <img class="card-img-top ratio ratio-16x9" src="/media/{{ show.banner_link}}" />
+                <div class="card-body">
+                    <h3 class="card-title">{{ show.title }}</h3>
+                    <p class="card-text">{{ show.dates_text }}</p>
+                </div>
+            </div>
+        </div>
+    </a>
+{% endfor %}
+
+<!--
 
 <div class="container ">
     <div class="row row-cols-md-1 row-cols-lg-3 g-3">
