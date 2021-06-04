@@ -51,9 +51,11 @@ class Event(models.Model):
         # return '%s at %s' % (self.show, self.begin.strftime('%D %H:%M'))
         return self.admission.astimezone().strftime('%d.%m.%y at %H:%M')
 
+    @admin.display
     def time_and_date(self):
          return self.admission.astimezone().strftime('%d.%m.%y at %H:%M')
 
+    @admin.display(boolean=True)
     def reservation_open(self) -> bool:
         ''' can you register, still open spots?
         '''
@@ -66,6 +68,7 @@ class Event(models.Model):
         # TODO is the event in the future?
         return True
 
+    @admin.display
     def reservation_count(self):
         return sum(map(lambda x: x.reservation.ticket_count(), ReservationPayment.objects.filter(reservation__event=self, status=PaymentStatus.CONFIRMED),))
 
@@ -172,3 +175,7 @@ class ReservationPayment(BasePayment):
         self.currency = 'EUR'
 
         return self
+
+    @admin.display
+    def ticket_count(self):
+        return self.reservation.ticket_count()
