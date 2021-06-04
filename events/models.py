@@ -31,6 +31,13 @@ class Show(models.Model):  # maybe call it an event?
         '''
         return self.last_modified.strftime('%Y-%m-%d')
 
+    @admin.display
+    def reserved_tickets(self):
+        events = Event.objects.filter(show=self)
+        available = sum(map(lambda x: x.reservation_capacity, events))
+        reserved = sum(map(lambda x: x.reservation_count(), events))
+        return f'{reserved}/{available}'
+
 
 class Event(models.Model):
     """ An event

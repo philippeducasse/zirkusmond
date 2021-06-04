@@ -33,6 +33,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ['show', 'begin', 'time_and_date',
                     'reservation_capacity', 'open_for_reservation',
                     'reservation_open', 'reservation_count']
+    # list_filter = ('show',)
 
 #class InlineCheckin(admin.StackedInline):
 #    model = Checkin
@@ -45,6 +46,13 @@ class PersonAdmin(admin.ModelAdmin):
     search_fields = ['surname', 'firstname', 'email', 'phonenumber']
  #   inlines = [InlineCheckin]
 
+class InlineGuest(admin.StackedInline):
+    model = Guest
+    extra = 0
+
+class InlinePerson(admin.StackedInline):
+    model = Person
+    extra = 0
 
 class ReservationPaymentAdmin(admin.ModelAdmin):
     list_display = [
@@ -56,10 +64,16 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
     list_filter = ('status',) # EventFilter)
     search_fields = ['reservation__reservant__firstname', 'reservation__reservant__surname']
 
+class ReservationAdmin(admin.ModelAdmin):
+    # inlines = (InlinePerson, InlineGuest,)
+    inlines = (InlineGuest,)
 
-admin.site.register(Show, MarkdownxModelAdmin)
+class ShowAdmin(MarkdownxModelAdmin):
+    list_display = ['title', 'dates_text', 'reserved_tickets']
+
+admin.site.register(Show, ShowAdmin)
 admin.site.register(Event, EventAdmin)
-admin.site.register(Reservation)
+admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(ReservationPayment, ReservationPaymentAdmin)
 admin.site.register(Guest)
 admin.site.register(Person, PersonAdmin)
