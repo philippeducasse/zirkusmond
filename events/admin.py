@@ -22,18 +22,17 @@ class EventFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         '''
         '''
-        print(queryset)
-        l = []
-        for i in queryset:
-            if i.event() == self.value():
-                l.append(i)
-        #return l
-        #return queryset
         return queryset.filter(
             Q(reservation__event=self.value()) |
             Q(guest__event_reservation__event=self.value()))
-        return queryset.filter(reservation__event=self.value()) + queryset.filter(guest__event_reservation__event=self.value())
 
+
+class EventAdmin(admin.ModelAdmin):
+    '''
+    '''
+    list_display = ['show', 'begin', 'time_and_date',
+                    'reservation_capacity', 'open_for_reservation',
+                    'reservation_open', 'reservation_count']
 
 #class InlineCheckin(admin.StackedInline):
 #    model = Checkin
@@ -47,9 +46,20 @@ class PersonAdmin(admin.ModelAdmin):
  #   inlines = [InlineCheckin]
 
 
+class ReservationPaymentAdmin(admin.ModelAdmin):
+    list_display = [
+        'reservation',
+        'status',
+        'ticket_count',
+                    #'reservation__reservant__firstname', 'reservation__reservant__surname',
+                    ]
+    list_filter = ('status',) # EventFilter)
+    search_fields = ['reservation__reservant__firstname', 'reservation__reservant__surname']
+
+
 admin.site.register(Show, MarkdownxModelAdmin)
-admin.site.register(Event)
+admin.site.register(Event, EventAdmin)
 admin.site.register(Reservation)
-admin.site.register(ReservationPayment)
+admin.site.register(ReservationPayment, ReservationPaymentAdmin)
 admin.site.register(Guest)
 admin.site.register(Person, PersonAdmin)
