@@ -64,6 +64,12 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
     list_filter = ('status',) # EventFilter)
     search_fields = ['reservation__reservant__firstname', 'reservation__reservant__surname']
 
+    actions = ['resend_confirmation_mail']
+    @admin.action(description='Resend confirmation E-Mail')
+    def resend_confirmation_mail(self, request, queryset):
+        for i in queryset:
+            i.reservation.send_confirmation_mail()
+
 class ReservationAdmin(admin.ModelAdmin):
     # inlines = (InlinePerson, InlineGuest,)
     inlines = (InlineGuest,)
