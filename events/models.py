@@ -7,6 +7,8 @@ from markdownx.models import MarkdownxField
 from image_cropping import ImageRatioField
 from payments import PaymentError, PaymentStatus
 
+from django.core.mail import send_mail
+
 class Show(models.Model):  # maybe call it an event?
     ''' This is a show, with it's description, picture blablabla
         every showing of this show is an Event
@@ -110,7 +112,6 @@ class Reservation(models.Model):
     ''' People have to register for an event and provide their data
     '''
     # https://docs.djangoproject.com/en/3.1/ref/models/fields/#primary-key
-    # TODO
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
     # the person making the reservation
@@ -129,6 +130,47 @@ class Reservation(models.Model):
     def __str__(self):
         return 'Reg %s, %s, %s Tickets for %s' % (
             self.reservant.surname, self.reservant.firstname, self.ticket_count(), self.event)
+
+    def send_confirmation_mail(self):
+        p = self.reservant
+        show = self.event.show
+        attendants = '\n%s %s\n%s %s %s\n%s %s'% (
+                        p.firstname, p.surname,
+                        p.street, p.zipcode, p.town,
+                        p.email, p.phonenumber)
+        for a in self.guests():
+            attendants += '\n\n%s %s\n%s %s %s\n%s %s' % (
+                a.firstname, a.surname,
+                a.street, a.zipcode, a.town,
+                a.email, a.phonenumber)
+        s_title = self.event.time_and_date()
+
+        send_mail(
+                            'Thank you for your Reservation for %s' % show.title,
+"""Dear %s,
+
+thank you for your reservation to %s!
+
+You have booked your visit for %s with the following personal information:
+%s
+
+We open our gates at %s, the Show will start at %s.
+
+Please note the following:
+- Be on time, make sure that you have a valid Covid-19 test (24h fresh) or confirmation that you are fully vaccinated.
+- Also please remember that we dont have a box office for later registration and due to the Covid-19 rules of Berlin we can’t let in more than 150 people. So tell your friends that they have to register through this form!
+
+See you at Zirkus Mond and have fun.
+ <3
+ """ % ( #  - On the site you are allowed to wander freely around but please remember to wear your mask at all times when distance to others can not be garanteed
+        p.firstname,
+        show.title,
+        s_title,
+        attendants,
+        self.event.admission.astimezone().strftime('%H:%M'),
+        self.event.begin.astimezone().strftime('%H:%M')),
+            'reservation@zirkusmond.de',
+            [p.email])
 
 
 class Guest(Person):

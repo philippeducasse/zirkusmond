@@ -67,6 +67,13 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
 class ReservationAdmin(admin.ModelAdmin):
     # inlines = (InlinePerson, InlineGuest,)
     inlines = (InlineGuest,)
+    actions = ['resend_confirmation_mail']
+    search_fields = ['reservant__firstname', 'reservant__surname']
+
+    @admin.action(description='Resend Reservation confirmation mail')
+    def resend_confirmation_mail(self, request, queryset):
+        for i in queryset:
+            i.send_confirmation_mail()
 
 class ShowAdmin(MarkdownxModelAdmin):
     list_display = ['title', 'dates_text', 'reserved_tickets']
