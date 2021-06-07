@@ -63,7 +63,9 @@
                                                 <div class="err_msg">
 
                                                     {% for err in attr.errors %}
+                                                    <div class="err_msg">
                                                         {{ err }}
+                                                    </div>
                                                     {% endfor %}
                                                 </div>
                                             </div>
@@ -79,14 +81,14 @@
 
             <div class="row row-padding">
                 <div style="background-color: #FFFFFF30;margin: 0.3em;">
-                    <input type="checkbox" name="res-covid_stuff" required="" id="id_res-covid_stuff" style="
+                    <input type="checkbox" name="res-covid_stuff" required id="id_res-covid_stuff" style="
                         margin: 0;
                         vertical-align: baseline;
                         display:  inline;
                         width: fit-content;
                         vertical-align: center;
                         margin-top: 0.4em;
-                        margin-right: 1em;">
+                        margin-right: 1em;" {% if rForm.covid_stuff.value %} checked {% endif %}">
                     I hereby acknowledge that my Guests and I can only attend with an official negative Test, Vaccination or Recovery Attest.
             </div></div>
 

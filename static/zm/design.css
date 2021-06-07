@@ -331,3 +331,8 @@ a.card-link  {
         border-right: 2px solid #E7B548;
     }
 }
+
+.err_msg {
+    color: #ff4b1e;
+    font-weight: bold;
+}

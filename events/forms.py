@@ -53,8 +53,9 @@ class GuestForm(ModelForm):
     '''
     class Meta:
         model = Guest
-        fields = ['firstname', 'surname', 'street', 'zipcode',
-                  'town', 'email', 'phonenumber']
+        name_address_fields = ['firstname', 'surname',
+                               'street', 'zipcode', 'town']
+        fields = name_address_fields + ['email', 'phonenumber']
 
     def line_tuples(self):
         return ((self['firstname'], self['surname']),
@@ -64,9 +65,15 @@ class GuestForm(ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        for f in self.Meta.fields:
+        for f in self.Meta.name_address_fields:
             if f not in cleaned_data.keys():
                 self.add_error(f, 'Missing')
             else:
                 if cleaned_data[f] == None or cleaned_data[f] == '':
                     self.add_error(f, 'Not Set')
+
+        if (('email' not in cleaned_data.keys() and
+             'phonenumber' not in cleaned_data.keys()) or
+            ((cleaned_data['email'] == None or cleaned_data['email'] == '') and
+             (cleaned_data['phonenumber'] is None or cleaned_data['phonenumber'] ==''))):
+            self.add_error('email', 'We need an Email or phonenumber')
