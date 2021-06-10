@@ -1,8 +1,14 @@
 from django.contrib import admin
 from markdownx.admin import MarkdownxModelAdmin
 from .models import Show, Event, Person, Guest, Reservation, ReservationPayment
+from payments import PaymentStatus
+from django.http import HttpResponse
 
 from django.db.models import Q
+
+
+from io import BytesIO
+import xlsxwriter
 
 
 class EventFilter(admin.SimpleListFilter):
@@ -33,7 +39,59 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ['show', 'begin', 'time_and_date',
                     'reservation_capacity', 'open_for_reservation',
                     'reservation_open', 'reservation_count']
-    # list_filter = ('show',)
+    actions = ['print_reservations']
+
+
+    @admin.action(description='Print Reservation List')
+    def print_reservations(self, request, queryset):
+        for event in queryset:
+            rPs = ReservationPayment.objects.filter(reservation__event=event, status=PaymentStatus.CONFIRMED).order_by('reservation__reservant__firstname')
+            reservations = map(lambda x: x.reservation, rPs)
+
+            output = BytesIO()
+            workbook = xlsxwriter.Workbook(output)
+            worksheet = workbook.add_worksheet()
+            worksheet.set_landscape()
+            worksheet.set_paper(0) # A4
+            worksheet.set_column(0, 5, 15)
+            # worksheet.set_column(4, 5, 5)
+
+            # Add a bold format to use to highlight cells.
+            bold = workbook.add_format({'bold': True, 'border': 1})
+            border = workbook.add_format({'border': 1})
+            # Add a number format for cells with money.
+            money = workbook.add_format({'num_format': '$#,##0'})
+
+
+            columns = ['firstname', 'surname', 'address', 'phone', 'email', 'newsletter']
+            def add_row(worksheet, row, person):
+                worksheet.write_row(row, 0,
+                    [person.firstname, person.surname, person.street, person.phonenumber, person.email],
+                    border)
+
+            worksheet.write_row(0, 0, columns, bold)
+            row = 1
+            for reservation in reservations:
+                reservant = reservation.reservant
+                print(reservation, type(reservation))
+                add_row(worksheet, row, reservation.reservant)
+                worksheet.write(row, 0, reservant.firstname, bold)
+
+                row += 1
+
+                for guest in Guest.objects.filter(event_reservation=reservation):
+                    add_row(worksheet, row, guest)
+                    row += 1
+
+            workbook.close()
+            xlsx_data = output.getvalue()
+
+            response = HttpResponse(
+                #headers={'Content_Disposition: inline; filename="myfile.txt"'},
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response.write(xlsx_data)
+            return response
+
 
 #class InlineCheckin(admin.StackedInline):
 #    model = Checkin
