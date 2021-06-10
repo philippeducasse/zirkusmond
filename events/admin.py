@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models.functions import Lower
 from markdownx.admin import MarkdownxModelAdmin
 from .models import Show, Event, Person, Guest, Reservation, ReservationPayment
 from payments import PaymentStatus
@@ -45,7 +46,7 @@ class EventAdmin(admin.ModelAdmin):
     @admin.action(description='Print Reservation List')
     def print_reservations(self, request, queryset):
         for event in queryset:
-            rPs = ReservationPayment.objects.filter(reservation__event=event, status=PaymentStatus.CONFIRMED).order_by('reservation__reservant__firstname')
+            rPs = ReservationPayment.objects.filter(reservation__event=event, status=PaymentStatus.CONFIRMED).order_by(Lower('reservation__reservant__firstname'))
             reservations = map(lambda x: x.reservation, rPs)
 
             output = BytesIO()
