@@ -3,3 +3,6 @@ markdown
 django-payments
 django-image-cropping
 easy_thumbnails
+jupyter_nbextensions_configurator
+django_extensions
+xlsxwriter
