@@ -71,6 +71,7 @@ class EventAdmin(admin.ModelAdmin):
                     border)
 
             worksheet.write_row(0, 0, columns, bold)
+            worksheet.repeat_rows(0)
             row = 1
             for reservation in reservations:
                 reservant = reservation.reservant
