@@ -17,8 +17,12 @@
                     <h3>Tickets</h3>
                     {{ rForm.event.label_tag }}
                     {{ rForm.event }}
-                    {{ rForm.event.error}}
-
+                    <div class="err_msg">
+                    {% for err in rForm.event.errors %}
+                        {{ err }}
+                    {% endfor %}
+                    </div>
+                    
                     {{ rForm.attendee_count.label_tag }}
                     {{ rForm.attendee_count }}
 
