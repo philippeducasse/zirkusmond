@@ -1,6 +1,8 @@
 from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, BooleanField
 from .models import Person, Event, Show, Guest
 
+from django.core.exceptions import ValidationError
+
 
 class ReservationForm(Form):
     '''
@@ -22,6 +24,7 @@ class ReservationForm(Form):
         if not cleaned_data['covid_stuff']:
             self.add_error('covid_stuff', 'You will have to be tested/vaccinated for the event')
         if not cleaned_data['event'].reservation_open():
+            self.add_error('event', 'Sorry, Reservation for this Event is closed')
             raise ValidationError("Registration is closed, sorry :(")
 
 
