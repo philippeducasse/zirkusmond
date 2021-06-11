@@ -1,6 +1,25 @@
-from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, BooleanField
+from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, BooleanField, Select
 from .models import Person, Event, Show, Guest
 
+
+class EventSelect(Select):
+    disabled_choices = []
+
+    def render_option(self, name, value, attrs, renderer):
+        print(type(self), self)
+        print(name)
+        print(attrs)
+        print(type(renderer), renderer)
+        if value in self.disabled_choices:
+            attrs.update({'disabled':' disabled'})
+        print(attrs)
+        import pdb
+        pdb.set_trace()
+        return super().render_option(name, value, attrs, renderer)
+
+class EventModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f'{obj}' if obj.reservation_open() else f'RESERVATION CLOSED - {obj}'
 
 class ReservationForm(Form):
     '''
@@ -12,9 +31,12 @@ class ReservationForm(Form):
 
     def __init__(self, show: Show, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['event'] = ModelChoiceField(
-            Event.objects.filter(
-                show=show.pk))
+        choices = Event.objects.filter(show=show.pk)
+        self.fields['event'] = EventModelChoiceField(choices)
+        #for i in choices:
+        #    if not i.reservation_open():
+        #        self.fields['event'].disabled_choices.append(str(i))
+
 
     def clean(self):
         cleaned_data = super().clean()
