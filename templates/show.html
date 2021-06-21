@@ -1,8 +1,25 @@
 {% extends "html_design.html" %}
 {% load static %}
 {% load markdown %}
+{% load cropping %}
 
 {% block title %}Zirkus Mond - {{ show.title }}{% endblock %}
+{% block head_description %}{{show.description|truncatechars:254}}{% endblock %}
+{% block structured_data %}
+{% for event in show.events %}
+{
+    "@context": "https://schema.org/",
+    "@type": "event",
+    "name": "{{ show.title }}",
+    "description": "{{ show.description|escapejs }}",
+    "image": "{% cropped_thumbnail show "head_img" %}",
+    "doorTime": "{{ show.admission_time }}",
+    "startDate": "{{ event.begin.isoformat }}",
+    "location": {"name": "Zirkus Mond", "address": "Lilie-Henoch Str",
+                    "geo": {"@type": "GeoCoordinates","latitude": 52.54224, "longitude": 13.4326655}}
+},
+{% endfor %}
+{% endblock %}
 
 {% block content-header %}
         <img src="{{ MEDIA_URL }}{{ show.banner_link }}"
