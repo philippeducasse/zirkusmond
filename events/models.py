@@ -21,12 +21,15 @@ class Show(models.Model):  # maybe call it an event?
 
     last_modified = models.DateTimeField(auto_now=True)
 
+    def events(self):
+        return Event.objects.filter(show=self)
+
     def __str__(self):
         return self.title
 
     def dates_text(self):
         # TODO
-        return '/'.join(map(str, Event.objects.filter(show=self)))
+        return '/'.join(map(str, self.events()))
 
     def lastmod(self):
         ''' lastmod string for sitemap
@@ -63,6 +66,9 @@ class Event(models.Model):
     @admin.display
     def time_and_date(self):
          return self.admission.astimezone().strftime('%d.%m.%y at %H:%M')
+
+    def admission_time(self):
+        return self.admission.astimezone().strftime('%H:%M')
 
     @admin.display(boolean=True)
     def reservation_open(self) -> bool:
