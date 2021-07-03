@@ -83,7 +83,11 @@ def reserve(request, show_id):
         print(type(show), show)
         rForm = ReservationForm(show, prefix='res')
         pForm = PersonForm(prefix='pers')
-        dgForms = None  # GuestFormSet(prefix='gues')
+        GuestFormSet = formset_factory(GuestForm, max_num=0,
+                                           extra=0, min_num=0,
+                                           validate_min=True)
+
+        dgForms = GuestFormSet(prefix='gues')
 
     return render(request, 'reserve.html',
                   {'show': show,
