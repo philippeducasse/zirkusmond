@@ -23,6 +23,7 @@ def plain(request):
     ''' Give em our index, without doing much
     '''
     us = Show.objects.all()
+    us = reversed(us)
     v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
                 ip=_get_ip(request),
                 referer=_get_referer(request),
