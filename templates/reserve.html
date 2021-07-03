@@ -38,7 +38,11 @@
                                 {{attr.label_tag}}
                                 {{attr}}
 
-                                <div class="err_msg"></div>
+                                {% for err in attr.errors %}
+                                <div class="err_msg">
+                                    {{ err }}
+                                </div>
+                                {% endfor %}
                             </div>
                         {% endfor %}
                     </div>
