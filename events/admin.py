@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models.functions import Lower
 from markdownx.admin import MarkdownxModelAdmin
-from .models import Show, Event, Person, Guest, Reservation, ReservationPayment
+from .models import Show, Event, Person, Guest, Reservation, ReservationPayment, NewsletterEmail
 from payments import PaymentStatus
 from django.http import HttpResponse
 
@@ -150,3 +150,4 @@ admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(ReservationPayment, ReservationPaymentAdmin)
 admin.site.register(Guest)
 admin.site.register(Person, PersonAdmin)
+admin.site.register(NewsletterEmail)

@@ -1,5 +1,5 @@
 # from django.shortcuts import render
-from .models import Show, Event, Reservation, Guest
+from .models import Show, Event, Reservation, Guest, NewsletterEmail
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -44,11 +44,14 @@ def reserve(request, show_id):
     ''' reserve stuff for show
     '''
     show = get_object_or_404(Show, pk=show_id)
+    newsletter = False
     if request.method == 'POST':
         rForm = ReservationForm(show, request.POST, prefix='res')
         pForm = PersonForm(request.POST, prefix='pers')
         import pdb
         # pdb.set_trace()
+        if 'newsletter' in request.POST:
+            newsletter = request.POST['newsletter'] # == 'on'
         try:
             gCount = int(rForm.data['res-attendee_count']) - 1
 
@@ -68,6 +71,11 @@ def reserve(request, show_id):
                             g.event_reservation_id = r.pk
                             g.instance.event_reservation = r
                             g.save()
+
+                        if newsletter:
+                            n = NewsletterEmail(email=p.email)
+                            n.save()
+
                         pass  # pay
                         variant = request.POST['payment-method']
                         rP = ReservationPayment.from_reservation(r,
@@ -93,7 +101,8 @@ def reserve(request, show_id):
                   {'show': show,
                    'rForm': rForm,
                    'pForm': pForm,
-                   'gForms': dgForms
+                   'gForms': dgForms,
+                   'newsletter': newsletter,
                    })
 
 
