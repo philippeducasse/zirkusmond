@@ -234,3 +234,9 @@ class ReservationPayment(BasePayment):
     @admin.display
     def ticket_count(self):
         return self.reservation.ticket_count()
+
+
+class NewsletterEmail(models.Model):
+    ''' Save E-Mails of people
+    '''
+    email = models.EmailField()
