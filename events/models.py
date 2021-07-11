@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.contrib import admin
+from django.utils import timezone
 
 from markdownx.models import MarkdownxField
 from image_cropping import ImageRatioField
@@ -43,6 +44,11 @@ class Show(models.Model):  # maybe call it an event?
         reserved = sum(map(lambda x: x.reservation_count(), events))
         return f'{reserved}/{available}'
 
+    @admin.display(boolean=True)
+    def reservation_open(self) -> bool:
+        print(list(map(lambda x: x.reservation_open, self.events())))
+        return any(list(map(lambda x: x.reservation_open(), self.events())))
+
 
 class Event(models.Model):
     """ An event
@@ -80,7 +86,9 @@ class Event(models.Model):
         if self.reservation_count() > self.reservation_capacity:
             return False
 
-        # TODO is the event in the future?
+        if timezone.now() > self.begin:
+            return False
+
         return True
 
     @admin.display
