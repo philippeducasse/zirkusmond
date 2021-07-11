@@ -142,7 +142,7 @@ class ReservationAdmin(admin.ModelAdmin):
             i.send_confirmation_mail()
 
 class ShowAdmin(MarkdownxModelAdmin):
-    list_display = ['title', 'dates_text', 'reserved_tickets']
+    list_display = ['title', 'dates_text', 'reserved_tickets', 'reservation_open']
 
 admin.site.register(Show, ShowAdmin)
 admin.site.register(Event, EventAdmin)

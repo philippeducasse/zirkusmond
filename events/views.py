@@ -88,7 +88,6 @@ def reserve(request, show_id):
         except KeyError:
             pass
     else:
-        print(type(show), show)
         rForm = ReservationForm(show, prefix='res')
         pForm = PersonForm(prefix='pers')
         GuestFormSet = formset_factory(GuestForm, max_num=0,
