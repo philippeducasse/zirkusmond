@@ -38,8 +38,7 @@ class EventAdmin(admin.ModelAdmin):
     '''
     '''
     list_display = ['show', 'begin', 'time_and_date',
-                    'reservation_capacity', 'open_for_reservation',
-                    'reservation_open', 'reservation_count']
+                    'reservation_capacity', 'reservation_open', 'reservation_count']
     actions = ['print_reservations']
 
 

@@ -20,6 +20,7 @@ class Show(models.Model):  # maybe call it an event?
     banner_link = models.ImageField()
     head_img = ImageRatioField('banner_link', '400x225')
 
+    private = models.BooleanField(default=False)
     last_modified = models.DateTimeField(auto_now=True)
 
     def events(self):

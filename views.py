@@ -22,8 +22,8 @@ def _get_referer(request):
 def plain(request):
     ''' Give em our index, without doing much
     '''
-    us = Show.objects.all()
-    us = reversed(us)
+    us = Show.objects.filter(private=False)
+    us = reversed(list(filter(lambda x: x.reservation_open(), us)))
     v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
                 ip=_get_ip(request),
                 referer=_get_referer(request),
@@ -66,12 +66,14 @@ def impressum(request):
 def robots(request):
     ''' display impressum
     '''
-    return render(request, 'robots.txt')
+    private_shows = Show.objects.filter(private=True)
+    shows = Show.objects.filter(private=False)
+    return render(request, 'robots.txt', {'private_shows': private_shows})
 
 
 def sitemap(request):
     ''' sitemap.xml
     '''
-    shows = Show.objects.all()
+    shows = Show.objects.filter(private=False)
     return render(request, 'sitemap.xml',
                   {'shows': shows})
