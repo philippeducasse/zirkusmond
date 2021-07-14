@@ -34,11 +34,34 @@ class EventFilter(admin.SimpleListFilter):
             Q(guest__event_reservation__event=self.value()))
 
 
+class ReservationPaymentEventFilter(admin.SimpleListFilter):
+    '''Filter Reservation Payments for events
+    '''
+    title = 'Event'
+    parameter_name = 'event'
+    def lookups(self, request, model_admin):
+        '''
+        '''
+        a = Event.objects.all()
+        b = list(map(lambda x: (x.id, str(x)), Event.objects.all()))
+        import pdb
+        #pdb.set_trace()
+        return b
+
+    def queryset(self, request, queryset):
+        '''
+        '''
+        if self.value():
+            return queryset.filter(reservation__event=self.value())
+        else:
+            return queryset
+
+
 class EventAdmin(admin.ModelAdmin):
     '''
     '''
     list_display = ['show', 'begin', 'time_and_date',
-                    'reservation_capacity', 'reservation_open', 'reservation_count']
+                    'reservation_open', 'reserved_tickets']
     actions = ['print_reservations']
 
 
@@ -74,7 +97,7 @@ class EventAdmin(admin.ModelAdmin):
             row = 1
             for reservation in reservations:
                 reservant = reservation.reservant
-                print(reservation, type(reservation))
+
                 add_row(worksheet, row, reservation.reservant)
                 worksheet.write(row, 0, reservant.firstname, bold)
 
@@ -118,9 +141,10 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
         'reservation',
         'status',
         'ticket_count',
+        'event',
                     #'reservation__reservant__firstname', 'reservation__reservant__surname',
                     ]
-    list_filter = ('status',) # EventFilter)
+    list_filter = ('status', ReservationPaymentEventFilter) # EventFilter)
     search_fields = ['reservation__reservant__firstname', 'reservation__reservant__surname']
 
     actions = ['resend_confirmation_mail']

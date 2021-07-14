@@ -47,7 +47,6 @@ class Show(models.Model):  # maybe call it an event?
 
     @admin.display(boolean=True)
     def reservation_open(self) -> bool:
-        print(list(map(lambda x: x.reservation_open, self.events())))
         return any(list(map(lambda x: x.reservation_open(), self.events())))
 
 
@@ -83,7 +82,7 @@ class Event(models.Model):
         '''
         if not self.open_for_reservation:
             return False
-        print('reservation_count: ', self.reservation_count())
+
         if self.reservation_count() > self.reservation_capacity:
             return False
 
@@ -95,6 +94,10 @@ class Event(models.Model):
     @admin.display
     def reservation_count(self):
         return sum(map(lambda x: x.reservation.ticket_count(), ReservationPayment.objects.filter(reservation__event=self, status=PaymentStatus.CONFIRMED),))
+
+    @admin.display
+    def reserved_tickets(self):
+        return f'{self.reservation_count()}/{self.reservation_capacity}'
 
 
 class Person(models.Model):
@@ -243,6 +246,10 @@ class ReservationPayment(BasePayment):
     @admin.display
     def ticket_count(self):
         return self.reservation.ticket_count()
+
+    @admin.display
+    def event(self):
+        return f'{self.reservation.event}'
 
 
 class NewsletterEmail(models.Model):
