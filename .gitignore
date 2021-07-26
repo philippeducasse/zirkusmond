@@ -9,3 +9,4 @@ events/migrations/*
 gallery/migrations/*
 test/*
 db.sqlite*
+/static/package-lock.json
