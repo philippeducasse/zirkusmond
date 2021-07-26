@@ -6,7 +6,7 @@ from django.utils import timezone as tz
 
 from .events.models import Show
 from .zm.models import Visitor
-
+from .zm.forms import NewsletterRegistrationForm
 
 def _get_ip(request):
     ''' fetches the user ip
@@ -23,15 +23,26 @@ def plain(request):
     ''' Give em our index, without doing much
     '''
     us = Show.objects.filter(private=False)
-    us = reversed(list(filter(lambda x: x.reservation_open(), us)))
+    us = list(filter(lambda x: x.reservation_open(), us))
     v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
                 ip=_get_ip(request),
                 referer=_get_referer(request),
                 time=tz.now())
     v.save()
+    newsletter_form = NewsletterRegistrationForm()
     return render(request, 'index.html',
-                  {'upcoming_shows': us})
+                  {'upcoming_shows': us,
+                   'newsletter_form': newsletter_form})
 
+
+def newsletter_registration(request):
+    if request.method == 'POST':
+        n = NewsletterRegistrationForm(request.POST)
+        if n.is_valid():
+            n.save()
+            return render(request, 'newsletter_registered.html')
+
+    return redirect('/')
 
 def handle404(request, exception):
     '''

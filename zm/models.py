@@ -8,3 +8,9 @@ class Visitor(models.Model):
     ip = models.GenericIPAddressField()
     referer = models.URLField()
     time = models.DateTimeField()
+
+
+class NewsletterRegistration(models.Model):
+    ''' collect email addresses that shall be added to our mailing list
+    '''
+    email = models.EmailField()

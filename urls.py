@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', views.plain),
+    path('newsletter_registration', views.newsletter_registration),
     url(r'^impressum.*', views.impressum),
     url(r'.*robots.txt', views.robots),
     path('sitemap.xml', views.sitemap),
