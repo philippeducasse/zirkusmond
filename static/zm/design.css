@@ -307,7 +307,7 @@ a.card-link  {
     padding: 1em;
     text-align: left;
     margin: auto;
-    width: fit-content;
+    width: max-content;
 }
 
 .form label {
