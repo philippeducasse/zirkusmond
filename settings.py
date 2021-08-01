@@ -84,33 +84,35 @@ THUMBNAIL_PROCESSORS = (
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
 
+
+PAYMENT_MODEL = 'events.ReservationPayment'
 if DEBUG:
     PAYMENT_HOST = 'localhost:8000'
-    PAYMENT_USES_SSL = True
+    PAYMENT_USES_SSL = False
+    PAYMENT_VARIANTS = {
+        'default': ('payments.dummy.DummyProvider', {}),
+        'klarna': ('zirkusmond.KlarnaPaymentProvider.KlarnaProvider', {
+            'client_id': 'PK40221_72a271f7431f',
+            'key': 'b12dpKxhFay3e2pC',
+            'endpoint': 'https://api.playground.klarna.com/',
+        }),
+        'paypal': ('payments.paypal.PaypalProvider', {
+            'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
+        '   secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
+        '   endpoint': 'https://api.sandbox.paypal.com',
+        '   capture': True})
+        }
+
 else:
     PAYMENT_HOST = 'zirkusmond.de'
     PAYMENT_USES_SSL = True
-PAYMENT_MODEL = 'events.ReservationPayment'
-PAYMENT_VARIANTS = {
-    #'default': ('payments.dummy.DummyProvider', {}),
-    #'klarna': ('zirkusmond.KlarnaPaymentProvider.KlarnaProvider', {
-        #'client_id': 'PK40221_72a271f7431f',
-        #'key': 'b12dpKxhFay3e2pC',
-        #'endpoint': 'https://api.playground.klarna.com/',
-        #}),
-    #'paypal': ('payments.paypal.PaypalProvider', {
-        #'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
-        #'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
-        #'endpoint': 'https://api.sandbox.paypal.com',
-        #'capture': True})
-    'paypal': ('payments.paypal.PaypalProvider', {
+    PAYMENT_VARIANTS = {
+        'paypal': ('payments.paypal.PaypalProvider', {
         'client_id': 'AQuG7F5Z8riP9M6kXdz0jXMFPl-dYWxY6xLPg7X1iU2qmIA7tKFwosYA3r2Un_NKL42cwlhQkfkOjGM-',
         'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
         'endpoint': 'https://api.paypal.com',
         'capture': True})
-    # pp identitytoken jPFPbeVTFVF_7keHfCkUHnsLoVfgR0UjyCMkFw8rxkUFx1CbHFuz4UMyJXK
-    }
-
+        }
 
 EMAIL_HOST_USER = 'reservation@zirkusmond.de'
 MAIL_HOST_CRED = os.environ.get("MAIL_HOST_CRED", "")
