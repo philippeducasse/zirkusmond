@@ -41,7 +41,6 @@ urlpatterns = [
     path('payment-failure/<uuid:payment_id>', event_views.payment_fail),
     path('payment/<uuid:payment_id>/<str:payment_variant>', event_views.payment,
          name='payment'),
-    # TODO Opps response for payment
 
 
     path('gallery', gviews.gallery, name='gallery'),
@@ -53,7 +52,7 @@ urlpatterns = [
 ]
 
 
-if settings.DEBUG or True:  # TODO no actual http server deployment
+if settings.DEBUG:
     urlpatterns = urlpatterns + static(settings.MEDIA_URL,
                                        document_root=settings.MEDIA_ROOT)
 
