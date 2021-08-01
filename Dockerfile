@@ -24,4 +24,4 @@ WORKDIR /srv/data
 EXPOSE 8020
 #STOPSIGNAL SIGTERM
 RUN ln -s /usr/src/zirkusmond /srv/data/zirkusmond
-CMD ["/usr/src/zirkusmond/start-server.sh"]s
+CMD ["/usr/src/zirkusmond/start-server.sh"]

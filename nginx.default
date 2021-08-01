@@ -2,7 +2,7 @@
 # nginx.default
 
 server {
-    listen 8020;
+    listen 8000;
     server_name zirkusmond.de;
 
     location / {
@@ -28,7 +28,8 @@ server {
         #    rewrite ^ $tmp break;
         #    }
     #}
-    location /media {
+    location /media/ {
         root /srv/data/;
     }
+    client_max_body_size 10M;
 }

@@ -84,8 +84,12 @@ THUMBNAIL_PROCESSORS = (
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
 
-PAYMENT_HOST = 'localhost:8000'
-PAYMENT_USES_SSL = False
+if Debug:
+    PAYMENT_HOST = 'localhost:8000'
+    PAYMENT_USES_SSL = True
+else:
+    PAYMENT_HOST = 'zirkusmond.de'
+    PAYMENT_USES_SSL = True
 PAYMENT_MODEL = 'events.ReservationPayment'
 PAYMENT_VARIANTS = {
     #'default': ('payments.dummy.DummyProvider', {}),
@@ -161,3 +165,4 @@ STATICFILES_DIRS = [BASE_DIR / 'zirkusmond/static']
 STATIC_ROOT = CUR_DIR / 'static'
 
 MEDIA_URL = '/media/'
+MEDIA_ROOT = CUR_DIR / 'media'
