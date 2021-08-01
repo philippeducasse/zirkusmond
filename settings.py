@@ -157,7 +157,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'zirkusmond/static']
-STATIC_ROOT = '/home/ablepharus/mond/zirkusmond/static_'
+#STATICFILES_DIRS = ['.']
+STATIC_ROOT = CUR_DIR / 'static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = CUR_DIR / 'media'
