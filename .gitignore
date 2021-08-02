@@ -10,3 +10,4 @@ gallery/migrations/*
 test/*
 db.sqlite*
 /static/package-lock.json
+/static/zm/package-lock.json
