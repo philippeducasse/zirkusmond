@@ -12,17 +12,17 @@
     {% endif %}
 
     {% for show in upcoming_shows %}
-        <a href="/show/{{ show.id }}">
-            <div class="col">
+        <div class="col">
+            <a href="/show/{{ show.id }}" class="h-100">
                 <div class="card h-100">
                     <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
                     <div class="card-body">
                         <h3 class="card-title">{{ show.title }}</h3>
-                        <p class="card-text">{{ show.dates_text }}</p>
                     </div>
+                    <div class="card-footer">{{ show.dates_text }}</div>
                 </div>
-            </div>
-        </a>
+              </a>
+        </div>
     {% endfor %}
     </div>
 </div>
