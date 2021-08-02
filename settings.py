@@ -98,9 +98,9 @@ if DEBUG:
         }),
         'paypal': ('payments.paypal.PaypalProvider', {
             'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
-        '   secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
-        '   endpoint': 'https://api.sandbox.paypal.com',
-        '   capture': True})
+            'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
+            'endpoint': 'https://api.sandbox.paypal.com',
+            'capture': True})
         }
 
 else:
