@@ -1,5 +1,6 @@
 # from django.shortcuts import render
 from .models import Show, Event, Reservation, Guest, NewsletterEmail
+from zirkusmond.zm.models import NewsletterRegistration
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -73,7 +74,7 @@ def reserve(request, show_id):
                             g.save()
 
                         if newsletter:
-                            n = NewsletterEmail(email=p.email)
+                            n = NewsletterRegistration(email=p.email)
                             n.save()
 
                         pass  # pay
