@@ -3,11 +3,18 @@
 
 
 <div class="container ">
-    <div class="row row-cols-md-1 row-cols-lg-3 g-3">
+    {% if upcoming_shows|length|divisibleby:2 %}
+        <div class="row row-cols-1 row-cols-lg-2 g-3">
+    {% elif upcoming_shows|length|divisibleby:3 %}
+        <div class="row row-cols-1 row-cols-lg-3 g-3">
+    {% else %}
+        <div class="row row-cols-1 g-3">
+    {% endif %}
+
     {% for show in upcoming_shows %}
         <a href="/show/{{ show.id }}">
-            <div class="col-md4">
-                <div class="card">
+            <div class="col">
+                <div class="card h-100">
                     <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
                     <div class="card-body">
                         <h3 class="card-title">{{ show.title }}</h3>
