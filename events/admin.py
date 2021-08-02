@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from django.db.models.functions import Lower
 from markdownx.admin import MarkdownxModelAdmin
 from .models import Show, Event, Person, Guest, Reservation, ReservationPayment, NewsletterEmail
@@ -110,8 +111,9 @@ class EventAdmin(admin.ModelAdmin):
             workbook.close()
             xlsx_data = output.getvalue()
 
+            filename = event.admission.astimezone().strftime('reservation_list_%Y-%m-%d.xlsx')
             response = HttpResponse(
-                #headers={'Content_Disposition: inline; filename="myfile.txt"'},
+                headers={'Content-Disposition': f'inline; filename="{filename}"'},
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response.write(xlsx_data)
             return response
@@ -167,10 +169,34 @@ class ReservationAdmin(admin.ModelAdmin):
 class ShowAdmin(MarkdownxModelAdmin):
     list_display = ['title', 'dates_text', 'reserved_tickets', 'reservation_open']
 
+class NewsletterRegistrationAdmin(admin.ModelAdmin):
+    list_display = ('email',)
+    actions = ['export_adresses']
+
+    @admin.action(description="Export EMail Adresses")
+    def export_adresses(self, request, queryset):
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet()
+
+        data = map(lambda x: x.email, queryset)
+        worksheet.write_column(0, 0, data)
+
+        workbook.close()
+        xlsx_data = output.getvalue()
+        filename = timezone.now().strftime('email_addresses_%Y_%m_%d.xlsx')
+        response = HttpResponse(
+            headers={
+                'Content-Type': 'application/vnd.ms-excel',
+                'Content-Disposition': f'attachment; filename={filename}',
+                })
+        response.write(xlsx_data)
+        return response
+
 admin.site.register(Show, ShowAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(ReservationPayment, ReservationPaymentAdmin)
 admin.site.register(Guest)
 admin.site.register(Person, PersonAdmin)
-admin.site.register(NewsletterEmail)
+admin.site.register(NewsletterEmail, NewsletterRegistrationAdmin)
