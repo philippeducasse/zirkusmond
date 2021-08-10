@@ -15,7 +15,14 @@
         <div class="col">
             <a href="/show/{{ show.id }}" class="h-100">
                 <div class="card h-100">
-                    <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
+                    {% if upcoming_shows|length|divisibleby:2 %}
+                        <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
+                    {% elif upcoming_shows|length|divisibleby:3 %}
+                        <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
+                    {% else %}
+                        <img class="card-img-top ratio ratio-16x9" src="{{ MEDIA_URL}}{{ show.banner_link }}" />
+                    {% endif %}
+
                     <div class="card-body">
                         <h3 class="card-title">{{ show.title }}</h3>
                     </div>
