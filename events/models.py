@@ -219,7 +219,7 @@ class ReservationPayment(BasePayment):
     def get_purchased_items(self):
         ''' yield a list of PurchasedItems
         '''
-        yield PurchasedItem(name=self.reservation.event.show.title + str(self.reservation.event),
+        yield PurchasedItem(name=f'{self.reservation.event.show.title} {self.reservation.event}',
                             sku=self.reservation.event.pk,
                             quantity=self.reservation.ticket_count(),
                             price=self.reservation.event.reservation_price,
