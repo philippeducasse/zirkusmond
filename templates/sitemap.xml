@@ -4,6 +4,10 @@
         <loc>https://zirkusmond.de</loc>
         <lastmod>2022-05-29</lastmod>
     </url>
+    <url>
+        <loc>https://zirkusmond.de/impressum</loc>
+        <lastmod>2022-06-18</lastmod>
+    </url>
     {% for show in shows %}
     <url>
         <loc>https://zirkusmond.de/show/{{show.id}}</loc>
