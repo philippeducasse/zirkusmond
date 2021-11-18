@@ -22,7 +22,9 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Zirkus Mond" />
     <meta property="og:url" content="https://zirkusmond.de" />
+    {% block og_image %}
     <meta property="og:image" content="https://zirkusmond.de/static/zm/img/zm_square.jpg" />
+    {% endblock %}
 
     <script type="application/ld+json">
     {% block structured_data %}
@@ -51,7 +53,6 @@
 <body>
     {% block body %}
     {% endblock %}
-
 
     <script type="text/javascript" src="/static/zm/node_modules/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/static/zm/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

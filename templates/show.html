@@ -4,6 +4,10 @@
 {% load cropping %}
 
 {% block title %}Zirkus Mond - {{ show.title }}{% endblock %}
+{% block og_image %}
+    <meta property="og:image" content="{% cropped_thumbnail show "head_img" %}" />
+{% endblock %}
+
 {% block head_description %}{{show.description|truncatechars:254}}{% endblock %}
 {% block structured_data %}
 {% for event in show.events %}
