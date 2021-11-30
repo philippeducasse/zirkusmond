@@ -3,89 +3,99 @@
 <div class="container-fluid">
     <div class="row">
 
-        <div class="col-md-12 col-lg-6 col-xl-4 g-3">
+        <div class="col-md-9">
+            <div class="col-md-12 col-lg-6">
 
-            <div class="last-blocks text-center">
-                <div class="ls-first-heading text-center">
-                    <h1 class="">Contact</h1>
-                </div>
-
-
-                <div class="office-contact">
-                    <div class="text-center ">
-                        <a href="mailto:zirkusmond@posteo.de">zirkusmond@posteo.de</a>
+                <div class="last-blocks text-center">
+                    <div class="ls-first-heading text-center">
+                        <h1 class="">Contact</h1>
                     </div>
-                </div>
 
-                <div class="social text-center" style="">
-                    <a href="https://www.youtube.com/channel/UCa4CK1Fl7ZpTA6mz04wH6CA">
-                        <img src="/static/zm/icons/youtube.svg" alt="youtube" height="30" color="yellow">
-                    </a>
-                    <a href="https://de-de.facebook.com/zirkusmond">
-                        <img src="/static/zm/icons/facebook.svg" alt="facebook" height="30">
-                    </a>
 
-                    <a href="https://de-de.facebook.com/zirkusmond">
-                        <img src="/static/zm/icons/instagram.svg" alt="instagram" height="30">
-                    </a>
-                </div>
+                    <div class="office-contact">
+                        <div class="text-center ">
+                            <a href="mailto:zirkusmond@posteo.de">zirkusmond@posteo.de</a>
+                        </div>
+                    </div>
 
-                <div class="office-contact">
-                    Direct matters concerning reservations to <a href="mailto:reservation@zirkusmond.de">reservation@zirkusmond.de</a><br><br>
-                    If you have a show or event and would like to present it at our venue, reach us at
-                    <a href="mailto:venue@zirkusmond.de">venue@zirkusmond.de</a>
-                    <br><br>
-                    If you are an Artist and want to get touch with us, drop us a line at
-                    <a href="mailto:talent@zirkusmond.de">talent@zirkusmond.de</a>
-                    <br><br>
-                </div>
-            </div>
-        </div>
+                    <div class="social text-center" style="">
+                        <a href="https://www.youtube.com/channel/UCa4CK1Fl7ZpTA6mz04wH6CA">
+                            <img src="/static/zm/icons/youtube.svg" alt="youtube" height="30" color="yellow">
+                        </a>
+                        <a href="https://de-de.facebook.com/zirkusmond">
+                            <img src="/static/zm/icons/facebook.svg" alt="facebook" height="30">
+                        </a>
 
-        <div class="col-md-12 col-lg-6 col-xl-4 g-3">
+                        <a href="https://de-de.facebook.com/zirkusmond">
+                            <img src="/static/zm/icons/instagram.svg" alt="instagram" height="30">
+                        </a>
+                    </div>
 
-            <div class="last-blocks text-center">
-                <h1 class="text-center">Mailing List</h1>
-                <div class="office-contact">
-                    Want to be notified about new Shows?<br>
-                    Hear whats going on on the moon?<br>
-                    Not be forgotten or left out?<br>
-                    <br>
-                    Become part of our magical Mailing List!<br>
-                    <br>
-                    <br>
-                    <div class="">
-                        <form action="/newsletter_registration" method="post">
-                            {% csrf_token %}
-                            <div style="width:100%;">
-                            <label for="id_email" style="margin-right: 20px;">Email:</label>
-                            <input type="email" name="email" maxlength="254" required="" id="id_email">
-                            </div>
-
-                            <br><br>
-                            <input type="submit" value="Submit" style="width:100%;" class="button">
-                        </form>
+                    <div class="office-contact">
+                        Direct matters concerning reservations to <a href="mailto:reservation@zirkusmond.de">reservation@zirkusmond.de</a><br><br>
+                        If you have a show or event and would like to present it at our venue, reach us at
+                        <a href="mailto:venue@zirkusmond.de">venue@zirkusmond.de</a>
+                        <br><br>
+                        If you are an Artist and want to get touch with us, drop us a line at
+                        <a href="mailto:talent@zirkusmond.de">talent@zirkusmond.de</a>
+                        <br><br>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-12 col-lg-12 col-xl-4 text-center ls-support g-3" >
-            <div class="last-blocks">
-                <h1>Support Us</h1>
+            <div class="col-md-12 col-lg-6">
 
-                <div class="ls-betterplace ls-iban" style="padding-top: 6em;">
-                    <h2>BankTransfer/Überweisung</h2>
-                    <h4>IBAN: DE34 4306 0967 1226 9437 00</h4>
-                    <h4>BIC: GENODEM1GLS</h4>
+                <div class="last-blocks text-center">
+                    <h1 class="text-center">Mailing List</h1>
+                    <div class="office-contact">
+                        Want to be notified about new Shows?<br>
+                        Hear whats going on on the moon?<br>
+                        Not be forgotten or left out?<br>
+                        <br>
+                        Become part of our magical Mailing List!<br>
+                        <br>
+                        <br>
+                        <div class="">
+                            <form action="/newsletter_registration" method="post">
+                                {% csrf_token %}
+                                <div style="width:100%;">
+                                <label for="id_email" style="margin-right: 20px;">Email:</label>
+                                <input type="email" name="email" maxlength="254" required="" id="id_email">
+                                </div>
+
+                                <br><br>
+                                <input type="submit" value="Submit" style="width:100%;" class="button">
+                            </form>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="ls-betterplace">
-                    <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E"><h2>Donate via Paypal</h2></a>
+            <div class="col-md-12 col-lg-6 text-center ls-support g-3" >
+                <div class="last-blocks">
+                    <h1>Support Us</h1>
+
+                    <div class="ls-betterplace ls-iban" style="padding-top: 6em;">
+                        <h2>BankTransfer/Überweisung</h2>
+                        <h4>IBAN: DE34 4306 0967 1226 9437 00</h4>
+                        <h4>BIC: GENODEM1GLS</h4>
+                    </div>
+
+                    <div class="ls-betterplace">
+                        <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E"><h2>Donate via Paypal</h2></a>
+                    </div>
                 </div>
             </div>
         </div>
+
+
+        <div class="col-md-3 text-center">
+            <h2>Find us</h2>
+            <img src="/static/zm/img/map.jpeg" alt="Der Zirkus liegt in der Nähe der Lili-Henoch-Str.">
+        </div>
+
     </div>
+
 
     <div class="deko"> <img src="{% static "zm/img/deko-2.png" %}"
         alt="********"></img> </div>
@@ -120,6 +130,7 @@
         <div class="col-sm-1 col-md-4">
             Steuer-Nr.: 37 / 406 / 50011<br>
             Steuer-ID: DE65 812 397 023<br>
+            USt-IdNr: DE319431419<br>
             Finanzamt für Körperschaften II<br>
             Handelsregister-Nr.:HRB 164783B<br>
         </div>
