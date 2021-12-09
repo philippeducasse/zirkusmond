@@ -17,7 +17,7 @@ print('BASE_DIR: %s' % BASE_DIR)
 SECRET_KEY = '9gg)@^#6+3&r33*#gszht&v=7-88^fqn-d3#2l3*sh^b*tfm3l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
                  '127.0.0.1', 'localhost', '192.168.188.154', '192.168.1.137',
                  'zirkusmond.de', 'www.zirkusmond.de']
@@ -105,7 +105,9 @@ if DEBUG:
             'id': ' 213473',
             'key': '9186e201d5a81047ea0ac212eed86629',
             'project_id': '735893',
-            'endpoint': 'https://api.sofort.com/api/xml'})
+            'endpoint': 'https://api.sofort.com/api/xml'}),
+        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
+            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
 
 else:
