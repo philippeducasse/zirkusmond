@@ -4,6 +4,9 @@ from decimal import Decimal, ROUND_HALF_UP
 import requests
 import json
 
+import logging
+logger = logging.getLogger(__name__)
+
 #from .forms import PaymentForm
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_credit_card_issuer, get_base_url
@@ -38,7 +41,7 @@ class CoinbaseProvider(BasicProvider):
             "metadata": {
                 "customer_name": f'{payment.billing_first_name} {payment.billing_last_name}',
             },
-            "redirect_url": f'{get_base_url()}/payment/process/{payment.token}', # TODO check
+            "redirect_url": f'{get_base_url()}/payments/process/{payment.token}',
             "cancel_url": payment.get_failure_url(),
             }
         r = requests.post(self.charge_url, headers=self.header_base,
@@ -46,20 +49,17 @@ class CoinbaseProvider(BasicProvider):
         return r
 
 
-    def post(self, payment, *args, **kwargs):
-        ''' post a charge
-        '''
-        import pdb
-        pdb.set_trace()
-
-
     def get_form(self, payment, data=None):
-        import pdb
         charge = self.create_charge(payment)
-
-        pdb.set_trace()
         raise RedirectNeeded(charge.json()['data']['hosted_url'])
 
     def process_data(self, payment, request):
-        import pdb
-        pdb.set_trace()
+        j = json.loads(request.body)
+        if j['event']['type'] == 'charge:confirmed':
+            payment.change_status(PaymentStatus.CONFIRMED)
+            logger.error('Charge confirmed')
+            return redirect(payment.get_success_url())
+        else:
+            payment.change_status(PaymentStatus.REJECTED)
+            logger.error('Charge denied')
+            return redirect(payment.get_failure_url())
