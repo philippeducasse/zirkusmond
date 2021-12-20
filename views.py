@@ -24,6 +24,11 @@ def plain(request):
     '''
     us = Show.objects.filter(private=False)
     us = list(filter(lambda x: x.reservation_open(), us))
+    ps = Show.objects.filter(private=False)
+    # get the last three shows which last date is in the past
+    #ps = filter(lambda x: x.last_event() != None, ps)
+    #ps = list(filter(lambda x: x.last_event().admission < tz.now(), ps))[-3:]
+    # ps = list(filter(lambda x:
     v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
                 ip=_get_ip(request),
                 referer=_get_referer(request),
@@ -32,6 +37,7 @@ def plain(request):
     newsletter_form = NewsletterRegistrationForm()
     return render(request, 'index.html',
                   {'upcoming_shows': us,
+    #               'past_shows': ps,
                    'newsletter_form': newsletter_form})
 
 

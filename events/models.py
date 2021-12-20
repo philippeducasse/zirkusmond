@@ -1,8 +1,10 @@
 import uuid
 
 from django.db import models
+from django.conf import settings
 from django.contrib import admin
 from django.utils import timezone
+from django.urls import reverse
 
 from markdownx.models import MarkdownxField
 from image_cropping import ImageRatioField
@@ -24,7 +26,13 @@ class Show(models.Model):  # maybe call it an event?
     last_modified = models.DateTimeField(auto_now=True)
 
     def events(self):
-        return Event.objects.filter(show=self)
+        return Event.objects.filter(show=self).order_by('admission')
+
+    def last_event(self):
+        return self.events().first()
+
+    def first_event(self):
+        return self.events().last()
 
     def __str__(self):
         return self.title
@@ -211,10 +219,16 @@ class ReservationPayment(BasePayment):
                                     on_delete=models.SET_NULL)
 
     def get_failure_url(self):
-        return '/payment-failure/%s' % self.pk
+        prot = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{prot}://{settings.PAYMENT_HOST}/payment-failure/%s' % self.pk
 
     def get_success_url(self):
-        return '/payment-success/%s' % self.pk
+        prot = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{prot}://{settings.PAYMENT_HOST}/payment-success/%s' % self.pk
+
+    def get_process_url(self) -> str:
+        prot = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{prot}://{settings.PAYMENT_HOST}' + reverse('process_payment', kwargs={'token': self.token})
 
     def get_purchased_items(self):
         ''' yield a list of PurchasedItems
