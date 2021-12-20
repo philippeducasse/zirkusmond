@@ -17,7 +17,7 @@ print('BASE_DIR: %s' % BASE_DIR)
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
                  '127.0.0.1', 'localhost', '192.168.188.154', '192.168.1.137',
                  'zirkusmond.de', 'www.zirkusmond.de']
@@ -100,7 +100,14 @@ if DEBUG:
             'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
             'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
             'endpoint': 'https://api.sandbox.paypal.com',
-            'capture': True})
+            'capture': True}),
+        'sofort': ('payments.sofort.SofortProvider', {
+            'id': ' 213473',
+            'key': '9186e201d5a81047ea0ac212eed86629',
+            'project_id': '735893',
+            'endpoint': 'https://api.sofort.com/api/xml'}),
+        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
+            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
 
 else:

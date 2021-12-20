@@ -137,8 +137,9 @@ def payment_success(request, payment_id):
     payment = get_object_or_404(ReservationPayment, id=payment_id)
     show = payment.reservation.event.show
     p = payment.reservation.reservant
-    if payment.status == 'confirmed':
-        payment.reservation.send_confirmation_mail()
+    # TODO reactivate condition, sofort answers 'waiting', at least in testing
+    # if payment.status == 'confirmed':
+    payment.reservation.send_confirmation_mail()
     return redirect('/reservation_status/%s' % payment.id)
 
 
