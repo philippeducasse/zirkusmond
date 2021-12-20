@@ -4,7 +4,7 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] ; 
     (python /usr/src/manage.py createsuperuser --no-input)
 fi
 ln -s /usr/src/zirkusmond .
-yes |python /usr/src/manage.py collectstatic
+yes yes|python /usr/src/manage.py collectstatic
 python /usr/src/manage.py makemigrations events
 #python /usr/src/manage.py migrate
 chown www-data:www-data -R .

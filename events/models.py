@@ -183,7 +183,7 @@ You have booked your visit for %s with the following personal information:
 We open our gates at %s, the Show will start at %s.
 
 Please note the following:
-- Be on time, make sure that you have a valid Covid-19 test (24h fresh) or confirmation that you are fully vaccinated.
+- Be on time, make sure that you have a valid Covid-19 test (24h fresh) and confirmation that you are fully vaccinated or recovered.
 - Also please remember that we dont have a box office for later registration and due to the Covid-19 rules of Berlin we can’t let in more than 150 people. So tell your friends that they have to register through this form!
 
 See you at Zirkus Mond and have fun.
