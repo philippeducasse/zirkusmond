@@ -20,7 +20,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 DEBUG = True
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
                  '127.0.0.1', 'localhost', '192.168.188.154', '192.168.1.137',
-                 'zirkusmond.de', 'www.zirkusmond.de']
+                 'zirkusmond.de', 'www.zirkusmond.de', 'testing.zirkusmond.de']
 
 
 # Application definition
@@ -158,7 +158,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
-LANGUAGE_CODE = 'de-de'
+LANGUAGE_CODE = 'en-gb'
 TIME_ZONE = 'Europe/Berlin'
 
 USE_I18N = True
