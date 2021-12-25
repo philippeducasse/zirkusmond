@@ -8,11 +8,16 @@ from django.urls import reverse
 
 from markdownx.models import MarkdownxField
 from image_cropping import ImageRatioField
+
+from decimal import Decimal
 from payments import PaymentError, PaymentStatus
+from payments import PurchasedItem
+from payments.models import BasePayment
 
 from django.core.mail import send_mail
 
-class Show(models.Model):  # maybe call it an event?
+
+class Show(models.Model):
     ''' This is a show, with it's description, picture blablabla
         every showing of this show is an Event
     '''
@@ -205,12 +210,6 @@ class Guest(Person):
     '''
     event_reservation = models.ForeignKey(Reservation,
                                           on_delete=models.CASCADE)
-
-
-from decimal import Decimal
-
-from payments import PurchasedItem
-from payments.models import BasePayment
 
 
 class ReservationPayment(BasePayment):
