@@ -76,7 +76,7 @@ class EventAdmin(admin.ModelAdmin):
             workbook = xlsxwriter.Workbook(output)
             worksheet = workbook.add_worksheet()
             worksheet.set_landscape()
-            worksheet.set_paper(0) # A4
+            worksheet.set_paper(9) # A4
             worksheet.set_column(0, 5, 15)
             # worksheet.set_column(4, 5, 5)
 
