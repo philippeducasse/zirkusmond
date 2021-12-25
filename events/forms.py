@@ -44,7 +44,7 @@ class ReservationForm(Form):
         cleaned_data = super().clean()
 
         if not cleaned_data['covid_stuff']:
-            self.add_error('covid_stuff', 'You will have to be tested/vaccinated for the event')
+            self.add_error('covid_stuff', 'You will have to comply with the corona regulations.')
         if not cleaned_data['event'].reservation_open():
             self.add_error('event', 'Sorry, Reservation for this Event is closed')
             raise ValidationError("Registration is closed, sorry :(")
