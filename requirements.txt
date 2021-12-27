@@ -7,3 +7,4 @@ jupyter_nbextensions_configurator
 django_extensions
 xlsxwriter
 gunicorn
+imaplib

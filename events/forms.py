@@ -1,5 +1,6 @@
-from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, BooleanField, Select
+from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, BooleanField, Select, CharField
 from .models import Person, Event, Show, Guest
+from markdownx.fields import MarkdownxFormField
 
 from django.core.exceptions import ValidationError
 
@@ -102,3 +103,8 @@ class GuestForm(ModelForm):
             ((cleaned_data['email'] == None or cleaned_data['email'] == '') and
              (cleaned_data['phonenumber'] is None or cleaned_data['phonenumber'] ==''))):
             self.add_error('email', 'We need an Email or phonenumber')
+
+
+class EmailTextForm(Form):
+    subject = CharField(max_length=255, help_text="Subject")
+    text_field = MarkdownxFormField()

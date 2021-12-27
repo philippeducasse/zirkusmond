@@ -4,13 +4,77 @@ from django.db.models.functions import Lower
 from markdownx.admin import MarkdownxModelAdmin
 from .models import Show, Event, Person, Guest, Reservation, ReservationPayment, NewsletterEmail
 from payments import PaymentStatus
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
+from django.template import Context, Template
 
+from django.core.mail import send_mail, EmailMessage
 from django.db.models import Q
-
+from django.conf import settings
+from .forms import EmailTextForm
 
 from io import BytesIO
 import xlsxwriter
+
+import imaplib
+import time
+
+def reservation_to_dict(reservation):
+    ''' make a dict with most important reservation infos
+        usefull for templates
+    '''
+    return {'show_title': reservation.event.show.title,
+            'event_time': reservation.event.time_and_date(),
+            'firstname': reservation.reservant.firstname,
+            'surname': reservation.reservant.surname,
+            'email': reservation.reservant.email}
+
+
+def render_mail(subject, body, context):
+    context = Context(context)
+    ts = Template(subject)
+    subject = ts.render(context)
+    tb = Template(body)
+    body = tb.render(context)
+    return subject, body
+
+
+def send_email_to_reservants(request, dicts, admin):
+    if 'text_field' in request.POST.keys():
+        form = EmailTextForm(request.POST)
+    else:
+        form = EmailTextForm()
+    sample_text, sample_subject = None, ""
+    if form.is_valid():
+        mail_text = form.data['text_field']
+        mail_subject = form.data['subject']
+        sample_subject, sample_text = render_mail(mail_subject, mail_text, dicts[0])
+
+        if 'send' in request.POST.keys():
+            imap = imaplib.IMAP4(settings.EMAIL_HOST)
+            imap.starttls()
+            imap.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+
+            for d in dicts:
+                subject, text = render_mail(mail_subject, mail_text, d)
+                m = EmailMessage(subject, text, 'reservation@zirkusmond.de',
+                                 [f"{d['firstname']} {d['surname']} <{d['email']}>"])
+                imap.append('Sent', '\\SEEN', imaplib.Time2Internaldate(time.time()), str(m.message()).encode())
+                m.send()
+            imap.logout()
+            admin.message_user(request,f"Mail sent to {len(dicts)} recipients")
+            return HttpResponseRedirect(request.get_full_path())
+
+
+    return render(request, 'admin/send_email.html',
+                context={'data': dicts,
+                            'form': form,
+                            'sample_text': sample_text,
+                            'sample_subject': sample_subject,
+                            'action': request.POST['action'],
+                            'select_across': request.POST['select_across'],
+                            'index': request.POST['index'],
+                            'selected_action': request.POST.getlist('_selected_action')})
 
 
 class EventFilter(admin.SimpleListFilter):
@@ -63,7 +127,7 @@ class EventAdmin(admin.ModelAdmin):
     '''
     list_display = ['show', 'begin', 'time_and_date',
                     'reservation_open', 'reserved_tickets']
-    actions = ['print_reservations']
+    actions = ['print_reservations', 'send_to_reservants']
 
 
     @admin.action(description='Print Reservation List')
@@ -118,6 +182,15 @@ class EventAdmin(admin.ModelAdmin):
             response.write(xlsx_data)
             return response
 
+    @admin.action(description="Send mail to Reservants") #,help="Send an email to al the People who reserved")
+    def send_to_reservants(self, request, queryset):
+        events_reservations = []
+        for event in queryset:
+            events_reservations += list(ReservationPayment.objects.filter(status="confirmed",
+                                                                          reservation__event=event))
+        #events_reservation = sum(events_reservations ,[])
+        dicts = [reservation_to_dict(r.reservation) for r in events_reservations]
+        return send_email_to_reservants(request, dicts, self)
 
 #class InlineCheckin(admin.StackedInline):
 #    model = Checkin
@@ -138,6 +211,7 @@ class InlinePerson(admin.StackedInline):
     model = Person
     extra = 0
 
+
 class ReservationPaymentAdmin(admin.ModelAdmin):
     list_display = [
         'reservation',
@@ -149,11 +223,17 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
     list_filter = ('status', ReservationPaymentEventFilter) # EventFilter)
     search_fields = ['reservation__reservant__firstname', 'reservation__reservant__surname']
 
-    actions = ['resend_confirmation_mail']
+    actions = ['resend_confirmation_mail', 'send_to_reservants']
     @admin.action(description='Resend confirmation E-Mail')
     def resend_confirmation_mail(self, request, queryset):
         for i in queryset:
             i.reservation.send_confirmation_mail()
+
+    @admin.action(description="Send mail to Reservants") #,help="Send an email to al the People who reserved")
+    def send_to_reservants(self, request, queryset):
+        import pdb
+        dicts = [reservation_to_dict(o.reservation) for o in queryset]
+        return send_email_to_reservants(request, dicts, self)
 
 class ReservationAdmin(admin.ModelAdmin):
     # inlines = (InlinePerson, InlineGuest,)
