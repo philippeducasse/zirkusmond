@@ -14,8 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.conf.urls import url, include
+from django.urls import path, re_path
+from django.conf.urls import include
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -30,8 +30,8 @@ urlpatterns = [
 
     path('', views.plain),
     path('newsletter_registration', views.newsletter_registration),
-    url(r'^impressum.*', views.impressum),
-    url(r'.*robots.txt', views.robots),
+    re_path('^impressum.*', views.impressum),
+    path('robots.txt', views.robots),
     path('sitemap.xml', views.sitemap),
     path('show/<int:show_id>', event_views.show, name='show'),
     path('reserve/<int:show_id>', event_views.reserve, name='reserve'),
@@ -47,7 +47,7 @@ urlpatterns = [
     path('gallery/<int:pk>', gviews.album),
     path('gallery/<int:album_id>/<int:foto_id>', gviews.foto),
 
-    url(r'^markdownx/', include('markdownx.urls')),
+    re_path(r'^markdownx/', include('markdownx.urls')),
     path('payments/', include('payments.urls')),
 ]
 
