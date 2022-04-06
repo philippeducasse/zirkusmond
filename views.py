@@ -22,8 +22,8 @@ def _get_referer(request):
 def plain(request):
     ''' Give em our index, without doing much
     '''
-    us = Show.objects.filter(private=False)
-    us = list(filter(lambda x: x.reservation_open(), us))
+    us = Show.objects.all()
+    us = list(filter(lambda x: x.show_in_preview(), us))
     ps = Show.objects.filter(private=False)
     # get the last three shows which last date is in the past
     #ps = filter(lambda x: x.last_event() != None, ps)
