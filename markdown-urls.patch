@@ -1,0 +1,10 @@
+7c7
+< from django.conf.urls import url
+---
+> from django.urls import re_path
+16,17c16,17
+<     url(r'^upload/$', ImageUploadView.as_view(), name='markdownx_upload'),
+<     url(r'^markdownify/$', MarkdownifyView.as_view(), name='markdownx_markdownify'),
+---
+>     re_path(r'^upload/$', ImageUploadView.as_view(), name='markdownx_upload'),
+>     re_path(r'^markdownify/$', MarkdownifyView.as_view(), name='markdownx_markdownify'),

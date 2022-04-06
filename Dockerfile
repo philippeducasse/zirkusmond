@@ -9,6 +9,8 @@ WORKDIR /usr/src/zirkusmond
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 ADD . .
+RUN patch /usr/local/lib/python3.9/site-packages/markdownx/urls.py markdown-urls.patch
+RUN pip install --upgrade django-payments
 COPY manage.py ..
 
 #RUN python ../manage.py makemigrations
