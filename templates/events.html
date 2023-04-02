@@ -1,0 +1,16 @@
+{% extends "html_base.html" %}
+{% load static %}
+
+{% block body %}
+
+{% include "container_intro.html" %}
+
+
+<div class="deko"> <img src="{% static "zm/img/deko-1.png" %}" alt="========"></img> </div>
+
+{% include "container_events.html" %}
+
+<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}" alt="********"></img> </div>
+
+
+{% endblock %}
