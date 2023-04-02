@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponse
 # from django import forms
 from django.views.generic.edit import CreateView
 from django.utils import timezone as tz
+import datetime
 
 from .events.models import Show
 from .zm.models import Visitor
@@ -19,11 +20,17 @@ def _get_referer(request):
     return request.META['HTTP_REFERER'] if 'HTTP_REFERER' in request.META.keys() else ''
 
 
+def _upcoming_shows():
+    us = Show.objects.all()
+    us = list(filter(lambda x: x.show_in_preview(), us))
+    us = sorted(us, key=lambda x: datetime.date(2020, 1, 1) if len(x.events()) == 0 else x.events()[0].admission.date())
+    return us
+
+
 def plain(request):
     ''' Give em our index, without doing much
     '''
-    us = Show.objects.all()
-    us = list(filter(lambda x: x.show_in_preview(), us))
+    us = _upcoming_shows()[:6]
     ps = Show.objects.filter(private=False)
     # get the last three shows which last date is in the past
     #ps = filter(lambda x: x.last_event() != None, ps)
@@ -37,8 +44,13 @@ def plain(request):
     newsletter_form = NewsletterRegistrationForm()
     return render(request, 'index.html',
                   {'upcoming_shows': us,
+                      'show_all_events_link': True,
     #               'past_shows': ps,
                    'newsletter_form': newsletter_form})
+
+
+def event_list(request):
+    return render(request, 'events.html', {'upcoming_shows': _upcoming_shows(), 'show_home_link': True})
 
 
 def newsletter_registration(request):

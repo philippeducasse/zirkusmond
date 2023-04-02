@@ -32,4 +32,15 @@
         </div>
     {% endfor %}
     </div>
+    <div style="width:100%;margin-top: 2em;display: flex;flex-wrap:wrap;justify-content: center;">
+	{% if show_all_events_link %}
+        <div style="display: flex; text-align: center;margin-top:2em;">
+            <a class="button" href="/events">All Events</a>
+	</div>
+	{% elif show_home_link %}
+        <div style="display: flex; text-align: center;margin-top:2em;">
+            <a class="button" href="/">Home</a>
+	</div>
+	{% endif %}
+    </div>
 </div>
