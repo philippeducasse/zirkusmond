@@ -3,7 +3,9 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
+import logging
+import logging.config
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -115,15 +117,22 @@ else:
     PAYMENT_USES_SSL = True
     PAYMENT_VARIANTS = {
         'paypal': ('payments.paypal.PaypalProvider', {
-        'client_id': 'AQuG7F5Z8riP9M6kXdz0jXMFPl-dYWxY6xLPg7X1iU2qmIA7tKFwosYA3r2Un_NKL42cwlhQkfkOjGM-',
-        'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
-        'endpoint': 'https://api.paypal.com',
-        'capture': True})
+           'client_id': 'AQuG7F5Z8riP9M6kXdz0jXMFPl-dYWxY6xLPg7X1iU2qmIA7tKFwosYA3r2Un_NKL42cwlhQkfkOjGM-',
+           'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
+           'endpoint': 'https://api.paypal.com',
+           'capture': True}),
+        'sofort': ('payments.sofort.SofortProvider', {
+            'id': ' 213473',
+            'key': '9186e201d5a81047ea0ac212eed86629',
+            'project_id': '735893',
+            'endpoint': 'https://api.sofort.com/api/xml'}),
+        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
+            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
 
 EMAIL_HOST_USER = 'reservation@zirkusmond.de'
 EMAIL_HOST_PASSWORD = 'kd9b2lvj2jdkoJUkvj2jfkvjskla'
-EMAIL_HOST = '192.168.178.21'
+EMAIL_HOST = '162.19.152.5'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
@@ -175,3 +184,33 @@ STATIC_ROOT = CUR_DIR / 'static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = CUR_DIR / 'media'
+
+
+
+# Clear prev config
+LOGGING_CONFIG = None
+
+# Get loglevel from env
+LOGLEVEL = os.getenv('DJANGO_LOGLEVEL', 'debug').upper()
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+    },
+    'loggers': {
+        '': {
+            'level': LOGLEVEL,
+            'handlers': ['console',],
+        },
+    },
+})
