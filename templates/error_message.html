@@ -1,9 +1,9 @@
 {% extends "html_design.html" %}
 {% load static %}
 
-{% block title %}{{error_code}} {{message}}{% endblock %}
+{% block title %}{{error_code}} {{error_message}}{% endblock %}
 {% block content %}
-<h1>{{message}}</h1>
+<h1>{{error_message}}</h1>
 
 <a href="/">How about going back Home</a>
 {% endblock %}
