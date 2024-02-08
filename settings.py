@@ -139,12 +139,24 @@ EMAIL_USE_SSL = True
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': CUR_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': CUR_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'monddb',
+            'USER': 'mond',
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': 'zm_db',
+            'PORT': '5432',
+    }}
+
 
 
 # Password validation
