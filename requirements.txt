@@ -9,3 +9,6 @@ xlsxwriter
 gunicorn
 imaplib2
 xmltodict
+psycopg2-binary
+psycopg2
+

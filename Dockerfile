@@ -1,4 +1,4 @@
-FROM python
+FROM python:3.10
 
 RUN apt-get update && apt-get install nginx vim npm -y --no-install-recommends
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -9,8 +9,6 @@ WORKDIR /usr/src/zirkusmond
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 ADD . .
-RUN patch /usr/local/lib/python3.10/site-packages/markdownx/urls.py markdown-urls.patch
-RUN pip install --upgrade django-payments
 COPY manage.py ..
 
 #RUN python ../manage.py makemigrations
