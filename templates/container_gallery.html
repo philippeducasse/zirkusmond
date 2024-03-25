@@ -2,28 +2,33 @@
 {% load static %}
 
 
-<div class="container-fluid shadowed-content" style="padding:0;">
-    <div id="carouselGallery" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    {% for i in "0123456789" %}
-        <button type="button" data-bs-target="#carouselGallery" data-bs-slide-to="{{i}}" class="active" aria-current="true" aria-label="Slide {{i}}"></button>
-    {% endfor %}
+<div class="zm-container ">
+  <div class="glide gallery ">
+    <div class="glide__track" data-glide-el="track">
+      <ul class="glide__slides ">
+        <li class="glide__slide my-auto">
+          <div class="ratio ratio-16x9 h-full" >
+            <video autoplay loop muted class="shadowed-content h-full">
+                <source src="/static/video.mp4" type="video/mp4">
+           
+            </video>
+            
+          </div>
+        </li>
+        {% for i in "0123456789" %}
+            <li class="glide__slide {% if forloop.first %}active{%endif%} my-auto">
+                <img src="{% get_static_prefix %}zm/img/img-{{i}}.jpg" class="gallery-img w-full h-full" alt="Gallery Picture {{i}}">
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="absolute top-0 h-full w-full flex justify-between items-center" data-glide-el="controls">
+      <button class="w-6 ml-8" data-glide-dir="<"><img src="/static/zm/img/prev.png"></button>
+      <button class="w-6 mr-8" data-glide-dir=">"><img src="/static/zm/img/next.png"></button>
+    </div>
   </div>
-  <div class="carousel-inner">
-    {% for i in "0123456789" %}
-        <div class="carousel-item {% if forloop.first %}active{%endif%}">
-            <img src="{% get_static_prefix %}zm/img/img-{{i}}.jpg" class="d-block w-100" alt="Gallery Picture {{i}}">
-        </div>
-    {% endfor %}
+  <div class="deko"> <img class="mx-auto" src="{% static "zm/img/deko-1.png" %}" alt="********"></img> </div>
+
+</div>
     
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselGallery"  data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselGallery"  data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-</div>
+

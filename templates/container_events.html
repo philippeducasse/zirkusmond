@@ -2,45 +2,24 @@
 {% load cropping %}
 
 
-<div class="container ">
-    {% if upcoming_shows|length|divisibleby:2 %}
-        <div class="row row-cols-1 row-cols-lg-2 g-3">
-    {% elif upcoming_shows|length|divisibleby:3 %}
-        <div class="row row-cols-1 row-cols-lg-3 g-3">
-    {% else %}
-        <div class="row row-cols-1 g-3">
-    {% endif %}
-
+<h3 class="text-center text-3xl lg:text-5xl my-12 text-zm-yellow">Upcoming Shows</h3>
+    <div class="zm-container flex all-events mt-14 flex-wrap">
     {% for show in upcoming_shows %}
-        <div class="col">
-            <a href="/show/{{ show.id }}" class="h-100">
-                <div class="card h-100">
-                    {% if upcoming_shows|length|divisibleby:2 %}
-                        <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
-                    {% elif upcoming_shows|length|divisibleby:3 %}
-                        <img class="card-img-top ratio ratio-16x9" src="{% cropped_thumbnail show "head_img" %}" />
-                    {% else %}
-                        <img class="card-img-top ratio ratio-16x9" src="{{ MEDIA_URL}}{{ show.banner_link }}" />
-                    {% endif %}
-
-                    <div class="card-body">
-                        <h3 class="card-title">{{ show.title }}</h3>
+            <a href="/show/{{ show.id }}" class="w-fit block mx-5 lg:mx-16 my-12 ">
+                <div class="card flex items-center flex-col">
+                    <div class="py-2 text-orange-600">
+                        <h3 class="card-title text-center text-4xl py-2">{{ show.title }}</h3>
+                        <div class="md:text-2xl text-2xl py-4 w-80 text-center">{{ show.dates_text }}</div>
                     </div>
-                    <div class="card-footer">{{ show.dates_text }}</div>
+                    <div class="image-container ">
+                        <img class="show-img" src="{{ MEDIA_URL }}{{ show.image1 }}" />
+                    </div>
+                    <!-- <div class="deko"> <img class="w-50 my-12" src="{% static "zm/img/deko-1.png" %}" alt="********"></img> </div> -->
                 </div>
               </a>
-        </div>
+
     {% endfor %}
-    </div>
-    <div style="width:100%;margin-top: 2em;display: flex;flex-wrap:wrap;justify-content: center;">
-	{% if show_all_events_link %}
-        <div style="display: flex; text-align: center;margin-top:2em;">
-            <a class="button" href="/events">All Events</a>
-	</div>
-	{% elif show_home_link %}
-        <div style="display: flex; text-align: center;margin-top:2em;">
-            <a class="button" href="/">Home</a>
-	</div>
-	{% endif %}
-    </div>
+    
 </div>
+
+<div class="deko"> <img class="mx-auto my-12" src="{% static "zm/img/deko-2.png" %}" alt="********"></img> </div>

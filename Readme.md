@@ -14,6 +14,12 @@
     - container_last
 - container_base extended by
 
+## Tailwind watcher
+
+run it in /static/zm
+
+npx tailwindcss -i ./design.css -o ./tailwind.css --watch 
+
 
 ## TODO
 
