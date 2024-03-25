@@ -128,9 +128,12 @@ else:
 
 EMAIL_HOST_USER = 'reservation@zirkusmond.de'
 EMAIL_HOST_PASSWORD = 'kd9b2lvj2jdkoJUkvj2jfkvjskla'
-EMAIL_HOST = '162.19.152.5'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
+EMAIL_HOST = 'mail.ableph.net'
+#EMAIL_PORT = 465
+#EMAIL_USE_SSL = True
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+#EMAIL_USE_SSL = True
 
 
 # Database
