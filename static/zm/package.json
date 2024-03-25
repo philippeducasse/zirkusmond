@@ -1,7 +1,14 @@
 {
   "dependencies": {
-    "bootstrap": "^5.0.2",
-    "jquery": "^3.6.0",
-    "leaflet": "^1.7.1"
+    "@glidejs/glide": "^3.6.0",
+    "browserslist": "^4.22.1",
+    "caniuse-lite": "^1.0.30001553",
+    "perspectivejs": "^1.0.3"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  },
+  "scripts": {
+    "tailwind": "npx tailwindcss -i ./design.css -o ./tailwind.css --watch"
   }
 }

@@ -48,6 +48,11 @@ def plain(request):
     #               'past_shows': ps,
                    'newsletter_form': newsletter_form})
 
+def about(request):
+    return render(request, 'about.html')
+
+def contact(request):
+    return render(request, 'contact.html')
 
 def event_list(request):
     return render(request, 'events.html', {'upcoming_shows': _upcoming_shows(), 'show_home_link': True})

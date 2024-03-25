@@ -3,17 +3,17 @@
 
 {% block body %}
 
-    <div class="container">
+{% include "navbar.html" %}
+
+    <div class="zm-container">
         {% block content-header %}
-        <div>
-            <img src="/static/zm/img/mond.png"
-                style="width:30%;margin-left: 35%; margin-right: 35%;margin-top:.3em;margin-bottom:1.7em;">
+        <div class="w-60 mx-auto my-10">
+            <img src="/static/zm/img/mond.png">
         </div>
         {% endblock %}
         {% block content %}
         {% endblock %}
         {% block content-footer %}
-        <div class="deko" style="margin-top:8em;"> <img src="/static/zm/img/copy.png"> </div>
         {% endblock %}
     </div>
 {% endblock %}

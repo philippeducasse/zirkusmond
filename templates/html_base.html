@@ -25,9 +25,9 @@
     {% block og_image %}
     <meta property="og:image" content="https://zirkusmond.de/static/zm/img/zm_square.jpg" />
     {% endblock %}
-
+    
     <script type="application/ld+json">
-    {% block structured_data %}
+        {% block structured_data %}
         {
             "@context": "https://schema.org",
             "@type": "Organization",
@@ -35,26 +35,50 @@
             "url": "https://zirkusmond.de",
             "logo": "https://zirkusmond.de/static/zm/img/zm_square.jpg"
         }
-    {% endblock %}
+        {% endblock %}
     </script>
 
     {% endblock %}
     {% block head_js %}
 
-    <link rel="stylesheet" href="/static/zm/node_modules/leaflet/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/>
-    <link rel="stylesheet" type="text/css" href="/static/zm/node_modules/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="{% static "zm/design.css" %}">
+    
+    <link  href="{% static "zm/tailwind.css" %}" rel="stylesheet">
+    <link rel="stylesheet" href="static/zm/node_modules/@glidejs/glide/dist/css/glide.core.min.css">
     {% endblock %}
 </head>
     
 </head>
-<body>
+<body >
+<div>
+
     {% block body %}
     {% endblock %}
+</div>
+<script src="static/zm/node_modules/@glidejs/glide/dist/glide.min.js"></script>
+<script>
+    if (document.querySelector('.glide')) {
+    new Glide('.glide').mount();
+    }
+    const header = document.querySelector('.navbar')
+       if (window.location.pathname === '/'){
+        window.addEventListener("scroll", function(){
+            header.classList.toggle('sticky', window.scrollY > 100)
+        })
+    } else header.classList.add('sticky')
+    
+    // window.addEventListener("scroll", function(){
+    //     const header = document.querySelector('.navbar')
+    //     header.classList.toggle('sticky', window.scrollY > 100)
+    // })
+    const hamburger = document.querySelector('.hamburger');
+    hamburger.addEventListener('click', function (){
+        const mobileMenu = document.querySelector('.mobile-menu');
+        hamburger.classList.toggle('open')
+        mobileMenu.classList.toggle('hidden')
+        mobileMenu.classList.toggle('flex')
+    })    
 
-    <script type="text/javascript" src="/static/zm/node_modules/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/zm/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</script>
+
 </body>
 </html>
