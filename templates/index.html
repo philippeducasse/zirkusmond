@@ -3,29 +3,13 @@
 
 {% block body %}
 
+{% include "navbar.html" %}
+
 {% include "container_intro.html" %}
-
-
-<div class="deko"> <img src="{% static "zm/img/deko-1.png" %}" alt="========"></img> </div>
 
 {% include "container_events.html" %}
 
-<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}" alt="********"></img> </div>
-
-{% include "container_video.html" %}
-
-<div id="outro">
-    <div class="deko"> <img src="{% static "zm/img/deko-1.png" %}" alt="********"></img> </div>
-    {% include "section_about_text.html" %}
-</div>
-
-<div class="deko"> <img src="{% static "zm/img/deko-2.png" %}" alt="========"></img> </div>
-
 {% include "container_gallery.html" %}
-
-<div class="deko" id="livestream"> <img src="{% static "zm/img/deko-2.png" %}"
-alt="********"></img> </div>
-
 
 {% include "container_last.html" %}
 
