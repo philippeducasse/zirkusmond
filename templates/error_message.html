@@ -3,7 +3,12 @@
 
 {% block title %}{{error_code}} {{error_message}}{% endblock %}
 {% block content %}
-<h1>{{error_message}}</h1>
 
-<a href="/">How about going back Home</a>
-{% endblock %}
+
+<div class="w-2/3 lg:text-lg text-center mx-auto" >
+    <h2 class="text-white text-xl mb-5">{{error_message}}</h2>
+    
+    <a class="button" href="/"> Back to home</a>
+    
+    {% endblock %}
+</div>
