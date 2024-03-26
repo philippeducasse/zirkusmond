@@ -1130,6 +1130,15 @@ a.card-link  {
   #donate-btn{
     font-size: 100%;
   }
+
+  #id_res-event{
+    width: 80%;
+  }
+
+  .button-payment{
+    margin: 1rem auto 0;
+    width: 80%;
+  }
 }
 
 .err_msg {

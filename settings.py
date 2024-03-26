@@ -116,7 +116,7 @@ else:
            'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
            'endpoint': 'https://api.paypal.com',
            'capture': True}),
-        'card-payment': ('payments.stripe.StripeProvider', {
+        'bank card': ('payments.stripe.StripeProvider', {
             'public_key': 'pk_live_51OczecLXJ9LQjER4Nq5qiGhvYUssXtVXh7WoyhNJxnSgEN9uy5DZrjKmDDGR0MKrK78GhAHREnDbE3u5lxKp8SIQ00ABrQpxME',
             'secret_key': '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',
             }),
