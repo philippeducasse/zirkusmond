@@ -12,7 +12,11 @@
                         <div class="md:text-2xl text-2xl py-4 w-80 text-center">{{ show.dates_text }}</div>
                     </div>
                     <div class="image-container ">
-                        <img class="show-img" src="{{ MEDIA_URL }}{{ show.image1 }}" />
+			{% if show.image1 != "" %}
+                            <img class="show-img" src="{{ MEDIA_URL }}{{ show.image1 }}" />
+			{% else %}
+                            <img class="show-img" src="{{ MEDIA_URL }}{{ show.banner_link }}" />
+			{% endif %}
                     </div>
                     <!-- <div class="deko"> <img class="w-50 my-12" src="{% static "zm/img/deko-1.png" %}" alt="********"></img> </div> -->
                 </div>
