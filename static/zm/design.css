@@ -237,7 +237,6 @@ a.card-link  {
         text-decoration: none;
         padding: 1em
     }
-    
     a.button:hover, a.button:active, .button:hover {
         border-style: double;
         /* transition: all ease-in-out 28s; padding: 1300px; */
@@ -250,6 +249,14 @@ a.card-link  {
     #donate-btn{
         font-size: 100%;
     }
+
+    #id_res-event{
+      width: 80%;
+    }
+  .button-payment{
+    margin: 1rem auto 0;
+    width: 80%;
+  }
     
    
 }
