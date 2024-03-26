@@ -116,7 +116,7 @@ else:
            'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
            'endpoint': 'https://api.paypal.com',
            'capture': True}),
-        'card-payment': ('payments.stripe.StripeProvider', {
+        'bank card': ('payments.stripe.StripeProvider', {
             'public_key': '',
             'secret_key': '',
             }),
