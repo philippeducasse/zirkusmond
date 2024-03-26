@@ -3,7 +3,10 @@
 {% block title %}Zirkus Monde - Impressum{% endblock %}
 
 {% block content %}
-<h1>Impressum</h1>
-{% include "impressum_text.html" %}
+<div class="impressum w-2/3 lg:text-lg text-center mx-auto" >
+    <h2 class="text-white text-2xl mb-5">Impressum</h2>
 
-{% endblock %}
+    {% include "impressum_text.html" %}
+    
+    {% endblock %}
+</div>

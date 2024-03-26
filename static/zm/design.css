@@ -418,7 +418,7 @@ a.card-link  {
 /* GALLERY */
 
 .gallery{
-    background-color: #00000040;
+    background-color: #000;
     border: 2px solid #E7B548;
 }
 
@@ -488,7 +488,9 @@ a.card-link  {
 
   /* rRESERVATION FORM */
 
-
+  .banner-img{
+    max-width: 800px;
+  }
 
   .reservation-form{
     padding: 2em;

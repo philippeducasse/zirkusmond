@@ -647,6 +647,10 @@ video {
   margin-bottom: auto;
 }
 
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
+
 .mb-6 {
   margin-bottom: 1.5rem;
 }
@@ -681,10 +685,6 @@ video {
 
 .block {
   display: block;
-}
-
-.inline-block {
-  display: inline-block;
 }
 
 .inline {
@@ -1310,7 +1310,7 @@ a.card-link  {
 /* GALLERY */
 
 .gallery{
-  background-color: #00000040;
+  background-color: #000;
   border: 2px solid #E7B548;
 }
 
@@ -1378,6 +1378,10 @@ a.card-link  {
 }
 
 /* rRESERVATION FORM */
+
+.banner-img{
+  max-width: 800px;
+}
 
 .reservation-form{
   padding: 2em;
@@ -1569,6 +1573,11 @@ a.card-link  {
   .lg\:text-5xl {
     font-size: 3rem;
     line-height: 1;
+  }
+
+  .lg\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 }
 
