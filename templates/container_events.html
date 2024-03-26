@@ -6,17 +6,17 @@
     <div class="zm-container flex all-events mt-14 flex-wrap">
     {% for show in upcoming_shows %}
             <a href="/show/{{ show.id }}" class="w-fit block mx-5 lg:mx-16 my-12 ">
-                <div class="card flex items-center flex-col">
-                    <div class="py-2 text-orange-600">
-                        <h3 class="card-title text-center text-4xl py-2">{{ show.title }}</h3>
-                        <div class="md:text-2xl text-2xl py-4 w-80 text-center">{{ show.dates_text }}</div>
-                    </div>
+                <div class="card flex items-center flex-col justify-between">
                     <div class="image-container ">
 			{% if show.image1 != "" %}
                             <img class="show-img" src="{{ MEDIA_URL }}{{ show.image1 }}" />
 			{% else %}
                             <img class="show-img" src="{{ MEDIA_URL }}{{ show.banner_link }}" />
 			{% endif %}
+                    </div>
+                    <div class="flex flex-col text-center my-auto items-center p-6 lg:p-2 justify-between">
+                        <h3 class="card-title text-center text-2xl md:text-4xl ">{{ show.title }}</h3>
+                        <p class="card-text w-full md:text-2xl text-white text-lg pt-2 w-80 text-center lg:p-2">{{ show.dates_text }}</p>
                     </div>
                     <!-- <div class="deko"> <img class="w-50 my-12" src="{% static "zm/img/deko-1.png" %}" alt="********"></img> </div> -->
                 </div>
