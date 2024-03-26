@@ -66,10 +66,6 @@
         })
     } else header.classList.add('sticky')
     
-    // window.addEventListener("scroll", function(){
-    //     const header = document.querySelector('.navbar')
-    //     header.classList.toggle('sticky', window.scrollY > 100)
-    // })
     const hamburger = document.querySelector('.hamburger');
     hamburger.addEventListener('click', function (){
         const mobileMenu = document.querySelector('.mobile-menu');
@@ -77,6 +73,11 @@
         mobileMenu.classList.toggle('hidden')
         mobileMenu.classList.toggle('flex')
     })    
+
+    const eventCardText = document.querySelectorAll('.card-text');
+    eventCardText.forEach((cardText) => {
+        cardText.innerHTML = cardText.innerHTML.replace(/(\d{2}:\d{2})\//g, '$1<br>')
+    })
 
 </script>
 
