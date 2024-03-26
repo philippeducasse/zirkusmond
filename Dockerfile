@@ -11,10 +11,8 @@ RUN pip install -r requirements.txt
 ADD . .
 COPY manage.py ..
 
-#RUN python ../manage.py makemigrations
-#RUN python ../manage.py makemigrations events
-#RUN python ../manage.py migrate
-#RUN python ../manage.py collectstatic
+RUN ln -s /srv/data/zm-migrations zm/migrations
+RUN ln -s /srv/data/events-migrations events/migrations
 
 COPY nginx.default /etc/nginx/sites-available/default
 
