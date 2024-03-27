@@ -584,9 +584,8 @@ a.card-link  {
     justify-content: center;
   }
   
-  .member-container img{
-    min-width: 280px;
-    max-width: 550px;
+  .member-container .MnM{
+    max-width: 335px;
   }
 
   .about-text{
