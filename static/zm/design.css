@@ -209,7 +209,9 @@ a.card-link  {
   font-size: 18px;
 }
 
-.payment-buttons{
+.reserve__button{
+  margin: 2rem auto;
+  display: block;
 }
 
 .payment-buttons div{
@@ -223,6 +225,8 @@ a.card-link  {
     }
 }
 @media only screen and (max-width:500px){
+  
+
   .show-img{
     max-width: 300px;
     min-width: 200px;
@@ -305,8 +309,8 @@ a.card-link  {
     flex-direction: column;
   }
 
-  .banner-image-container{
-    height: 300px!important; 
+  .banner-img{
+    display: none;
   }
 
   .deko img {
