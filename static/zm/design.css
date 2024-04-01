@@ -283,7 +283,8 @@ a.card-link  {
   transition: all 600ms;
   transition-delay: 200ms;
   backface-visibility: hidden;
-
+  visibility: hidden;
+  border-bottom: 3px solid #f6ae42;
 }
 
 .home-nav{
@@ -293,8 +294,8 @@ a.card-link  {
 .navbar.sticky{
   opacity: 1;
   background-image: url("/static/zm/img/bg_pattern.png");
-  border-bottom: 3px solid #f6ae42;
   backface-visibility: hidden;
+  visibility: visible;
 }
 
 
