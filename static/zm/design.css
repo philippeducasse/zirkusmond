@@ -298,6 +298,11 @@ a.card-link  {
   visibility: visible;
 }
 
+.zm-logo{
+  height: 56.25px;
+  width: 56.25px;
+  object-fit: cover;
+}
 
 /* Mobile Navigation Styling */
 .nav-items {
