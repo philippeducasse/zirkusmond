@@ -759,6 +759,10 @@ video {
   width: 100vw;
 }
 
+.w-1\/3 {
+  width: 33.333333%;
+}
+
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
@@ -802,6 +806,11 @@ video {
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 .py-4 {
@@ -1183,6 +1192,13 @@ a.card-link  {
   visibility: visible;
 }
 
+.zm-logo{
+  height: 56.25px;
+  width: 56.25px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 /* Mobile Navigation Styling */
 
 .nav-items {
@@ -1527,6 +1543,11 @@ a.card-link  {
 
   .md\:flex-row {
     flex-direction: row;
+  }
+
+  .md\:px-12 {
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 
   .md\:text-2xl {
