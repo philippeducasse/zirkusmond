@@ -98,10 +98,10 @@ if DEBUG:
             'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True}),
-        'card payment': ('payments.stripe.StripeProvider', {
-            'public_key': '',
+         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': '',
             }),
+
         'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
             'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
@@ -116,8 +116,7 @@ else:
            'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
            'endpoint': 'https://api.paypal.com',
            'capture': True}),
-        'bank card': ('payments.stripe.StripeProvider', {
-            'public_key': '',
+        'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': '',
             }),
         'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
