@@ -98,10 +98,10 @@ if DEBUG:
             'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True}),
-        'card payment': ('payments.stripe.StripeProvider', {
-            'public_key': 'pk_test_51OczecLXJ9LQjER4CbAn1wKBtrzqTyQFeAOt4IXweXnV4ijWJJdhnVACjByvItVNkNiUiXhfK0o8FziB72yDm43E00gkf96WMX',
+         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': 'sk_test_51OczecLXJ9LQjER4DYUZoyxXvKULAlJcNbq8DssE3EBSz5sz2geMZh6WLzCSCzGUIGcwYnjCvm5oS47O57Xzd9B700I1MDXwTu',
             }),
+
         'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
             'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
@@ -116,8 +116,7 @@ else:
            'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
            'endpoint': 'https://api.paypal.com',
            'capture': True}),
-        'bank card': ('payments.stripe.StripeProvider', {
-            'public_key': 'pk_live_51OczecLXJ9LQjER4Nq5qiGhvYUssXtVXh7WoyhNJxnSgEN9uy5DZrjKmDDGR0MKrK78GhAHREnDbE3u5lxKp8SIQ00ABrQpxME',
+        'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': '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',
             }),
         'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
