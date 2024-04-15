@@ -33,6 +33,7 @@ class StripeProvider(BasicProvider):
                 success_url=f'{get_base_url()}/reservation_status/{payment.id}'
                 
             )
+            payment.change_status(PaymentStatus.CONFIRMED)
             return checkout_session.url
         except stripe.error.StripeError as e:
             payment.change_status(PaymentStatus.REJECTED)
@@ -40,16 +41,5 @@ class StripeProvider(BasicProvider):
     def get_form(self, payment, data=None):
         session_url = self.create_stripe_session(payment)
         raise RedirectNeeded(session_url)
-    def process_data(self, payment, request):
-        event = self.validate_stripe_event(request)
-        if event and event['type'] == 'checkout.session.completed':
-            payment.change_status(PaymentStatus.CONFIRMED)
-        else:
-            payment.change_status(PaymentStatus.REJECTED)
-        return redirect(payment.get_success_url())
 
-    def validate_stripe_event(self, request):
-        # Implement the logic to validate the Stripe event
-        # This typically involves checking the event signature and type
-        # Return the event if valid, None otherwise
-        pass  # Placeholder for actual implementation
+        
