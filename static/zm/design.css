@@ -609,10 +609,14 @@ a.card-link  {
 
   .member-container{
     display: flex;
+    flex-wrap: wrap;
     background-color: #00000040;
     border: 2px solid #E7B548;
     align-items: center;
     justify-content: center;
+  }
+
+  .member-text{
   }
   
   .member-container .MnM{
@@ -620,9 +624,9 @@ a.card-link  {
   }
 
   .image__member {
+    object-fit: cover;
     width: 400px; 
     height: 400px; 
-    object-fit: cover;
     object-position: 25% 25%; 
     }
   .juan{
