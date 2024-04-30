@@ -1,3 +1,4 @@
+
 import stripe
 import requests
 import json
@@ -32,10 +33,7 @@ class StripeProvider(BasicProvider):
                 }],
                 mode='payment',
                 success_url= f'{get_base_url()}/payments/process/{payment.token}',
-                cancel_url= payment.get_failure_url()
-                success_url= f'{get_base_url()}/payments/process/{payment.token}',
-                cancel_url= payment.get_failure_url()
-                
+                cancel_url= payment.get_failure_url(),
             )
             
             
