@@ -1,6 +1,8 @@
-# this is a custom provider
-
 import stripe
+import requests
+import json
+import logging
+logger = logging.getLogger(__name__)
 from django.shortcuts import redirect
 from payments import PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_base_url
@@ -12,7 +14,6 @@ class StripeProvider(BasicProvider):
         stripe.api_key = self.secret_key
         self.callback_host = get_base_url()
         super(StripeProvider, self).__init__(**kwargs)
-
 
     def create_stripe_session(self, payment, *args, **kwargs):
        
@@ -30,10 +31,14 @@ class StripeProvider(BasicProvider):
                     'quantity': 1,
                 }],
                 mode='payment',
-                success_url=f'{get_base_url()}/reservation_status/{payment.id}'
+                success_url= f'{get_base_url()}/payments/process/{payment.token}',
+                cancel_url= payment.get_failure_url()
+                success_url= f'{get_base_url()}/payments/process/{payment.token}',
+                cancel_url= payment.get_failure_url()
                 
             )
-            payment.change_status(PaymentStatus.CONFIRMED)
+            
+            
             return checkout_session.url
         except stripe.error.StripeError as e:
             payment.change_status(PaymentStatus.REJECTED)
@@ -41,5 +46,7 @@ class StripeProvider(BasicProvider):
     def get_form(self, payment, data=None):
         session_url = self.create_stripe_session(payment)
         raise RedirectNeeded(session_url)
-
-        
+    def process_data(self, payment, request):
+        payment.change_status(PaymentStatus.CONFIRMED)
+        return redirect(payment.get_success_url())
+       
