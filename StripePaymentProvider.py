@@ -32,7 +32,7 @@ class StripeProvider(BasicProvider):
                     'quantity': 1,
                 }],
                 mode='payment',
-                success_url= f'{get_base_url()}/payments/process/{payment.token}',
+                success_url= f'{get_base_url()}/payments/process/{payment.token}/',
                 cancel_url= payment.get_failure_url(),
             )
             
