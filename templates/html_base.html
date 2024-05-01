@@ -79,19 +79,28 @@
         cardText.innerHTML = cardText.innerHTML.replace(/(\d{2}:\d{2})\//g, '$1<br>')
     })
 
+    let spinner = document.querySelector('.spinner');
+    let redirectingText = document.querySelector('.redirecting-text');
+    let submitButtons = document.querySelectorAll('.button-payment')
+    
     function showSpinner() {
-            console.log('clicked')
-            let spinner = document.querySelector('.spinner');
-            let redirectingText = document.querySelector('.redirecting-text')
-
-                // Show spinner
                 spinner.classList.remove('hide-spinner');
-                // show text
                 redirectingText.classList.remove('hide-spinner')
 
                 // Disable buttons to prevent multiple submissions
-                submitButtons.forEach((btn) =>  btn.disabled = true);
+                submitButtons.forEach((btn) =>  
+                 setTimeout(() => {
+                    btn.disabled = true;
+                    }, 1));
         };
+
+    // hide spinner if navigates back to page
+    window.addEventListener('pageshow', function() {
+        spinner.classList.add('hide-spinner');
+        redirectingText.classList.add('hide-spinner');
+
+        submitButtons.forEach((btn) => btn.disabled = false);
+    });
 
 </script>
 
