@@ -41,9 +41,14 @@ body {
 
 }
 
+.zm-container{
+  max-width: 1800px;
+}
+
 .deko img {
   width: 70%;
-  margin: 2rem auto;
+  margin: 2rem auto 8rem;
+  max-width: 1200px;
 }
 
 
@@ -504,6 +509,12 @@ a.card-link  {
     justify-content: space-between
   }
 
+  .show-btn{
+    display: flex;
+    text-align: right;
+    margin-top:2em;
+  }
+
   .links a{
     width: fit-content;
   }
@@ -593,12 +604,15 @@ a.card-link  {
   }
   }
 
+ 
+
 
   /* ABOUT PAGE */
 
   .about-page{
     margin: 0 4rem;
     box-sizing: border-box;
+    max-width: 1400px;
   }
 
   .about-page__header{
@@ -675,4 +689,26 @@ a.card-link  {
   to {
     transform: rotate(360deg);
   }
+}
+
+@media screen and (min-width:1200px) {
+  .show-details{
+    margin: 2em auto;
+  }
+  .show-btns{
+    margin: 2rem 8rem;
+    justify-content: center;
+  }
+  .show-btn{
+    margin: 0 10rem;
+  }
+
+  .about-page{
+    margin: 0 auto;
+  }
+
+  .zm-container{
+    margin: 0 auto;
+  }
+
 }
