@@ -691,7 +691,7 @@ a.card-link  {
   }
 }
 
-@media screen and (min-width:1200px) {
+@media screen and (min-width:1281px) {
   .show-details{
     margin: 2em auto;
   }
