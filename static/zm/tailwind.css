@@ -682,10 +682,6 @@ video {
   margin-top: 3.5rem;
 }
 
-.mt-16 {
-  margin-top: 4rem;
-}
-
 .mt-8 {
   margin-top: 2rem;
 }
@@ -939,7 +935,7 @@ body {
 
 .deko img {
   width: 70%;
-  margin: 2rem auto 8rem;
+  margin: 4rem auto ;
   max-width: 1200px;
 }
 
@@ -1385,7 +1381,7 @@ a.card-link  {
   padding: 2em;
   flex-wrap: wrap;
   max-width: 600px;
-  max-height: 600px;
+  max-height: 700px;
   min-width: 250px;
 }
 

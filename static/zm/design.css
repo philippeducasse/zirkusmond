@@ -47,7 +47,7 @@ body {
 
 .deko img {
   width: 70%;
-  margin: 2rem auto 8rem;
+  margin: 4rem auto ;
   max-width: 1200px;
 }
 
@@ -491,7 +491,7 @@ a.card-link  {
     padding: 2em;
     flex-wrap: wrap;
     max-width: 600px;
-    max-height: 600px;
+    max-height: 700px;
     min-width: 250px;
   }
   
