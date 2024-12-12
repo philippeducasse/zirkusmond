@@ -297,7 +297,7 @@ a.card-link  {
 
     max-width: 310px;
     min-height: 500px;
-    max-height: 520px;
+    max-height: fit-content;
   }
 
     a.button:link, a.button:visited, input.button {
