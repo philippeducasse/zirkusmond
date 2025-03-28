@@ -45,6 +45,7 @@
   const unmuteBtn = document.getElementById('unmute-btn');
   const muteLogo = document.getElementById('mute-logo');
   const videoContainer = document.getElementById('video-container');
+  var autoPlayVideo = true;
 
   // Function to update the icon size
   function updateIconSize() {
@@ -62,8 +63,9 @@
 
   // Play video when it's in view
   function handleScroll() {
-    if (isInView()) {
+    if (isInView() && autoPlayVideo) {
       video.play();
+      autoPlayVideo = false;
     }
   }
 
