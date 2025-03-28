@@ -14,7 +14,7 @@
         </button>
        </div>
     </div>
-    <video id="crowdfunding-video" autoplay muted loop class="shadowed-content h-full w-full">
+    <video id="crowdfunding-video" autoplay muted loop playsinline class="shadowed-content h-full w-full">
       <source src="/static/zm/crowdfunding_video.webm" type="video/webm">
     </video>
 
@@ -45,7 +45,6 @@
   const unmuteBtn = document.getElementById('unmute-btn');
   const muteLogo = document.getElementById('mute-logo');
   const videoContainer = document.getElementById('video-container');
-  var autoPlayVideo = true;
 
   // Function to update the icon size
   function updateIconSize() {
@@ -63,9 +62,8 @@
 
   // Play video when it's in view
   function handleScroll() {
-    if (isInView() && autoPlayVideo) {
+    if (isInView()) {
       video.play();
-      autoPlayVideo = false;
     }
   }
 
