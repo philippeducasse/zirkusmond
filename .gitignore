@@ -5,11 +5,10 @@ static/zm/node_modules/*
 *kate-swp
 static_/*
 media/*
-events/migrations/*
-gallery/migrations/*
 test/*
 db.sqlite*
 /static/package-lock.json
 /static/zm/package-lock.json
 venv/*
 templates/mond.html
+

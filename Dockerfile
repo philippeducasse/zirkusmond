@@ -11,15 +11,30 @@ RUN pip install -r requirements.txt
 ADD . .
 COPY manage.py ..
 
-RUN ln -s /srv/data/zm-migrations zm/migrations
-RUN ln -s /srv/data/events-migrations events/migrations
-
 COPY nginx.default /etc/nginx/sites-available/default
 
 EXPOSE 8000
 WORKDIR /srv/data
-#CMD ["python", "/usr/src/manage.py", "runserver", "0.0.0.0:8000"]
+
 EXPOSE 8020
-#STOPSIGNAL SIGTERM
+
 RUN ln -s /usr/src/zirkusmond /srv/data/zirkusmond
 CMD ["/usr/src/zirkusmond/start-server.sh"]
+
+
+
+#
+# from django.db import migrations, connection
+#from django.utils import timezone
+#
+#def mark_migration_as_applied(app_label, migration_name):
+#    with connection.cursor() as cursor:
+#        cursor.execute(
+#            """
+#            INSERT INTO django_migrations (app, name, applied)
+#            VALUES (%s, %s, %s)
+#            """,
+#            [app_label, migration_name, timezone.now()]
+#        )
+#        print(f"Marked {app_label}.{migration_name} as applied.")
+

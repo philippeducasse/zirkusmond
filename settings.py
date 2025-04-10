@@ -4,6 +4,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+import platform
 import logging
 import logging.config
 from pathlib import Path
@@ -19,7 +20,7 @@ print('BASE_DIR: %s' % BASE_DIR)
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = platform.node() != 'zirkusmond_de'
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
                  '127.0.0.1', 'localhost', '192.168.188.154', '192.168.1.137',
                  'zirkusmond.de', 'www.zirkusmond.de', 'testing.zirkusmond.de']
