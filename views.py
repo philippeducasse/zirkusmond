@@ -48,8 +48,8 @@ def plain(request):
     newsletter_form = NewsletterRegistrationForm()
     return render(request, 'index.html',
                   {'upcoming_shows': us,
-                      'show_all_events_link': True,
-    #               'past_shows': ps,
+                   'show_all_events_link': True,
+                   'show_home_link': False,
                    'newsletter_form': newsletter_form})
 
 def about(request):
@@ -65,7 +65,7 @@ def international(request):
     return render(request, 'international.html')
 
 def event_list(request):
-    return render(request, 'events.html', {'upcoming_shows': _upcoming_shows(), 'show_home_link': True})
+    return render(request, 'events.html', {'upcoming_shows': _upcoming_shows(), 'show_home_link': True, 'show_all_events_link': False})
 
 
 def newsletter_registration(request):

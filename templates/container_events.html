@@ -19,12 +19,12 @@
               </a>
         {% endfor %}
     </div>
-    {% if show_all_events_link %}
+    {% if show_all_events_link|default:False %}
     <div class="flex justify-center"> 
         <a class="button " href="/events">See all events</a>
     </div>
     {% endif %}
-    {% if show_home_link%}
+    {% if show_home_link|default:False  %}
     <div class="flex justify-center"> 
         <a class="button " href="/">Back to home</a>
     </div>
