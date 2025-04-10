@@ -427,9 +427,10 @@ a.card-link  {
   z-index:100;
   background-image: url("/static/zm/img/bg_pattern.png");
   border: 2px solid #E7B548;
-  top:80px;
+  top:77.7px;
   right:0;
   padding: 1rem 4rem;
+  gap: 1rem;
 }
 
 .banner-image-container {
@@ -603,6 +604,7 @@ a.card-link  {
   .about-page{
     margin: 0 !important;
   }
+
   }
 
  
