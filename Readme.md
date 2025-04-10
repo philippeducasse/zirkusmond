@@ -16,12 +16,19 @@
 
 ## Tailwind watcher
 
-run it in /static/zm
+run it in zirkusmond/static/zm
 
 npx tailwindcss -i ./design.css -o ./tailwind.css --watch 
 
 
 ## TODO
+
+- Change logos in zm- ->> border radius on lisboa
+- change images
+- add Merch in navbar -> redirect to payment site
+
+
+- translations: en, de, es, pt
 
 
 ## FAQ

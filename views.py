@@ -6,7 +6,7 @@ from django.utils import timezone as tz
 import datetime
 
 from .events.models import Show
-from .zm.models import Visitor
+from .zm.models import Visitor, RentalObject
 from .zm.forms import NewsletterRegistrationForm
 
 def _get_ip(request):
@@ -25,6 +25,10 @@ def _upcoming_shows():
     us = list(filter(lambda x: x.show_in_preview(), us))
     us = sorted(us, key=lambda x: datetime.date(2020, 1, 1) if len(x.events()) == 0 else x.events()[0].admission.date())
     return us
+
+def _rental_objects():
+    rental_objects = RentalObject.objects.all()
+    return rental_objects
 
 
 def plain(request):
@@ -53,6 +57,12 @@ def about(request):
 
 def contact(request):
     return render(request, 'contact.html')
+
+def rentals(request):
+    return render(request, 'rentals.html',  {'rental_objects': _rental_objects()})
+
+def international(request):
+    return render(request, 'international.html')
 
 def event_list(request):
     return render(request, 'events.html', {'upcoming_shows': _upcoming_shows(), 'show_home_link': True})
@@ -96,6 +106,10 @@ def impressum(request):
     '''
     return render(request, 'impressum.html')
 
+def datenschutz(request):
+    ''' display datenschutz
+    '''
+    return render(request, 'datenschutz.html')
 
 def robots(request):
     ''' display impressum

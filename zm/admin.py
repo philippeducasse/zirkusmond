@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Visitor, NewsletterRegistration
+from .models import Visitor, NewsletterRegistration, RentalObject
 from django.http import HttpResponse
 from django.utils import timezone
 
@@ -38,3 +38,4 @@ class NewsletterRegistrationAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Visitor, VisitorAdmin)
 admin.site.register(NewsletterRegistration, NewsletterRegistrationAdmin)
+admin.site.register(RentalObject)
