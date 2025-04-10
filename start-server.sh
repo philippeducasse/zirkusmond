@@ -9,5 +9,5 @@ python /usr/src/manage.py makemigrations events
 python /usr/src/manage.py migrate events
 chown www-data:www-data -R .
 chown www-data:www-data db.sqlite3
-gunicorn zirkusmond.wsgi --user www-data --bind 0.0.0.0:8010 --workers 3 &
+gunicorn zirkusmond.wsgi --user www-data --bind 0.0.0.0:8010 --workers 3 --timeout 240 &
 nginx -g "daemon off;"
