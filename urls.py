@@ -22,11 +22,16 @@ from django.conf.urls.static import static
 
 from . import views
 from .events import views as event_views
+from .events.views_admin import purge_old_payments_view
+
 from .gallery import views as gviews
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("admin/events/", include("zirkusmond.events.urls", namespace="events_admin")),
+    path("admin-purge-old-payments", purge_old_payments_view),
+
 
     path('', views.plain),
     path('events', views.event_list),
@@ -47,7 +52,6 @@ urlpatterns = [
     path('payment-failure/<uuid:payment_id>', event_views.payment_fail),
     path('payment/<uuid:payment_id>/<str:payment_variant>', event_views.payment,
          name='payment'),
-
 
     path('gallery', gviews.gallery, name='gallery'),
     path('gallery/<int:pk>', gviews.album),
