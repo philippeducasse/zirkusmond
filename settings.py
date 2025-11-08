@@ -223,5 +223,10 @@ logging.config.dictConfig({
             'level': LOGLEVEL,
             'handlers': ['console',],
         },
+        'django.utils.autoreload': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+            'propagate': False,
+        },
     },
 })
