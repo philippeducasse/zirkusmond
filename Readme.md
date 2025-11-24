@@ -68,5 +68,14 @@ https://stackoverflow.com/questions/501719/dynamically-adding-a-form-to-a-django
 
 ### paypal
 
-sb-f2wjp5409330@business.example.com
-iR2#,z,l
+- User: `sb-f2wjp5409330@business.example.com`
+- Password: `iR2#,z,l`
+
+### stripe
+
+Use any card listed in the Stripe docs https://docs.stripe.com/testing#cards. Common example:
+
+- Card: `4242 4242 4242 4242`
+- Expiry: any future month/year (e.g. `12 / 34`)
+- CVC: any 3 digits (e.g. `123`)
+- ZIP: any 5 digits (e.g. `12345`)
