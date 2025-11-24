@@ -20,10 +20,14 @@ print('BASE_DIR: %s' % BASE_DIR)
 SECRET_KEY = '9gg)@^#6+3&r33*#gszht&v=7-88^fqn-d3#2l3*sh^b*tfm3l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = platform.node() != 'zirkusmond_de'
+DEBUG = platform.node() not in ['zirkusmond_de', 'testing_zirkusmond_de']
 ALLOWED_HOSTS = ['192.168.178.28', '192.168.178.21', 'mondy.ableph.net',
                  '127.0.0.1', 'localhost', '192.168.188.154', '192.168.1.137',
-                 'zirkusmond.de', 'www.zirkusmond.de', 'testing.zirkusmond.de']
+                 'zirkusmond.de', 'www.zirkusmond.de', 'testing.zirkusmond.de',
+                 'www.testing.zirkusmond.de']
+
+
+IS_TESTING = 'IS_TESTING' in os.environ
 
 
 # Application definition
@@ -107,6 +111,24 @@ if DEBUG:
             'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
 
+elif IS_TESTING:
+    PAYMENT_HOST = 'testing.zirkusmond.de'
+    PAYMENT_USES_SSL = True
+    PAYMENT_VARIANTS =  {
+        'default': ('payments.dummy.DummyProvider', {}),
+        'paypal': ('payments.paypal.PaypalProvider', {
+            'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
+            'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
+            'endpoint': 'https://api.sandbox.paypal.com',
+            'capture': True}),
+         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
+            'secret_key': 'sk_test_51OczecLXJ9LQjER4DYUZoyxXvKULAlJcNbq8DssE3EBSz5sz2geMZh6WLzCSCzGUIGcwYnjCvm5oS47O57Xzd9B700I1MDXwTu',
+            }),
+
+
+        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
+            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
+    }
 
 else:
     PAYMENT_HOST = 'zirkusmond.de'
@@ -146,14 +168,25 @@ if DEBUG:
         }
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'monddb',
-            'USER': 'mond',
-            'PASSWORD': '999927nfopfh8282yfmo3027dbwfpmz01q',
-            'HOST': 'zm_db',
-            'PORT': '5432',
+    if IS_TESTING:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'monddb',
+                'USER': 'mond',
+                'PASSWORD': '999927nfopfh8282yfmo3027dbwfpmz01q',
+                'HOST': 'testing_zm_db',
+                'PORT': '5432',
+    }}
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'monddb',
+                'USER': 'mond',
+                'PASSWORD': '999927nfopfh8282yfmo3027dbwfpmz01q',
+                'HOST': 'zm_db',
+                'PORT': '5432',
     }}
 
 
@@ -222,6 +255,11 @@ logging.config.dictConfig({
         '': {
             'level': LOGLEVEL,
             'handlers': ['console',],
+        },
+        'django.utils.autoreload': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+            'propagate': False,
         },
     },
 })
