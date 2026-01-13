@@ -31,7 +31,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("admin/events/", include("zirkusmond.events.urls", namespace="events_admin")),
     path("admin-purge-old-payments", purge_old_payments_view),
-
+    path('tinymce/', include('tinymce.urls')),
 
     path('', views.plain),
     path('events', views.event_list),
