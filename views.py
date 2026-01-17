@@ -35,11 +35,6 @@ def plain(request):
     ''' Give em our index, without doing much
     '''
     us = _upcoming_shows()[:6]
-    ps = Show.objects.filter(private=False)
-    # get the last three shows which last date is in the past
-    #ps = filter(lambda x: x.last_event() != None, ps)
-    #ps = list(filter(lambda x: x.last_event().admission < tz.now(), ps))[-3:]
-    # ps = list(filter(lambda x:
     v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
                 ip=_get_ip(request),
                 referer=_get_referer(request),
@@ -66,7 +61,6 @@ def international(request):
 
 def event_list(request):
     return render(request, 'events.html', {'upcoming_shows': _upcoming_shows(), 'show_home_link': True, 'show_all_events_link': False})
-
 
 def newsletter_registration(request):
     if request.method == 'POST':
