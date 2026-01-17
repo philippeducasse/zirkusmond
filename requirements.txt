@@ -12,4 +12,5 @@ xmltodict
 psycopg2-binary
 psycopg2
 stripe
+qrcode[pil]
 django-tinymce

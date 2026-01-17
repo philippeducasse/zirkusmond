@@ -79,3 +79,7 @@ Use any card listed in the Stripe docs https://docs.stripe.com/testing#cards. Co
 - Expiry: any future month/year (e.g. `12 / 34`)
 - CVC: any 3 digits (e.g. `123`)
 - ZIP: any 5 digits (e.g. `12345`)
+
+
+### Todos philo 2026:
+- fix person / guest classes

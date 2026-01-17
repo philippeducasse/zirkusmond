@@ -2,13 +2,14 @@
 module.exports = {
   content: [
     '../../templates/**/*.{html,js}',
+    './qr-scanner/**/*.vue',
   ],
   theme: {
-    colors: {
-      'zm-yellow': '#f6ae42',
-      'white':'#fff'
+    extend: {
+      colors: {
+        'zm-yellow': '#f6ae42',
+      },
     },
-    extend: {},
   },
   plugins: [],
 }

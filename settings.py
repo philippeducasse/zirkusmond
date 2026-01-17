@@ -149,14 +149,13 @@ else:
 
 
 
-EMAIL_HOST_USER = 'reservation@zirkusmond.de'
-MAIL_HOST_CRED = os.environ.get("MAIL_HOST_CRED", "")
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'mail.ableph.net'
-#EMAIL_PORT = 465
-#EMAIL_USE_SSL = True
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-#EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'reservation@zirkusmond.de'
+MAIL_HOST_CRED = os.environ.get("MAIL_HOST_CRED", "")
+DEFAULT_FROM_EMAIL = 'reservation@zirkusmond.de'
 
 
 # Database
