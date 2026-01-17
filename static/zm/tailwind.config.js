@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     '../../templates/**/*.{html,js}',
+    '../../events/templates/**/*.{html,js}',
     './qr-scanner/**/*.vue',
   ],
   theme: {
