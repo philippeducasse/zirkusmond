@@ -31,7 +31,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("admin/events/", include("zirkusmond.events.urls", namespace="events_admin")),
     path("admin-purge-old-payments", purge_old_payments_view),
-
+    path('tinymce/', include('tinymce.urls')),
 
     path('', views.plain),
     path('events', views.event_list),
@@ -52,6 +52,10 @@ urlpatterns = [
     path('payment-failure/<uuid:payment_id>', event_views.payment_fail),
     path('payment/<uuid:payment_id>/<str:payment_variant>', event_views.payment,
          name='payment'),
+    
+    path('qr-scanner/get-events', event_views.get_events),
+    path('qr-scanner/', event_views.qr_scanner),
+    path('qr-scanner/<uuid:reservation_id>/check-in', event_views.check_in),
 
     path('gallery', gviews.gallery, name='gallery'),
     path('gallery/<int:pk>', gviews.album),
