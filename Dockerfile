@@ -9,6 +9,7 @@ WORKDIR /usr/src/zirkusmond
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 ADD . .
+RUN cd static/zm && npm install && npx tailwindcss -i ./design.css -o ./tailwind.css --minify && npm run build
 COPY manage.py ..
 
 COPY nginx.default /etc/nginx/sites-available/default
