@@ -1,6 +1,10 @@
 {% extends "html_base.html" %}
 {% load static %}
 
+{% block title %}Zirkus Mond – Zirkuszelt & Equipment mieten{% endblock %}
+{% block head_description %}Miete Zirkuszelt, Bühne und Equipment von Zirkus Mond Berlin – die alternative Eventlocation und Kulturraum für dein Event.{% endblock %}
+{% block head_keywords %}, Zirkuszelt Berlin, Zirkuszelt, Veranstaltungsort Berlin, Kultur Location Berlin, Eventlocation alternativ, Bühne Berlin, Kulturraum Berlin, Off Location Berlin, temporäre Kulturorte, Manegebühne, Rundbühne, Zirkusbühne, Off Bühne, Freie Bühne, Mobile Bühne, Pop-up Bühne{% endblock %}
+
 {% block body %}
 
 {% include "navbar.html" %}
@@ -23,7 +27,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mx-2 my-4 gap-y-16">
               {% for object in rental_objects %}
                 <div>
-                  <img src="{{ MEDIA_URL }}{{ object.image }}" alt="stretch-tent" class="">
+                  <img src="{{ MEDIA_URL }}{{ object.image }}" alt="{{ object.name }}" class="">
                 </div>
                 <div class="flex flex-col justify-evenly gap-3">
                   <h3 class="text-4xl text-center">{{ object.name }}</h3>

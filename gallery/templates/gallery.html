@@ -9,7 +9,7 @@
         {% for album in alben %}
             <a href="/gallery/{{album.pk}}">
                 <div class="card">
-                    <img class="ratio ratio-16x9" width="200px" src="{{MEDIA_URL}}{{album.cover.image}}">
+                    <img class="ratio ratio-16x9" width="200px" src="{{MEDIA_URL}}{{album.cover.image}}" alt="{{ album.name }}">
                     <div class="card-body">
                         <h3>{{album.name}}</h3>
                     </div>
