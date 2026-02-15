@@ -1,9 +1,14 @@
-{% extends 'html_base.html' %} {% load static %} {% block body %} {% include 'navbar.html' %}
+{% extends 'html_base.html' %} {% load static %}
+
+{% block title %}Zirkus Mond – International{% endblock %}
+{% block head_keywords %}, Zirkus Mond, internationales Zirkusnetzwerk, Contemporary Circus, Circus Arts, internationale Artist:innen, kultureller Austausch{% endblock %}
+
+{% block body %} {% include 'navbar.html' %}
 <container>
   <section class="flex flex-col gap-y-4 py-8 about-page">
     <div class="about-page__header">
       <div class="banner-image mx-auto mb-8">
-        <img class="w-full" src="https://placehold.co/1200x400" />
+        <img class="w-full" src="https://placehold.co/1200x400" alt="Zirkus Mond International Banner" />
       </div>
       <div class="about-text p-4 md:p-10">
         <h2 class="text-3xl text-center py-8">Zirkus Mond around the world</h2>
@@ -59,8 +64,8 @@
           </ul>
         </div>
         <div class="absolute top-0 h-full w-full flex justify-between items-center" data-glide-el="controls">
-          <button class="w-3 ml-4 lg:w-6 lg:ml-8" data-glide-dir="<"><img src="/static/zm/img/prev.png" /></button>
-          <button class="w-3 mr-4 lg:w-6 lg:mr-8" data-glide-dir=">"><img src="/static/zm/img/next.png" /></button>
+          <button class="w-3 ml-4 lg:w-6 lg:ml-8" data-glide-dir="<"><img src="/static/zm/img/prev.png" alt="Previous" /></button>
+          <button class="w-3 mr-4 lg:w-6 lg:mr-8" data-glide-dir=">"><img src="/static/zm/img/next.png" alt="Next" /></button>
         </div>
       </div>
       <div class="deko">

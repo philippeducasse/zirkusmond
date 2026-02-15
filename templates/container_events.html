@@ -8,7 +8,7 @@
             <a href="/show/{{ show.id }}" class="w-fit block mx-5 lg:mx-16 my-12 ">
                 <div class="card flex items-center flex-col justify-between">
                     <div class="image-container ">
-                        <img class="show-img" src="{{ MEDIA_URL }}{{ show.card_image }}" />
+                        <img class="show-img" src="{{ MEDIA_URL }}{{ show.card_image }}" alt="{{ show.title }}" />
                     </div>
                     <div class="flex flex-col text-center my-auto items-center p-6 lg:p-2 justify-between">
                         <h3 class="card-title text-center text-xl md:text-2xl ">{{ show.title }}</h3>
