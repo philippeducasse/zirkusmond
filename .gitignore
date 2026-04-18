@@ -13,3 +13,4 @@ static/zm/dist
 venv/*
 templates/mond.html
 
+.venv/*

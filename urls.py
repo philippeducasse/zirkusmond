@@ -28,9 +28,9 @@ from .gallery import views as gviews
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("admin/events/", include("zirkusmond.events.urls", namespace="events_admin")),
-    path("admin-purge-old-payments", purge_old_payments_view),
+    path('mondmin/', admin.site.urls),
+    path("mondmin/events/", include("zirkusmond.events.urls", namespace="events_admin")),
+    path("mondmin-purge-old-payments", purge_old_payments_view),
     path('tinymce/', include('tinymce.urls')),
 
     path('', views.plain),

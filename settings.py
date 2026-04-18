@@ -110,9 +110,6 @@ if DEBUG:
          'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': '',
             }),
-
-        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
-            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
 elif IS_TESTING:
     PAYMENT_HOST = 'testing.zirkusmond.de'
@@ -127,9 +124,6 @@ elif IS_TESTING:
          'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': '',
             }),
-
-        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
-            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
     }
 else:
     PAYMENT_HOST = 'zirkusmond.de'
@@ -143,8 +137,6 @@ else:
         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
             'secret_key': '',
             }),
-        'coinbase': ('zirkusmond.CoinbasePaymentProvider.CoinbaseProvider', {
-            'key': '970a25f6-5161-4f51-9c96-3819763cf56f'})
         }
 
 

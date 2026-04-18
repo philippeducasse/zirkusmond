@@ -83,3 +83,21 @@ Use any card listed in the Stripe docs https://docs.stripe.com/testing#cards. Co
 
 ### Todos philo 2026:
 - fix person / guest classes
+
+# deploy code
+
+cd test_zirkus_mond
+(... here you probably have to vim .git/config and change your user, add your api key)
+git switch -c yourbranch yourbranch
+sudo docker-compose build zirkusmond_de_testing
+sudo docker-compose stop zirkusmond_de_testing
+sudo docker-compose up zirkusmond_de_testing
+
+# qr code duplication
+# cookie popover
+# remove talent && venue && remove all other emails from website
+# add way for juan to change videos && images
+# handle case for shows that zm doesnt handle bookings
+
+# early bird tickets
+# tickets umbuchen
