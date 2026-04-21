@@ -107,9 +107,7 @@ onBeforeUnmount(() => {
 });
 
 const checkInReservation = async (ticket_uuid, event_uuid) => {
-  console.log({ event_uuid, ticket_uuid });
 
-  console.log("IDS", event_uuid, selectedEvent.value.id);
   if (event_uuid !== selectedEvent.value.id) {
     error.value = "Ticket for wrong event!";
     playSound("error");
@@ -118,7 +116,6 @@ const checkInReservation = async (ticket_uuid, event_uuid) => {
   try {
     const response = await fetch(`${ticket_uuid}/check-in`);
     const data = await response.json();
-    console.log({ data, response });
     if (data.success) {
       lastScan.value = data;
       playSound("success");
@@ -190,8 +187,13 @@ watch(upcomingEvents, () => console.log({ selectedEvent, upcomingEvents }));
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
           </svg>
           <div class="text-left">
-            <p class="text-6xl"><strong>Tickets:</strong> {{ lastScan.guests.length }}</p>
-            <p class="text-5xl"><strong>Guests:</strong> {{ lastScan.guests.join(", ") }}</p>
+            <template v-if="lastScan.is_group">
+              <p class="text-6xl"><strong>Tickets:</strong> {{ lastScan.guests.length }}</p>
+              <p class="text-5xl"><strong>Guests:</strong> {{ lastScan.guests.join(", ") }}</p>
+            </template>
+            <template v-else>
+              <p class="text-5xl"><strong>Guest:</strong> {{ lastScan.guests[0] }}</p>
+            </template>
             <p class="text-5xl">
               <strong>Reservation ID:</strong> {{ lastScan.reservation_number }}
             </p>
