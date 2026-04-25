@@ -140,6 +140,12 @@ a.button:hover, a.button:active, .button:hover {
     font-weight: bold;
     background-color: #00000040;
 }
+
+.button:disabled, input.button:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 /* EVENTS */
 
 .all-events{
