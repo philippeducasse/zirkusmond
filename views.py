@@ -10,8 +10,6 @@ from .zm.models import Visitor, RentalObject
 from .zm.forms import NewsletterRegistrationForm
 
 def _get_ip(request):
-    ''' fetches the user ip
-    '''
     key = 'HTTP_X_REAL_IP' if 'HTTP_X_REAL_IP' in request.META.keys() else 'REMOTE_ADDR'
     return request.META[key]
 
@@ -21,7 +19,7 @@ def _get_referer(request):
 
 
 def _upcoming_shows():
-    us = Show.objects.all()
+    us = Show.objects.prefetch_related('event_set').all()
     us = list(filter(lambda x: x.show_in_preview(), us))
     us = sorted(us, key=lambda x: datetime.date(2020, 1, 1) if len(x.events()) == 0 else x.events()[0].admission.date())
     return us
