@@ -107,7 +107,7 @@ if DEBUG:
             'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True}),
-         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
+         'bank card': ('zirkusmond.events.StripePaymentProvider.StripeProvider', {
             'secret_key': 'sk_test_51OczecLXJ9LQjER4DYUZoyxXvKULAlJcNbq8DssE3EBSz5sz2geMZh6WLzCSCzGUIGcwYnjCvm5oS47O57Xzd9B700I1MDXwTu',
             }),
         }
@@ -121,7 +121,7 @@ elif IS_TESTING:
             'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True}),
-         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
+         'bank card': ('zirkusmond.events.StripePaymentProvider.StripeProvider', {
             'secret_key': 'sk_test_51OczecLXJ9LQjER4DYUZoyxXvKULAlJcNbq8DssE3EBSz5sz2geMZh6WLzCSCzGUIGcwYnjCvm5oS47O57Xzd9B700I1MDXwTu',
             }),
     }
@@ -134,7 +134,7 @@ else:
            'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
            'endpoint': 'https://api.paypal.com',
            'capture': True}),
-        'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
+        'bank card': ('zirkusmond.events.StripePaymentProvider.StripeProvider', {
             'secret_key': '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',
             }),
         }
