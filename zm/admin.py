@@ -1,14 +1,10 @@
 from django.contrib import admin
-from .models import Visitor, NewsletterRegistration, RentalObject
+from .models import NewsletterRegistration, RentalObject
 from django.http import HttpResponse
 from django.utils import timezone
 
 from io import BytesIO
 import xlsxwriter
-
-class VisitorAdmin(admin.ModelAdmin):
-    list_display =('ip', 'useragent', 'referer', 'time')
-    list_filter = ('time', )
 
 class NewsletterRegistrationAdmin(admin.ModelAdmin):
     list_display = ('email', )
@@ -36,6 +32,5 @@ class NewsletterRegistrationAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(Visitor, VisitorAdmin)
 admin.site.register(NewsletterRegistration, NewsletterRegistrationAdmin)
 admin.site.register(RentalObject)

@@ -1,21 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
-# from django import forms
-from django.views.generic.edit import CreateView
-from django.utils import timezone as tz
 import datetime
 
 from .events.models import Show
-from .zm.models import Visitor, RentalObject
+from .zm.models import RentalObject
 from .zm.forms import NewsletterRegistrationForm
-
-def _get_ip(request):
-    key = 'HTTP_X_REAL_IP' if 'HTTP_X_REAL_IP' in request.META.keys() else 'REMOTE_ADDR'
-    return request.META[key]
-
-
-def _get_referer(request):
-    return request.META['HTTP_REFERER'] if 'HTTP_REFERER' in request.META.keys() else ''
 
 
 def _upcoming_shows():
@@ -30,14 +19,7 @@ def _rental_objects():
 
 
 def plain(request):
-    ''' Give em our index, without doing much
-    '''
     us = _upcoming_shows()[:6]
-    v = Visitor(useragent=request.META['HTTP_USER_AGENT'],
-                ip=_get_ip(request),
-                referer=_get_referer(request),
-                time=tz.now())
-    v.save()
     newsletter_form = NewsletterRegistrationForm()
     return render(request, 'index.html',
                   {'upcoming_shows': us,

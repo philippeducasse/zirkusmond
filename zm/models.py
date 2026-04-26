@@ -2,15 +2,6 @@ from django.db import models
 from markdownx.models import MarkdownxField
 
 
-class Visitor(models.Model):
-    '''
-    '''
-    useragent = models.TextField()
-    ip = models.GenericIPAddressField()
-    referer = models.URLField()
-    time = models.DateTimeField()
-
-
 class NewsletterRegistration(models.Model):
     ''' collect email addresses that shall be added to our mailing list
     '''
