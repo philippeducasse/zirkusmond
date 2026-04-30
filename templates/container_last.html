@@ -21,7 +21,14 @@
             </div>
             <div class="office-contact flex ">
                 <p class="text-lg p-6">
-                    Direct matters concerning reservations <a class="block my-6 underline" href="mailto:reservation@zirkusmond.de">reservation@zirkusmond.de</a>
+                    Direct matters concerning reservations <a class="block my-6 underline" id="reservation-email-link"></a>
+                    <script>
+                        (function() {
+                            const el = document.getElementById('reservation-email-link');
+                            el.textContent = "zirkusmond@gmail.com"
+                            el.href = "mailto:zirkusmond@gmail.com"
+                        })();
+                    </script>
                 </p>
             </div>
         </div>
@@ -64,10 +71,10 @@
     </div>
 </div>
 
-<div class="text-center mb-8">
+<div class="text-center mb-8 lg:mx-16">
     <div class="flex gap-4 justify-evenly">
-        <a href="/impressum"><h4 class="text-3xl my-6 underline">Impressum</h4></a>
-        <a href="/datenschutz"><h4 class="text-3xl my-6 underline">Datenschutz</h4></a>
+        <a href="/impressum"><h4 class="text-xl my-6 underline">Impressum</h4></a>
+        <a href="/datenschutz"><h4 class="text-xl my-6 underline">Datenschutz</h4></a>
     </div>
     <div class="flex flex-col md:flex-row">
         <div class="px-4 lg:w-1/3">
