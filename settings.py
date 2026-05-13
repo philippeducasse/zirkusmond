@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'image_cropping',
     'tinymce',
+    'anymail',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -141,12 +142,18 @@ else:
 
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.ableph.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'reservation@zirkusmond.de'
-EMAIL_HOST_PASSWORD = 'kd9b2lvj2jdkoJUkvj2jfkvjskla'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+
+ANYMAIL = {
+    "BREVO_API_KEY": "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",
+}
+
+# EMAIL_HOST = 'mail.ableph.net'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'reservation@zirkusmond.de'
+# EMAIL_HOST_PASSWORD = 'kd9b2lvj2jdkoJUkvj2jfkvjskla'
 DEFAULT_FROM_EMAIL = 'reservation@zirkusmond.de'
 
 
