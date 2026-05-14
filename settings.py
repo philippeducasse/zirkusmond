@@ -17,7 +17,7 @@ print('BASE_DIR: %s' % BASE_DIR)
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = platform.node() not in ['zirkusmond_de', 'testing_zirkusmond_de']
@@ -104,12 +104,12 @@ if DEBUG:
     PAYMENT_VARIANTS =  {
         'default': ('payments.dummy.DummyProvider', {}),
         'paypal': ('payments.paypal.PaypalProvider', {
-            'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
-            'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
+            'client_id': os.environ['PAYPAL_SANDBOX_CLIENT_ID'],
+            'secret': os.environ['PAYPAL_SANDBOX_SECRET'],
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True}),
          'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
-            'secret_key': '',
+            'secret_key': os.environ['STRIPE_TEST_TOKEN'],
             }),
         }
 elif IS_TESTING:
@@ -118,12 +118,12 @@ elif IS_TESTING:
     PAYMENT_VARIANTS =  {
         'default': ('payments.dummy.DummyProvider', {}),
         'paypal': ('payments.paypal.PaypalProvider', {
-            'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
-            'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
+            'client_id': os.environ['PAYPAL_SANDBOX_CLIENT_ID'],
+            'secret': os.environ['PAYPAL_SANDBOX_SECRET'],
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True}),
          'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
-            'secret_key': '',
+            'secret_key': os.environ['STRIPE_TEST_TOKEN'],
             }),
     }
 else:
@@ -131,12 +131,12 @@ else:
     PAYMENT_USES_SSL = True
     PAYMENT_VARIANTS = {
         'paypal': ('payments.paypal.PaypalProvider', {
-           'client_id': 'AQuG7F5Z8riP9M6kXdz0jXMFPl-dYWxY6xLPg7X1iU2qmIA7tKFwosYA3r2Un_NKL42cwlhQkfkOjGM-',
-           'secret': 'EIiUdLCQAB3P9cr2r0lybJunYuZ9VANhEnp3cdu-jOqj5GTwSa96m8Yf2SvsFcAxDD9CI6Qz8Q4SVOGV',
+           'client_id': os.environ['PAYPAL_LIVE_CLIENT_ID'],
+           'secret': os.environ['PAYPAL_LIVE_SECRET'],
            'endpoint': 'https://api.paypal.com',
            'capture': True}),
         'bank card': ('zirkusmond.StripePaymentProvider.StripeProvider', {
-            'secret_key': '',
+            'secret_key': os.environ['STRIPE_LIVE_SECRET_KEY'],
             }),
         }
 
@@ -146,7 +146,7 @@ else:
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 
 ANYMAIL = {
-    "BREVO_API_KEY": "",
+    "BREVO_API_KEY": os.environ['BREVO_API_KEY'],
 }
 
 # EMAIL_HOST = 'mail.ableph.net'
@@ -173,7 +173,7 @@ else:
                 'ENGINE': 'django.db.backends.postgresql',
                 'NAME': 'monddb',
                 'USER': 'mond',
-                'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+                'PASSWORD': os.environ['DB_PASSWORD'],
                 'HOST': 'testing_zm_db',
                 'PORT': '5432',
         }}
@@ -183,7 +183,7 @@ else:
                 'ENGINE': 'django.db.backends.postgresql',
                 'NAME': 'monddb',
                 'USER': 'mond',
-                'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+                'PASSWORD': os.environ['DB_PASSWORD'],
                 'HOST': 'zm_db',
                 'PORT': '5432',
         }}
