@@ -2,9 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
 import datetime
 
-from .events.models import Show
-from .zm.models import RentalObject
-from .zm.forms import NewsletterRegistrationForm
+from events.models import Show
+from rentals.models import RentalObject
+from newsletter.forms import NewsletterRegistrationForm
 
 
 def _upcoming_shows():
