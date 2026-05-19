@@ -1,3 +1,4 @@
+import os
 from .base import *
 
 DEBUG = True
@@ -17,12 +18,12 @@ PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
     'default': ('payments.dummy.DummyProvider', {}),
     'paypal': ('payments.paypal.PaypalProvider', {
-        'client_id': 'Ad_26WJhrD5hvWOIe4y9z2z2XV8d66D_SNPenIKlUazAJG3bhmQwZfyagXFdZ4ZL15KvVxnz6P5O7VaE',
-        'secret': 'EC_3Evhzbfb1F_ZYCMNih4bH0Oj3U7sCRmvRCcmjAktzbsEMbgnF2_byg1n5FU6N708O2Mws6zjMupnS',
+        'client_id': os.environ.get('PAYPAL_SANDBOX_CLIENT_ID', ''),
+        'secret': os.environ.get('PAYPAL_SANDBOX_SECRET', ''),
         'endpoint': 'https://api.sandbox.paypal.com',
         'capture': True,
     }),
     'bank card': ('events.StripePaymentProvider.StripeProvider', {
-        'secret_key': 'sk_test_51OczecLXJ9LQjER4DYUZoyxXvKULAlJcNbq8DssE3EBSz5sz2geMZh6WLzCSCzGUIGcwYnjCvm5oS47O57Xzd9B700I1MDXwTu',
+        'secret_key': os.environ.get('STRIPE_TEST_SECRET_KEY', ''),
     }),
 }

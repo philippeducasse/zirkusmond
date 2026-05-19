@@ -7,7 +7,7 @@ from easy_thumbnails.conf import Settings as thumbnail_settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # zirkusmond/ project root
 
-SECRET_KEY = '9gg)@^#6+3&r33*#gszht&v=7-88^fqn-d3#2l3*sh^b*tfm3l'
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 INSTALLED_APPS = [
     'events',
@@ -16,6 +16,7 @@ INSTALLED_APPS = [
 
     'markdownx',
     'payments',
+    'anymail',
 
     'easy_thumbnails',
     'image_cropping',
@@ -69,12 +70,10 @@ THUMBNAIL_PROCESSORS = (
 
 PAYMENT_MODEL = 'events.ReservationPayment'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.ableph.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'reservation@zirkusmond.de'
-EMAIL_HOST_PASSWORD = 'kd9b2lvj2jdkoJUkvj2jfkvjskla'
+EMAIL_BACKEND = 'anymail.backends.brevo.EmailBackend'
+ANYMAIL = {
+    'BREVO_API_KEY': os.environ.get('BREVO_API_KEY', ''),
+}
 DEFAULT_FROM_EMAIL = 'reservation@zirkusmond.de'
 
 AUTH_PASSWORD_VALIDATORS = [
