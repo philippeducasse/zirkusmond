@@ -24,9 +24,6 @@ from . import views
 from .events import views as event_views
 from .events.views_admin import purge_old_payments_view
 
-from .gallery import views as gviews
-
-
 urlpatterns = [
     path('mondmin/', admin.site.urls),
     path("mondmin/events/", include("zirkusmond.events.urls", namespace="events_admin")),
@@ -56,10 +53,6 @@ urlpatterns = [
     path('qr-scanner/get-events', event_views.get_events),
     path('qr-scanner/', event_views.qr_scanner),
     path('qr-scanner/<uuid:reservation_id>/check-in', event_views.check_in),
-
-    path('gallery', gviews.gallery, name='gallery'),
-    path('gallery/<int:pk>', gviews.album),
-    path('gallery/<int:album_id>/<int:foto_id>', gviews.foto),
 
     re_path(r'^markdownx/', include('markdownx.urls')),
     path('payments/', include('payments.urls')),

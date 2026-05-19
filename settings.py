@@ -36,7 +36,6 @@ IS_TESTING = 'IS_TESTING' in os.environ
 # Application definition
 INSTALLED_APPS = [
     'zirkusmond.events',
-    'zirkusmond.gallery',
     'zirkusmond.zm',
 
     'markdownx',
