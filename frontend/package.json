@@ -13,7 +13,7 @@
     "vite": "^7.3.1"
   },
   "scripts": {
-    "tailwind": "npx tailwindcss -i ./src/design.css -o ./src/tailwind.css --watch",
+    "tailwind": "npx tailwindcss -i ./src/design.css -o ../backend/static/css/tailwind.css --watch",
     "build": "vite build",
     "dev": "vite"
   }

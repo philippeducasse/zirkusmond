@@ -7,7 +7,7 @@
   font-style: normal;
   font-weight: normal;
   font-size: 140%;
-  src: local('Spirited Serif Regular'), url('Spirited Serif.woff') format('woff');
+  src: local('Spirited Serif Regular'), url('/static/media/fonts/Spirited Serif.woff') format('woff');
 }
 
 @font-face {
@@ -15,7 +15,7 @@
   font-style: normal;
   font-weight: normal;
   font-size: 140%;
-  src: local('Spirited Serif Bold Regular'), url('Serif Bold.woff') format('woff');
+  src: local('Spirited Serif Bold Regular'), url('/static/media/fonts/Serif Bold.woff') format('woff');
 }
 
 :root {
@@ -31,7 +31,7 @@
 
 body {
   
-  background: url("./img/bg_pattern.png") repeat;
+  background: url("/static/media/images/gallery/bg_pattern.png") repeat;
   color:  #f6ae42;
   box-sizing:border-box;
 
@@ -352,7 +352,7 @@ a.card-link  {
 
 .navbar.sticky{
   opacity: 1;
-  background-image: url("/static/zm/img/bg_pattern.png");
+  background-image: url("/static/media/images/gallery/bg_pattern.png");
   backface-visibility: hidden;
   visibility: visible;
 }
@@ -431,7 +431,7 @@ a.card-link  {
 
 .mobile-menu{
   z-index:100;
-  background-image: url("/static/zm/img/bg_pattern.png");
+  background-image: url("/static/media/images/gallery/bg_pattern.png");
   border: 2px solid #E7B548;
   top:77.7px;
   right:0;
@@ -442,7 +442,7 @@ a.card-link  {
 .banner-image-container {
     width: 100%;
     height: 80vh;
-    background-image: url('/static/zm/img/zm_banner.jpg');
+    background-image: url('/static/media/images/gallery/zm_banner.jpg');
     background-size: cover;
     background-position: center;
 
