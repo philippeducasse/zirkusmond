@@ -1,3 +1,0 @@
-[submodule "events"]
-	path = backend/events
-	url = git@git.ableph.net:ableph/zirkusmond-events.git

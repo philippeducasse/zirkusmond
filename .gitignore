@@ -22,3 +22,4 @@ frontend/package-lock.json
 # Environment
 .env
 .env.local
+.envrc
