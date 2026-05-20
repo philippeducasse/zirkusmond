@@ -3,5 +3,4 @@
       build: .
       ports:
         - "8000:8000"
-        - "8020:8020"
       env_file: .env

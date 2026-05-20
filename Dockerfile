@@ -18,10 +18,14 @@ RUN pip install -r backend/requirements.txt
 COPY frontend ./frontend
 RUN cd frontend && npm install && npm run tailwind && npm run build
 
+# Copy node_modules dependencies to static for HTML references
+RUN mkdir -p /usr/src/backend/static/media/dist/@glidejs && \
+    cp -r /usr/src/frontend/node_modules/@glidejs /usr/src/backend/static/media/dist/
+
 COPY ./nginx.default /etc/nginx/sites-available/default
 
-EXPOSE 8000
+RUN mkdir -p /srv/data/static /srv/data/media
 
-EXPOSE 8020
+EXPOSE 8000
 
 CMD ["/usr/src/start-server.sh"]
