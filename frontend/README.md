@@ -22,7 +22,7 @@ frontend/
 
 ## Build Process
 
-The built assets are output to `../zirkusmond_de/static/media/dist/` and served by Django.
+The built assets are output to `../backend/static/media/dist/` and served by Django.
 
 ### Commands
 
