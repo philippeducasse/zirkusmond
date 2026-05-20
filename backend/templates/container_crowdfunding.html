@@ -1,0 +1,98 @@
+{% load static %}
+
+<div class="zm-container">
+
+    <h2 class="text-center text-4xl lg:text-5xl my-12 text-zm-yellow" >Support our Circus Garden Campaign!</h2>
+
+  <!-- Make sure the video-container is relatively positioned and has a height set -->
+  <div class="ratio ratio-16x9 h-full relative " style="position:relative;" id="video-container">
+  <div class="absolute top-0 h-full w-full flex justify-between items-center" data-glide-el="controls">
+      <!-- Unmute Button with Logo -->
+      <div class="absolute top-4 right-4 z-10" style="top:0; right:20px">
+        <button id="unmute-btn" class="bg-blue-500 p-2 rounded-full shadow-md hover:bg-blue-600 focus:outline-none flex items-center justify-center">
+          <img id="mute-logo" src="{% static 'media/images/icons/unmute.svg' %}" alt="Unmute" class="w-auto h-auto" />
+        </button>
+       </div>
+    </div>
+    <video id="crowdfunding-video" autoplay muted loop playsinline class="shadowed-content h-full w-full">
+      <source src="/static/media/video/crowdfunding_video.webm" type="video/webm">
+    </video>
+
+
+
+  </div>
+
+  <div class="text-center mt-4">
+    <p class="text-center text-3xl lg:text-5xl my-12 text-zm-yellow">Ein neuer Garten für euch im Zirkus Mond Berlin</p>
+    <p class="text-lg text-gray-600">
+        In Zeiten, in denen Orte der Gemeinschaft immer knapper werden, möchten wir unseren Freiraum ausweiten. Im Schatten unseres Zirkuszeltes an der Greifswalder Straße soll ein Ort entstehen, welcher der Gentrifizierung trotzt und der Berliner alternativen Kulturszene einen Raum für Austausch, Phanthasie und Aktionismus schenkt. Gemeinsam mit euch möchten wir in unserem neuen Garten Pflänzchen und Ideen säen, nähren, und Sie in der Sonne beim Gedeihen bestaunen. Mit eurer Hilfe wird alles möglich!<br>
+        Help us bring the magic of the Circus Garden to life. Your donation makes a difference! <br>
+      <a href="https://example.com/campaign-link" class="text-blue-500 hover:underline" target="_blank">Visit the crowdfunding page</a> to contribute.
+    </p>
+  </div>
+
+    <div class="flex justify-center my-10">
+        <a class="button " href="https://www.startnext.com/projekt-zirkusgarten">Visit crowdfunding Campaign</a>
+    </div>
+
+  <div class="deko">
+    <img class="mx-auto" src="{% static 'media/images/gallery/deko-1.png' %}" alt="Circus Garden Decoration">
+  </div>
+</div>
+
+<script>
+  const video = document.getElementById('crowdfunding-video');
+  const unmuteBtn = document.getElementById('unmute-btn');
+  const muteLogo = document.getElementById('mute-logo');
+  const videoContainer = document.getElementById('video-container');
+
+  // Function to update the icon size
+  function updateIconSize() {
+    const videoWidth = videoContainer.offsetWidth; // Get the video width
+    const iconSize = videoWidth / 10; // Set the icon size to 10% of video width
+    muteLogo.style.width = `${iconSize}px`; // Update the width of the icon
+    muteLogo.style.height = `${iconSize}px`; // Maintain square aspect ratio
+  }
+
+  // Check if the video is in view
+  function isInView() {
+    const rect = videoContainer.getBoundingClientRect();
+    return rect.top >= 0 && rect.bottom <= window.innerHeight;
+  }
+
+  // Play video when it's in view
+  function handleScroll() {
+    if (isInView()) {
+      video.play();
+    }
+  }
+
+  // Unmute or mute the video when the button is clicked
+  unmuteBtn.addEventListener('click', () => {
+    if (video.muted) {
+      video.muted = false;
+      muteLogo.src = "{% static 'media/images/icons/mute.svg' %}"; // Switch to mute logo
+    } else {
+      video.muted = true;
+      muteLogo.src = "{% static 'media/images/icons/unmute.svg' %}"; // Switch back to unmute logo
+    }
+  });
+
+  // Listen to scroll events to play the video once in view
+  window.addEventListener('scroll', handleScroll);
+
+  // Initially, make sure the video is paused and muted
+  video.pause();
+  video.muted = true;
+
+  // Optionally play the video if already in view on load
+  if (isInView()) {
+    video.play();
+  }
+
+  // Update the icon size on window resize
+  window.addEventListener('resize', updateIconSize);
+
+  // Initially set the icon size
+  updateIconSize();
+</script>

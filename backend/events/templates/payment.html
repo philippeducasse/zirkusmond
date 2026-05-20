@@ -1,0 +1,20 @@
+{% extends "html_design.html" %}
+{% load static %}
+{% block content %}
+{% include "navbar.html" %}
+
+
+{% if form.variant == 'klarna' %}
+{% autoescape off %} {{ form.inner_html }} {% endautoescape %}
+{% else %}
+    <form action="{{ form.action }}" method="{{ form.method }}" class="mx-auto w-fit p-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+    </form>
+
+    <div style="display: flex; text-align: left;margin-top:2em;">
+        <button class="button mx-auto" onclick="history.back()">Go Back</button>
+    </div>
+
+    {% endif %}
+{% endblock %}

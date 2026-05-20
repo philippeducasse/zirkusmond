@@ -1,0 +1,18 @@
+{% extends "html_design.html" %}
+{% load static %}
+
+{% include "navbar.html" %}
+
+
+{% block content %}
+<div class="payment-failure w-fit p-8 mx-auto flex flex-col text-center text-white justify-evenly">
+    <h2 class="text-3xl text-zm-yellow mb-8">Sorry - Payment failed</h2>
+    
+    <a class="button text-center my-8 w-fit mx-auto" href="/reserve/{{payment.reservation.event.show.id}}">Try again?</a>
+    <p class="write-email">If you think this has been a mistake on our side, write a mail to:
+        <a href="mailto:reservation@zirkusmond.de?subject=Payment error for {{payment.id}}">reservation@zirkusmond.de</a> and mention your ID: <span style="background-color: #00000030">{{payment.id}}</span></p>
+        <p class="cusoon">Hope to see you soon</p>
+        <br>
+        <a href="/" class="button w-fit my-8 mx-auto">Home</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,16 @@
+django-payments
+django-image-cropping
+easy_thumbnails
+jupyter_nbextensions_configurator
+django_extensions
+xlsxwriter
+gunicorn
+imaplib2
+xmltodict
+psycopg2-binary
+psycopg2
+stripe
+qrcode[pil]
+django-tinymce
+reportlab
+django-anymail
