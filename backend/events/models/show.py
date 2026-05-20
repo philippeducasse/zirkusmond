@@ -42,6 +42,9 @@ class Show(models.Model):
     def events(self):
         return list(self.event_set.all())
 
+    def future_events(self):
+        return [e for e in self.events() if e.begin > timezone.now()]
+
     def last_event(self):
         events = self.events()
         return events[0] if events else None
