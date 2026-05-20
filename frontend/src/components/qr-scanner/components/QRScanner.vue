@@ -40,7 +40,6 @@ const fetchEvents = async () => {
       upcomingEvents.value = data;
       const today = new Date().toISOString().split("T")[0];
       const todayEvent = data.find((event) => event.begin.includes(today));
-      console.log("today event: ", todayEvent, today, upcomingEvents.value);
       if (todayEvent) {
         selectedEvent.value = todayEvent;
         initialiseScanner();
@@ -81,7 +80,6 @@ const initialiseScanner = () => {
 };
 
 const onScanSuccess = (decodedText) => {
-  console.log("Scanned: ", decodedText);
   error.value = null;
   alreadyCheckedIn.value = null;
   lastScan.value = null;
@@ -107,7 +105,6 @@ onBeforeUnmount(() => {
 });
 
 const checkInReservation = async (ticket_uuid, event_uuid) => {
-
   if (event_uuid !== selectedEvent.value.id) {
     error.value = "Ticket for wrong event!";
     playSound("error");
@@ -134,7 +131,6 @@ const checkInReservation = async (ticket_uuid, event_uuid) => {
     error.value = `Error: ${err.message}`;
   }
 };
-watch(upcomingEvents, () => console.log({ selectedEvent, upcomingEvents }));
 </script>
 <template>
   <div class="min-h-screen p-4" @click="unlockAudio">
