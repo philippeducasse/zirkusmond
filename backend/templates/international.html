@@ -1,0 +1,112 @@
+{% extends 'html_base.html' %} {% load static %}
+
+{% block title %}Zirkus Mond – International{% endblock %}
+{% block head_keywords %}, Zirkus Mond, internationales Zirkusnetzwerk, Contemporary Circus, Circus Arts, internationale Artist:innen, kultureller Austausch{% endblock %}
+
+{% block body %} {% include 'navbar.html' %}
+<container>
+  <section class="flex flex-col gap-y-4 py-8 about-page">
+    <div class="about-page__header">
+      <div class="banner-image mx-auto mb-8">
+        <img class="w-full" src="https://placehold.co/1200x400" alt="Zirkus Mond International Banner" />
+      </div>
+      <div class="about-text p-4 md:p-10">
+        <h2 class="text-3xl text-center py-8">Zirkus Mond around the world</h2>
+        <p class="text-base text-left md:text-center md:text-xl pb-8">
+          Zirkus Mond International is a circus network with locations in Berlin (Germany), Lisbon (Portugal) and
+          Guadalajara (Mexico) that promotes circus arts and the creative industry. Through cooperation and the exchange
+          of knowledge and experience it seeks to connect communities through art and thus promote cultural exchange.
+          Zirkus Mond was born in Berlin in 2018 as an independent circus project with a permanent circus tent in the
+          city centre dedicated to circus, dance and other performing arts. From its beginnings and through a varied and
+          dynamic programme of shows and activities, the aim is to promote and encourage circus arts and boost the
+          circus industry. To this end, it is committed to giving opportunities to artists with innovative proposals and
+          emerging companies. It is a space for creation and experimentation that serves as a launching pad to boost
+          their professional careers. The essence of this cultural exchange has driven the expansion of the project to
+          new latitudes, building an international circus network.
+        </p>
+      </div>
+    </div>
+    <div class="deko">
+      <img class="mx-auto" src="{% static 'media/images/gallery/deko-1.png' %}" alt="********" />
+    </div>
+    <section>
+      <div class="flex justify-evenly items-center">
+        <img src="{% static 'media/images/gallery/zirkus-mond-zelt.png' %}" alt="Zirkus Mond Berlin Logo" width="200" />
+        <img
+          src="{% static 'media/images/gallery/lisboa_logo.jpg' %}"
+          alt="Zirkus Mond Lisboa Logo"
+          width="200"
+          class="rounded-full"
+        />
+        <img src="{% static 'media/images/gallery/guada_logo.png' %}" alt="Zirkus Mond Guadalajara Logo" width="200" />
+      </div>
+    </section>
+
+    <div class="deko">
+      <img class="mx-auto" src="{% static 'media/images/gallery/deko-2.png' %}" alt="********" />
+    </div>
+  </section>
+  <main>
+    <div class="zm-container">
+      <div class="glide">
+        <div class="glide__track h-auto lg:h-screen mx-auto" data-glide-el="track">
+          <ul class="glide__slides">
+            {% for i in "123456789" %}
+            <!-- Change images -->
+            <li class="glide__slide {% if forloop.first %}active{% endif %} my-auto">
+              <img
+                src="{% get_static_prefix %}media/images/gallery/img-{{ i }}.jpg"
+                class="gallery-img w-full h-full"
+                alt="Gallery Picture {{ i }}"
+              />
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="absolute top-0 h-full w-full flex justify-between items-center" data-glide-el="controls">
+          <button class="w-3 ml-4 lg:w-6 lg:ml-8" data-glide-dir="<"><img src="/static/media/images/gallery/prev.png" alt="Previous" /></button>
+          <button class="w-3 mr-4 lg:w-6 lg:mr-8" data-glide-dir=">"><img src="/static/media/images/gallery/next.png" alt="Next" /></button>
+        </div>
+      </div>
+      <div class="deko">
+        <img class="mx-auto" src="{% static 'media/images/gallery/deko-1.png' %}" alt="********" />
+      </div>
+    </div>
+    <article class="contact lg:mx-16 p-4 grid grid-cols-1 md:grid-cols-2 mb-16 items-center justify-center">
+      <div class="items-center justify-center mx-auto my-8">
+        <img src="{% static 'media/images/gallery/logo.png' %}" alt="Zirkus mond logo" class="rounded-full" width="200" />
+      </div>
+      <div class="flex flex-col gap-y-6 mx-4">
+        <h4 class="text-2xl">Berlin, the Mother Ship</h4>
+        <p>
+          Berlin was the first space to consolidate and has served as a seedbed for artists from various disciplines,
+          promoting collaboration and innovation in the circus arts.
+        </p>
+        <a class="underline" href="https://google.com" target="_blank">Link to the website</a>
+      </div>
+      <div class="items-center justify-center mx-auto my-8">
+        <img src="{% static 'media/images/gallery/ZM-lisboa.jpg' %}" alt="Zirkus mond logo" class="rounded-full" width="200" />
+      </div>
+      <div class="flex flex-col gap-y-6 mx-4">
+        <h4 class="text-2xl">Lisboa</h4>
+        <p>
+          Lisbon became the second node of the project and has made significant progress in its development,
+          strengthening the local and international artistic community.
+        </p>
+        <a class="underline" href="https://google.com" target="_blank">Link to the website</a>
+      </div>
+      <div class="items-center justify-center mx-auto my-8">
+        <img src="{% static 'media/images/gallery/zm-mexico-white.jpg' %}" alt="Zirkus mond logo" class="rounded-full" width="200" />
+      </div>
+      <div class="flex flex-col gap-y-6 mx-4">
+        <h4 class="text-2xl">Guadalajara</h4>
+        <p>
+          The third venue to join and is in its initial phase, laying the foundations for a new space for circus
+          encounters and creation in Mexico.
+        </p>
+        <a class="underline" href="https://google.com" target="_blank">Link to the website</a>
+      </div>
+    </article>
+  </main>
+</container>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "html_design.html" %}
+{% load static %}
+{% load cropping %}
+{% include "navbar.html" %}
+
+{% block title %}Zirkus Mond - {{ show.title }}{% endblock %}
+{% block og_image %}
+    <meta property="og:image" content="{% cropped_thumbnail show "head_img" %}" />
+{% endblock %}
+
+{% block head_description %}{{ show.description|striptags|truncatechars:254 }}{% endblock %}
+{% block head_keywords %}, Zirkus Mond Tickets, Zirkus Shows Berlin, Live Performance, Bühnenperformance, Abendshow, Zirkusatmosphäre, Magie der Manege, Manege, Zirkuslicht, Dramaturgie, Storytelling Performance, Intime Bühne, zeitgenössische Artistik, Zeitgenössische Artistik, Artistische Darbietung, Performance Show, Night Show, Experimental Show, Live Musik{% endblock %}
+{% block structured_data %}
+{% for event in show.events %}
+{
+    "@context": "https://schema.org/",
+    "@type": "event",
+    "name": "{{ show.title }}",
+    "description": "{{ show.description|striptags|escapejs }}",
+    "image": "{% cropped_thumbnail show "head_img" %}",
+    "doorTime": "{{ event.admission_time }}",
+    "startDate": "{{ event.begin.isoformat }}",
+    "location": {"name": "Zirkus Mond", "address": "Lilie-Henoch Str",
+                    "geo": {"@type": "GeoCoordinates","latitude": 52.54224, "longitude": 13.4326655}}
+},
+{% endfor %}
+{% endblock %}
+
+{% block content-header %}
+{% include "navbar.html" %}
+{% if show.banner_link %}
+
+        <img class="banner-img mx-auto" src="{{ MEDIA_URL }}{{ show.banner_link }}" alt="{{ show.title }} Banner"></img>
+
+{% endif %}
+{% endblock %}
+
+{% block content %}
+        <div class="flex flex-col">
+            
+            {% block show_details %}
+                <div class="flex justify-center flex-wrap">
+                       
+                    {% for event in show.events %}
+                        <div  class="flex mt-2 lg:mt-8 time-details ">
+                            <div class="text-xl">
+                            <div class="text-xl"><p class="text-center card-date">{{event.elaborate_date_str}}</p></div>
+                            <div class="text-xl">Show begin: {{ event.begin_time }}</div>
+                            <div class="text-xl">Admission: {{ event.admission_time }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="my-8 block mx-auto">
+
+
+                    {% if show.third_party_reservation %}
+                        <a class="button reserve__button" href="{{show.third_party_reservation_link}}">Zur Reservierung</a>
+                    {% elif show.ticket_price %}
+                        <a class="button reserve__button" href="/reserve/{{show.pk}}">Tickets Kaufen</a>
+                    {% else %}
+                        <a class="button reserve__button" href="/reserve/{{show.pk}}">Zur Reservierung</a>
+                    {% endif %}
+                </div>
+
+			<div class="deko"> <img class="mx-auto" src="{% static "zm/img/deko-1.png" %}" alt="********"></img> </div>
+
+
+                <div class="show-details flex flex-col text-xl lg:text-2xl" style="color: white;">
+                    <div class="show-description">
+                        <p class="mt-8 mb-4 text-3xl text-zm-yellow">About the show: </p>
+                        <br>
+                        {{ show.description | safe}}
+                    </div>
+                    <div class="more-info flex justify-center">
+
+			{% if show.card_image %}
+                        <div class="show-images">
+                            <img class="show-image " src="{{ MEDIA_URL }}{{ show.card_image}}" alt="{{ show.title }}"></img>
+                        </div>
+			{% endif %}
+                        
+                        {% if show.cast %}
+
+                        <div class="cast flex flex-col lg:mt-12">
+                            <p class="mt-14 mb-4 text-3xl text-zm-yellow">Cast:</p>
+                        <br>
+
+                            {{show.cast | safe}}
+                        </div>
+                        {% endif %}
+
+                    </div>
+                    <div class="links mt-8 flex justify-evenly items-center hover:text-white">
+                        {% if show.video_link %}
+                        <a class="hover:text-white text-3xl text-center w-fit my-1" href="{{show.video_link}}" target="_blank">Trailer</a>
+                        {% endif %}
+                        {% if show.website_link %}
+                        <a class="hover:text-white text-3xl text-center w-fit my-1" href="{{show.website_link}}" target="_blank">Company's website</a>
+                        {% endif %}
+                   
+                    </div>
+            </div>
+                        
+                <div class="show-btns">
+
+                    <div class="show-btn">
+                        <a class="button" href="/">Home</a>
+                    </div>
+                    <div class="show-btn">
+                        {% if show.third_party_reservation %}
+                            <a class="button reserve" href="{{show.third_party_reservation_link}}">Zur Reservierung</a>
+                        {% elif show.ticket_price %}
+                            <a class="button reserve" href="/reserve/{{show.pk}}">Tickets Kaufen</a>
+                        {% else %}
+                            <a class="button reserve" href="/reserve/{{show.pk}}">Zur Reservierung</a>
+                        {% endif %}
+                    </div>
+                </div>
+			<div class="deko"> <img class="mx-auto mt-4" src="{% static "zm/img/deko-2.png" %}" alt="********"></img> </div>
+
+            {% endblock %}
+        </div>
+{% endblock %}

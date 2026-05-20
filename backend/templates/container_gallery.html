@@ -1,0 +1,33 @@
+
+{% load static %}
+
+
+<div class="zm-container ">
+  <div class="glide  ">
+    <div class="glide__track h-auto lg:h-screen mx-auto" data-glide-el="track">
+      <ul class="glide__slides ">
+        <li class="glide__slide my-auto">
+          <div class="ratio ratio-16x9 h-full" >
+            <video autoplay loop muted class="shadowed-content h-full w-full">
+                <source src="{% static 'media/video/video.mp4' %}" type="video/mp4">
+           
+            </video>
+            
+          </div>
+        </li>
+        {% for i in "0123456789" %}
+            <li class="glide__slide {% if forloop.first %}active{%endif%} my-auto">
+                <img src="{% get_static_prefix %}media/images/gallery/img-{{i}}.jpg" class="gallery-img w-full h-full" alt="Gallery Picture {{i}}">
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="absolute top-0 h-full w-full flex justify-between items-center" data-glide-el="controls">
+      <button class="w-3 ml-4 lg:w-6 lg:ml-8" data-glide-dir="<"><img src="/static/media/images/gallery/prev.png" alt="Previous"></button>
+      <button class="w-3 mr-4  lg:w-6 lg:mr-8" data-glide-dir=">"><img src="/static/media/images/gallery/next.png" alt="Next"></button>
+    </div>
+  </div>
+  <div class="deko"> <img class="mx-auto" src="{% static "media/images/gallery/deko-1.png" %}" alt="********"/> </div>
+
+</div>
+

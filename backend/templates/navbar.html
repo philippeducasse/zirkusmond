@@ -1,0 +1,36 @@
+<div class="navbar top-0 fixed flex justify-between w-screen items-center h-20 z-50 px-6 md:px-12 lg:px-24">
+    <div class="logo flex justify-center">
+        <a href="/">
+            <img class="zm-logo" src="/static/media/images/gallery/logo_16x9.png" alt="Zirkusmond logo" width="100">
+        </a>
+    </div>
+    <div class="flex nav-items justify-between gap-5">
+        <a class="text-2xl w-fit" href="/events">Events</a>
+        <a class="text-2xl w-fit" href="/about">About</a>
+        <a class="text-2xl w-fit" href="/contact">Contact</a>
+<!--        <a class="text-2xl w-fit" href="/rentals">Rentals</a> -->
+<!--        <a class="text-2xl w-fit" href="/international">ZM-International</a> -->
+        {% comment %} <a class="text-2xl w-fit" href="https://fashion.zirkusmond.de/en/"  target="_blank">Merch</a> {% endcomment %}
+        {% if user.is_staff %}
+        <a class="text-2xl w-fit" href="/qr-scanner/">QR Scanner</a>
+        {% endif %}
+    </div>
+    <button id='menu-btn'
+            class='hamburger md:hidden flex focus:outline-none items-center'>
+            <span class="hamburger-top"></span>
+            <span class="hamburger-middle"></span>
+            <span class="hamburger-bottom"></span>
+    </button>
+    <div class="mobile-menu hidden flex-col w-fit absolute align-middle items-center">
+        <a class="text-2xl w-fit" href="/events">Events</a>
+        <a class="text-2xl w-fit" href="/about">About</a>
+        <a class="text-2xl w-fit" href="/contact">Contact</a>
+<!--        <a class="text-2xl w-fit" href="/rentals">Rentals</a>
+        <a class="text-2xl w-fit" href="/international">ZM-International</a> -->
+        {% comment %} <a class="text-2xl w-fit" href="https://fashion.zirkusmond.de/en/" target="_blank">Merch</a> {% endcomment %}
+        {% if user.is_staff %}
+        <a class="text-2xl w-fit" href="/qr-scanner/">QR Scanner</a>
+        {% endif %}
+    </div>
+    </a>
+</div>
