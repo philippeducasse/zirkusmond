@@ -7,6 +7,9 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
 WORKDIR /usr/src
 
+# Copy start-server script
+COPY start-server.sh .
+RUN chmod +x start-server.sh
 # Copy and install backend
 COPY backend ./backend
 RUN pip install -r backend/requirements.txt

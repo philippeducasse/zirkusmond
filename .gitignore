@@ -1,0 +1,24 @@
+# Python
+backend/__pycache__/*
+backend/**/__pycache__
+**/__pycache__
+*kate-swp
+.venv/*
+backend/.venv/*
+
+# Backend
+backend/db.sqlite*
+backend/media/*
+backend/static_/*
+backend/templates/mond.html
+
+# Frontend
+frontend/node_modules/
+frontend/dist
+frontend/.DS_Store
+frontend/*.local
+frontend/package-lock.json
+
+# Environment
+.env
+.env.local
