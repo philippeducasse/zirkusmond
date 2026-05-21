@@ -103,3 +103,7 @@ sudo docker-compose up zirkusmond
 
 # early bird tickets
 # tickets umbuchen
+
+# Notes to migrate to new architecture:
+ - make sure newsletter subsciptions have been exported. this table will be wiped clean
+ - make sure to git clone into a fresh repo / folder -> git clone -b organise-backend git@git.ableph.net:ableph/zirkusmond_de.git ~/
