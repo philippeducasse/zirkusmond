@@ -1,22 +1,50 @@
 services:
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+  postgres:
+    image: postgres:16.1
+    restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - zm_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
 
-  zirkusmond:
-    build: .
-    ports:
-      - "8000:8000"
-    env_file: .env
+  django:
+    hostname: django
+    env_file:
+      - .env
+    build:
+      context: .
+    restart: unless-stopped
+    volumes:
+      - zm_media:/srv/data
     depends_on:
-      - db
+      - postgres
+
+  nginx:
+    image: nginx
+    depends_on:
+      - django
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./sites.d:/etc/nginx/sites.d/:ro
+      - ./certs:/certs/:ro
+      - ./acme:/var/www/acme-challenge
+      - zm_media:/var/www/html_zm
+      - /var/log/nginx-docker:/var/log/nginx
+    restart: always
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.202.0/24
 
 volumes:
-  postgres_data:
+  zm_media:
+  zm_db:
