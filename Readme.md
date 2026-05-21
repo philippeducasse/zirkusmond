@@ -108,3 +108,4 @@ sudo docker-compose up zirkusmond
  - make sure newsletter subsciptions have been exported. this table will be wiped clean
  - make sure to git clone into a fresh repo / folder -> git clone -b organise-backend git@git.ableph.net:ableph/zirkusmond_de.git ~/
  - make sure env file is correctly defined
+ - testing docker compose file is slightly different and shares prod nginx setting. this will get removed / become redundant once we use CICD

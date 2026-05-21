@@ -5,8 +5,8 @@ services:
     volumes:
       - zm_db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=monddb
+      - POSTGRES_USER=mond
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
   django:
