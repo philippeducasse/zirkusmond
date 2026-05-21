@@ -17,7 +17,7 @@ DATABASES = {
         'NAME': 'monddb',
         'USER': 'mond',
         'PASSWORD': os.environ['DB_PASSWORD'],
-        'HOST': 'testing_zm_db' if IS_TESTING else 'zm_db',
+        'HOST': 'testing_postgres' if IS_TESTING else 'postgres',
         'PORT': '5432',
     }
 }
