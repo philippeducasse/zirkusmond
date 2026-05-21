@@ -25,3 +25,4 @@ frontend/package-lock.json
 .envrc
 
 docker-compose.local.yml
+.claude
