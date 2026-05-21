@@ -40,8 +40,8 @@
             
             {% block show_details %}
                 <div class="flex justify-center flex-wrap">
-                       
                     {% for event in show.events %}
+                        {% if event.reservation_open %}
                         <div  class="flex mt-2 lg:mt-8 time-details ">
                             <div class="text-xl">
                             <div class="text-xl"><p class="text-center card-date">{{event.elaborate_date_str}}</p></div>
@@ -49,6 +49,7 @@
                             <div class="text-xl">Admission: {{ event.admission_time }}</div>
                             </div>
                         </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
                 <div class="my-8 block mx-auto">
