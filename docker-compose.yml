@@ -40,10 +40,6 @@ services:
 networks:
   default:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.202.0/24
 
 volumes:
   zm_media:
