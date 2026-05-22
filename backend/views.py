@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, HttpResponse
 import datetime
 
-from events.models import Show
+from shows.models import Show
 from rentals.models import RentalObject
 from newsletter.forms import NewsletterRegistrationForm
 

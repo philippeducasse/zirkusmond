@@ -12,6 +12,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 INSTALLED_APPS = [
     "events",
     "shows",
+    "stats",
     "newsletter",
     "rentals",
     "payments",

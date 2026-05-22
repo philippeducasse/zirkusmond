@@ -6,7 +6,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template.response import TemplateResponse
 
 from ..forms import ReservationForm, PersonForm, GuestForm
-from ..models import Show, Reservation, ReservationPayment
+from ..models import Reservation, ReservationPayment
+from shows.models import Show
 from payments import RedirectNeeded
 
 

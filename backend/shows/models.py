@@ -23,7 +23,7 @@ class Show(models.Model):
     card_image = models.ImageField()
     website_link = models.CharField(max_length=255, blank=True)
     banner_link = models.ImageField(blank=True)
-    seo_image_crop = ImageRatioField("banner_link", "400x225", editable=False)
+    seo_image_crop = ImageRatioField("banner_link", "400x225")
 
     private = models.BooleanField(default=False)
     third_party_reservation = models.BooleanField(

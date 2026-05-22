@@ -29,8 +29,8 @@ from .models import (
     Person,
     Reservation,
     ReservationPayment,
-    SiteStats,
 )
+from stats.models import SiteStats
 
 
 @admin.register(SiteStats)
