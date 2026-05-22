@@ -1,7 +1,8 @@
 from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, \
     BooleanField, Select, CharField
 from tinymce.widgets import TinyMCE
-from .models import Person, Event, Show, Guest
+from .models import Person, Event, Guest
+from shows.models import Show
 
 from django.core.exceptions import ValidationError
 
