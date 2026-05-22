@@ -112,19 +112,17 @@ class Show(models.Model):
             return base_price + 10
         return 15
 
+    class Meta:
+        verbose_name_plural = "all shows"
+
 
 class UpcomingShow(Show):
     objects = UpcomingShowManager()
 
     class Meta:
         proxy = True
-
-
-class PastShow(Show):
-    objects = PastShowManager()
-
-    class Meta:
-        proxy = True
+        verbose_name = "upcoming show"
+        verbose_name_plural = "upcoming shows"
 
 
 class UnscheduledShow(Show):
@@ -132,3 +130,14 @@ class UnscheduledShow(Show):
 
     class Meta:
         proxy = True
+        verbose_name = "unscheduled show"
+        verbose_name_plural = "unscheduled shows"
+
+
+class PastShow(Show):
+    objects = PastShowManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "past show"
+        verbose_name_plural = "past shows"
