@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 import views
 from events import views as event_views
 from events.views_admin import purge_old_payments_view
+from shows import views as show_views
 
 urlpatterns = [
     path('mondmin/', admin.site.urls),
@@ -26,7 +27,7 @@ urlpatterns = [
     re_path('^datenschutz.*', views.datenschutz),
     path('robots.txt', views.robots),
     path('sitemap.xml', views.sitemap),
-    path('show/<int:show_id>', event_views.show, name='show'),
+    path('show/<int:show_id>', show_views.show, name='show'),
     path('reserve/<int:show_id>', event_views.reserve, name='reserve'),
     path('reservation_status/<uuid:payment_id>', event_views.reservation_status),
     path('payment/<uuid:payment_id>', event_views.payment, name='payment'),
