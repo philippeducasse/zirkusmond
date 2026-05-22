@@ -8,9 +8,9 @@ from newsletter.forms import NewsletterRegistrationForm
 
 
 def _upcoming_shows():
-    us = Show.objects.prefetch_related('event_set').all()
+    us = Show.objects.prefetch_related('events').all()
     us = list(filter(lambda x: x.show_in_preview(), us))
-    us = sorted(us, key=lambda x: datetime.date(2020, 1, 1) if len(x.events()) == 0 else x.events()[0].admission.date())
+    us = sorted(us, key=lambda x: datetime.date(2020, 1, 1) if not x.future_events() else x.future_events()[0].admission.date())
     return us
 
 def _rental_objects():
