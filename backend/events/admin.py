@@ -23,11 +23,8 @@ from payments import PaymentStatus
 
 from . import services
 from .forms import EmailTextForm
-from .models import (
-    Event,
-    ReservationPayment,
-)
-from reservations.models import Guest, Reservation
+from events.models import Event
+from reservations.models import Guest, Reservation, ReservationPayment
 from stats.models import SiteStats
 
 
