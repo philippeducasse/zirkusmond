@@ -8,7 +8,7 @@ from django.urls import reverse
 from payments import PurchasedItem
 from payments.models import BasePayment
 
-from .reservation import Reservation
+from reservations.models import Reservation
 
 
 class ReservationPayment(BasePayment):
@@ -29,16 +29,16 @@ class ReservationPayment(BasePayment):
         }
 
     def get_failure_url(self):
-        prot = 'https' if settings.PAYMENT_USES_SSL else 'http'
-        return f'{prot}://{settings.PAYMENT_HOST}/payment-failure/%s' % self.pk
+        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{protocol}://{settings.PAYMENT_HOST}/payment-failure/%s' % self.pk
 
     def get_success_url(self):
-        prot = 'https' if settings.PAYMENT_USES_SSL else 'http'
-        return f'{prot}://{settings.PAYMENT_HOST}/payment-success/%s' % self.pk
+        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{protocol}://{settings.PAYMENT_HOST}/payment-success/%s' % self.pk
 
     def get_process_url(self) -> str:
-        prot = 'https' if settings.PAYMENT_USES_SSL else 'http'
-        return f'{prot}://{settings.PAYMENT_HOST}' + reverse('process_payment', kwargs={'token': self.token})
+        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{protocol}://{settings.PAYMENT_HOST}' + reverse('process_payment', kwargs={'token': self.token})
 
     def get_purchased_items(self):
         yield PurchasedItem(
@@ -68,19 +68,18 @@ class ReservationPayment(BasePayment):
 
     @staticmethod
     def from_reservation(reservation: Reservation, *args, **kwargs):
-        self = ReservationPayment(*args, **kwargs)
-        self.reservation = reservation
-        r = reservation.reservant
-        self.billing_first_name = r.firstname
-        self.billing_last_name = r.surname
-        self.billing_address_1 = r.street if r.street is not None else ""
-        self.billing_postcode = r.zipcode if r.zipcode is not None else ""
-        self.billing_city = r.town if r.town is not None else ""
-        self.billing_email = r.email
-        self.description = 'Reservations for %s' % reservation.event
-        self.total = self.reservation.ticket_count() * self.ticket_price
-        self.currency = 'EUR'
-        return self
+        payment = ReservationPayment(*args, **kwargs)
+        payment.reservation = reservation
+        payment.billing_first_name = reservation.first_name
+        payment.billing_last_name = reservation.last_name
+        payment.billing_address_1 = ""
+        payment.billing_postcode = ""
+        payment.billing_city = ""
+        payment.billing_email = reservation.email
+        payment.description = 'Reservations for %s' % reservation.event
+        payment.total = reservation.ticket_count() * payment.ticket_price
+        payment.currency = 'EUR'
+        return payment
 
     @admin.display
     def ticket_count(self):
