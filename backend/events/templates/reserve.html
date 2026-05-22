@@ -19,16 +19,16 @@
 
             <div class="ticket-form p-2 pr-6 mr-8 my-4">
                     <h3 class="text-3xl text-zm-yellow">Tickets</h3>
-                    {{ rForm.event.label_tag }}
-                    {{ rForm.event }}
+                    {{ reservation_form.event.label_tag }}
+                    {{ reservation_form.event }}
                     <div class="err_msg">
-                    {% for err in rForm.event.errors %}
+                    {% for err in reservation_form.event.errors %}
                         {{ err }}
                     {% endfor %}
                     </div>
 
-                    {{ rForm.attendee_count.label_tag }}
-                    {{ rForm.attendee_count }}
+                    {{ reservation_form.attendee_count.label_tag }}
+                    {{ reservation_form.attendee_count }}
                     {% if not show.ticket_price %}
                         <p class="w-full my-4 ">
                             For your Reservation, you will have to pay {{ show.reservation_price|default:5 }} Euro per Ticket. This will be fully deducted from your entree fee at the box office.
@@ -38,31 +38,40 @@
 
             <div class="input-form w-full p-2">
                 <h3 class="text-3xl text-zm-yellow">Personal Information</h3>
-                {% for attr_list in pForm.line_tuples %}
-                    <div class="row">
-                        {% for attr in attr_list %}
-                            <div class="col-md-{% widthratio 12 attr_list|length 1 %}">
-                                {{attr.label_tag}}
-                                {{attr}}
-
-                                {% for err in attr.errors %}
-                                <div class="err_msg">
-                                    {{ err }}
-                                </div>
-                                {% endfor %}
-                            </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ reservation_form.first_name.label_tag }}
+                        {{ reservation_form.first_name }}
+                        {% for err in reservation_form.first_name.errors %}
+                        <div class="err_msg">{{ err }}</div>
                         {% endfor %}
                     </div>
-                {% endfor %}
+                    <div class="col-md-6">
+                        {{ reservation_form.last_name.label_tag }}
+                        {{ reservation_form.last_name }}
+                        {% for err in reservation_form.last_name.errors %}
+                        <div class="err_msg">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ reservation_form.email.label_tag }}
+                        {{ reservation_form.email }}
+                        {% for err in reservation_form.email.errors %}
+                        <div class="err_msg">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
 
         </div>
 
 
             <div id="guest-forms-container">
-                {{ gForms.management_form }}
+                {{ guest_formset.management_form }}
 
-                {% for form in gForms %}
+                {% for form in guest_formset %}
                     <div class="guest-form-wrapper" data-guest-index="{{ forloop.counter0 }}" style="display: none;">
                         <div class="guest-form">
                             <div class="card-body guest-form-container">

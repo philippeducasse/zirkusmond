@@ -5,10 +5,9 @@ from django.forms import formset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.response import TemplateResponse
 
-from ..forms import ReservationForm, PersonForm, GuestForm
-from ..models import Reservation, ReservationPayment
+from ..forms import ReservationForm, GuestForm
+from ..models import ReservationPayment
 from shows.models import Show
-from payments import RedirectNeeded
 
 
 def _get_ip(request):
@@ -22,32 +21,27 @@ def reserve(request, show_id):
     GuestFormSet = formset_factory(GuestForm, max_num=9, extra=9)
 
     if request.method == 'POST':
-        rForm = ReservationForm(show, request.POST, prefix='res')
-        pForm = PersonForm(request.POST, prefix='pers')
-        dgForms = GuestFormSet(request.POST, prefix='gues')
+        reservation_form = ReservationForm(show, request.POST, prefix='res')
+        guest_formset = GuestFormSet(request.POST, prefix='gues')
 
         if 'newsletter' in request.POST:
             newsletter = request.POST['newsletter']
 
-        if rForm.is_valid() and pForm.is_valid():
-            gCount = rForm.cleaned_data['attendee_count'] - 1
-            guest_forms_valid = all(dgForms[i].is_valid() for i in range(gCount))
+        if reservation_form.is_valid():
+            guest_count = reservation_form.cleaned_data['attendee_count'] - 1
+            guest_forms_valid = all(guest_formset[i].is_valid() for i in range(guest_count))
 
             if guest_forms_valid:
                 with transaction.atomic():
-                    event = rForm.cleaned_data['event']
-                    reservant_person = pForm.save()
-                    reservation = Reservation(event=event, reservant=reservant_person)
-                    reservation.save()
+                    reservation = reservation_form.save()
 
-                    for i in range(gCount):
-                        guest = dgForms[i].save(commit=False)
-                        guest.event_reservation_id = reservation.pk
-                        guest.event_reservation = reservation
+                    for i in range(guest_count):
+                        guest = guest_formset[i].save(commit=False)
+                        guest.reservation = reservation
                         guest.save()
 
                 variant = request.POST['payment-method']
-                rP = ReservationPayment.from_reservation(
+                payment = ReservationPayment.from_reservation(
                     reservation, variant=variant, customer_ip_address=_get_ip(request))
 
                 if show.ticket_price:
@@ -55,25 +49,26 @@ def reserve(request, show_id):
                     if custom_price:
                         try:
                             custom_price = Decimal(custom_price)
-                            rP.custom_ticket_price = custom_price
+                            payment.custom_ticket_price = custom_price
                             base_price = show.ticket_price or Decimal(5.0)
-                            if not rP.validate_custom_price(base_price):
-                                pForm.add_error(None, 'Invalid ticket price selected')
+                            if not payment.validate_custom_price(base_price):
+                                reservation_form.add_error(None, 'Invalid ticket price selected')
                                 return render(request, 'reserve.html', {
-                                    'show': show, 'rForm': rForm, 'pForm': pForm,
-                                    'gForms': dgForms, 'newsletter': newsletter,
+                                    'show': show,
+                                    'reservation_form': reservation_form,
+                                    'guest_formset': guest_formset,
+                                    'newsletter': newsletter,
                                     'base_price': base_price,
                                 })
-                            rP.total = reservation.ticket_count() * rP.ticket_price
+                            payment.total = reservation.ticket_count() * payment.ticket_price
                         except (ValueError, TypeError):
                             pass
 
-                rP.save()
-                return redirect('/payment/%s' % rP.pk)
+                payment.save()
+                return redirect('/payment/%s' % payment.pk)
     else:
-        rForm = ReservationForm(show, prefix='res')
-        pForm = PersonForm(prefix='pers')
-        dgForms = GuestFormSet(prefix='gues')
+        reservation_form = ReservationForm(show, prefix='res')
+        guest_formset = GuestFormSet(prefix='gues')
 
     base_price = show.ticket_price or show.reservation_price or Decimal(15.0)
     min_price = show.get_effective_min_price(base_price)
@@ -81,9 +76,8 @@ def reserve(request, show_id):
 
     return render(request, 'reserve.html', {
         'show': show,
-        'rForm': rForm,
-        'pForm': pForm,
-        'gForms': dgForms,
+        'reservation_form': reservation_form,
+        'guest_formset': guest_formset,
         'newsletter': newsletter,
         'base_price': base_price,
         'min_price': min_price,
