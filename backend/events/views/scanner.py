@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from ..models import Event, Reservation, Guest
+from ..models import Event
+from reservations.models import Reservation, Guest
 
 
 @staff_member_required(login_url="/admin/login/")
@@ -23,12 +24,12 @@ def get_events(request):
     )
     return JsonResponse([
         {
-            'id': e['id'],
-            'title': e['show__title'],
-            'begin': e['begin'],
-            'date': e['begin'].astimezone().strftime('%d.%m.%y'),
+            'id': event['id'],
+            'title': event['show__title'],
+            'begin': event['begin'],
+            'date': event['begin'].astimezone().strftime('%d.%m.%y'),
         }
-        for e in upcoming_events
+        for event in upcoming_events
     ], safe=False)
 
 
@@ -36,24 +37,23 @@ def get_events(request):
 def check_in(request, reservation_id):
     try:
         reservation = Reservation.objects.get(id=reservation_id)
-        total_guests = [str(reservation.reservant)]
-        total_guests.extend(str(g) for g in reservation.guests())
+        all_names = [f"{reservation.first_name} {reservation.last_name}"]
+        all_names.extend(str(guest) for guest in reservation.guests.all())
         if reservation.checked_in:
             return JsonResponse({'error': 'Ticket already checked in',
                                  'reservation_number': str(reservation.id),
-                                 'guests': total_guests}, status=400)
+                                 'guests': all_names}, status=400)
         reservation.checked_in = True
         reservation.save()
         return JsonResponse({'success': True,
                              'reservation_number': str(reservation.id),
-                             'guests': total_guests,
+                             'guests': all_names,
                              'is_group': True})
     except Reservation.DoesNotExist:
         pass
 
     try:
-        guest = Guest.objects.select_related('event_reservation__reservant').get(
-            ticket_id=reservation_id)
+        guest = Guest.objects.get(ticket_id=reservation_id)
         if guest.checked_in:
             return JsonResponse({'error': 'Ticket already checked in',
                                  'reservation_number': str(guest.ticket_id),

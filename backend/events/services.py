@@ -13,7 +13,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as rl_canvas
 
-from .models import Guest, Person, Reservation, ReservationPayment
+from .models import ReservationPayment
+from reservations.models import Guest, Reservation
 from stats.models import SiteStats
 from payments import PaymentStatus
 
@@ -22,77 +23,72 @@ logger = logging.getLogger(__name__)
 HALF_YEAR_DAYS = 220  # ≈6 months
 
 
-# ---------------------------------------------------------------------------
-# Confirmation email
-# ---------------------------------------------------------------------------
-
 def _make_qr_buffer(data: dict) -> BytesIO:
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(json.dumps(data))
     qr.make(fit=True)
-    buf = BytesIO()
-    qr.make_image(fill_color="black", back_color="white").save(buf, format='PNG')
-    buf.seek(0)
-    return buf
+    buffer = BytesIO()
+    qr.make_image(fill_color="black", back_color="white").save(buffer, format='PNG')
+    buffer.seek(0)
+    return buffer
 
 
 def _build_tickets_pdf(reservation: Reservation, tickets: list) -> BytesIO:
-    pdf_buf = BytesIO()
+    pdf_buffer = BytesIO()
     width, height = A4
-    c = rl_canvas.Canvas(pdf_buf, pagesize=A4)
+    canvas = rl_canvas.Canvas(pdf_buffer, pagesize=A4)
     show = reservation.event.show
-    cx = width / 2
+    center_x = width / 2
 
-    for name, qr_buf in tickets:
-        qr_img = ImageReader(qr_buf)
+    for name, qr_buffer in tickets:
+        qr_image = ImageReader(qr_buffer)
         qr_size = 220
         qr_x = (width - qr_size) / 2
         qr_y = height / 2 - qr_size / 2 + 20
 
-        c.setFont("Helvetica-Bold", 22)
-        c.drawCentredString(cx, qr_y + qr_size + 60, show.title)
+        canvas.setFont("Helvetica-Bold", 22)
+        canvas.drawCentredString(center_x, qr_y + qr_size + 60, show.title)
 
-        c.setFont("Helvetica", 14)
-        c.drawCentredString(cx, qr_y + qr_size + 36, f"Ticket für / Ticket for:  {name}")
+        canvas.setFont("Helvetica", 14)
+        canvas.drawCentredString(center_x, qr_y + qr_size + 36, f"Ticket für / Ticket for:  {name}")
 
-        c.setLineWidth(0.5)
-        c.line(72, qr_y + qr_size + 22, width - 72, qr_y + qr_size + 22)
+        canvas.setLineWidth(0.5)
+        canvas.line(72, qr_y + qr_size + 22, width - 72, qr_y + qr_size + 22)
 
-        c.drawImage(qr_img, qr_x, qr_y, width=qr_size, height=qr_size)
+        canvas.drawImage(qr_image, qr_x, qr_y, width=qr_size, height=qr_size)
 
-        c.line(72, qr_y - 16, width - 72, qr_y - 16)
+        canvas.line(72, qr_y - 16, width - 72, qr_y - 16)
 
-        c.setFont("Helvetica-Bold", 13)
-        c.drawCentredString(cx, qr_y - 36, reservation.event.date_str())
+        canvas.setFont("Helvetica-Bold", 13)
+        canvas.drawCentredString(center_x, qr_y - 36, reservation.event.date_str())
 
-        c.setFont("Helvetica", 12)
-        c.drawCentredString(cx, qr_y - 54,
+        canvas.setFont("Helvetica", 12)
+        canvas.drawCentredString(center_x, qr_y - 54,
                             f"Einlass {reservation.event.admission_time()}  ·  Beginn {reservation.event.begin_time()}")
-        c.drawCentredString(cx, qr_y - 72,
+        canvas.drawCentredString(center_x, qr_y - 72,
                             "Bitte QR-Code an der Tür vorzeigen  ·  Please show QR code at the door")
 
-        c.showPage()
+        canvas.showPage()
 
-    c.save()
-    pdf_buf.seek(0)
-    return pdf_buf
+    canvas.save()
+    pdf_buffer.seek(0)
+    return pdf_buffer
 
 
 def send_confirmation_mail(reservation: Reservation):
-    p = reservation.reservant
     show = reservation.event.show
-    guests = list(reservation.guests())
+    guests = list(reservation.guests.all())
     payment = ReservationPayment.objects.filter(reservation=reservation).first()
 
     tickets = [(
-        f"{p.firstname} {p.surname}",
+        f"{reservation.first_name} {reservation.last_name}",
         _make_qr_buffer({"ticket": str(reservation.id), "event": reservation.event.id}),
     )]
     for guest in guests:
         if guest.ticket_id is None:
             continue
         tickets.append((
-            f"{guest.firstname} {guest.surname}",
+            f"{guest.first_name} {guest.last_name}",
             _make_qr_buffer({"ticket": str(guest.ticket_id), "event": reservation.event.id}),
         ))
 
@@ -101,7 +97,7 @@ def send_confirmation_mail(reservation: Reservation):
     guests_de = ""
     guests_en = ""
     if guests:
-        guest_names = "\n".join(f"  - {g.firstname} {g.surname}" for g in guests)
+        guest_names = "\n".join(f"  - {guest.first_name} {guest.last_name}" for guest in guests)
         guests_de = f"\nGäste:\n{guest_names}\n"
         guests_en = f"\nGuests:\n{guest_names}\n"
 
@@ -113,11 +109,11 @@ def send_confirmation_mail(reservation: Reservation):
         payment_de = f"\nPreis pro Ticket: {ticket_price:.2f} EUR\nGesamtbetrag: {total:.2f} EUR\n"
         payment_en = f"\nPrice per ticket: {ticket_price:.2f} EUR\nTotal paid: {total:.2f} EUR\n"
 
-    body = f"""Liebe*r {p.firstname},
+    body = f"""Liebe*r {reservation.first_name},
 vielen Dank für deine Buchung für {show.title} am {reservation.event.date_str()}!
 
 Deine Reservierung:
-Name: {p.firstname} {p.surname}
+Name: {reservation.first_name} {reservation.last_name}
 Reservierungs-ID: {reservation.id}
 Tickets: {reservation.ticket_count()}{guests_de}{payment_de}
 Im Anhang findest du das PDF mit deinen Tickets – für jede Person gibt es einen eigenen QR-Code. Falls ihr nicht gemeinsam ankommt, leite bitte den jeweiligen QR-Code an deine Gäste weiter.
@@ -132,11 +128,11 @@ Wir freuen uns auf dich im Zirkus Mond – viel Spaß!
 
 —————————————————————————————————————
 
-Dear {p.firstname},
+Dear {reservation.first_name},
 thank you for your booking to {show.title} on the {reservation.event.date_str()}!
 
 Your reservation:
-Name: {p.firstname} {p.surname}
+Name: {reservation.first_name} {reservation.last_name}
 Reservation ID: {reservation.id}
 Tickets: {reservation.ticket_count()}{guests_en}{payment_en}
 The attached PDF contains a individual QR code for each person in your booking. If you're not arriving together, please forward the relevant QR code to your guests.
@@ -154,36 +150,31 @@ See you at Zirkus Mond and have fun.
         subject=f'🎪 Thank you for your Reservation for {show.title} 🌙',
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[p.email]
+        to=[reservation.email]
     )
     email.attach(f'tickets_{reservation.id}.pdf', pdf_buffer.read(), 'application/pdf')
     email.send()
 
 
-# ---------------------------------------------------------------------------
-# Purge old payments
-# ---------------------------------------------------------------------------
-
 def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):
     cutoff = timezone.now() - datetime.timedelta(days=HALF_YEAR_DAYS)
 
-    qs = ReservationPayment.objects.filter(created__lt=cutoff)
+    payments_qs = ReservationPayment.objects.filter(created__lt=cutoff)
     if confirmed_only:
-        qs = qs.filter(status=PaymentStatus.CONFIRMED)
+        payments_qs = payments_qs.filter(status=PaymentStatus.CONFIRMED)
 
     payments = list(
-        qs.select_related(
+        payments_qs.select_related(
             "reservation",
-            "reservation__reservant",
             "reservation__event",
             "reservation__event__show",
         )
     )
 
     total_visitors = 0
-    for p in payments:
-        if p.reservation:
-            total_visitors += p.reservation.ticket_count()
+    for payment in payments:
+        if payment.reservation:
+            total_visitors += payment.reservation.ticket_count()
 
     if dry_run:
         return {
@@ -200,7 +191,7 @@ def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):
         SiteStats.objects.filter(pk=stats.pk).update(
             deleted_visitors=F("deleted_visitors") + total_visitors
         )
-        deleted_count, _ = qs.delete()
+        deleted_count, _ = payments_qs.delete()
         stats.refresh_from_db()
 
     return {
@@ -213,70 +204,24 @@ def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):
     }
 
 
-# ---------------------------------------------------------------------------
-# Purge orphaned people and reservations
-# ---------------------------------------------------------------------------
-
-def purge_orphan_people_and_reservations(*, dry_run: bool = True):
-    reservations_wo_payment_qs = Reservation.objects.filter(
+def purge_orphan_reservations(*, dry_run: bool = True):
+    orphan_reservations_qs = Reservation.objects.filter(
         ~Exists(ReservationPayment.objects.filter(reservation=OuterRef("pk")))
     )
-    reservations_to_delete = reservations_wo_payment_qs.count()
-
-    guests_wo_res_qs = Guest.objects.filter(event_reservation__isnull=True)
-    guests_to_delete_now = guests_wo_res_qs.count()
-    
-    # Persons that currently have no Reservation and are not a Guest
-    persons_wo_res_now_qs = Person.objects.filter(
-        ~Exists(Reservation.objects.filter(reservant=OuterRef("pk"))),
-        ~Exists(Guest.objects.filter(pk=OuterRef("pk"))),
-    )
-    persons_to_delete_now = persons_wo_res_now_qs.count()
-
-    # Approximate "post-phase-1" persons: those who have *no* reservations
-    # other than ones we are about to delete, and are not Guests.
-    # (For huge datasets, you can skip this extra preview to avoid large IN clauses.)
-    res_ids_to_delete = list(reservations_wo_payment_qs.values_list("pk", flat=True))
-    persons_wo_res_after_phase1_qs = Person.objects.filter(
-         # No surviving reservations (i.e., any reservation NOT in res_ids_to_delete)
-        ~Exists(
-            Reservation.objects.exclude(pk__in=res_ids_to_delete).filter(
-                reservant=OuterRef("pk")
-            )
-        ),
-        ~Exists(Guest.objects.filter(pk=OuterRef("pk"))),
-    )
-    persons_to_delete_after_phase1 = persons_wo_res_after_phase1_qs.count()
+    reservations_to_delete = orphan_reservations_qs.count()
 
     if dry_run:
         return {
             "dry_run": True,
             "reservations_to_delete": reservations_to_delete,
-            "guests_to_delete_now": guests_to_delete_now,
-            "persons_to_delete_now": persons_to_delete_now,
-            "persons_to_delete_after_phase1": persons_to_delete_after_phase1,
             "deleted_reservations": 0,
-            "deleted_guests": 0,
-            "deleted_persons": 0,
         }
 
     with transaction.atomic():
-        deleted_reservations, _ = reservations_wo_payment_qs.delete()
-        deleted_guests_null, _ = guests_wo_res_qs.delete()
-
-        persons_wo_res_qs = Person.objects.filter(
-            ~Exists(Reservation.objects.filter(reservant=OuterRef("pk"))),
-            ~Exists(Guest.objects.filter(pk=OuterRef("pk"))),
-        )
-        deleted_persons, _ = persons_wo_res_qs.delete()
+        deleted_reservations, _ = orphan_reservations_qs.delete()
 
     return {
         "dry_run": False,
         "reservations_to_delete": reservations_to_delete,
-        "guests_to_delete_now": guests_to_delete_now,
-        "persons_to_delete_now": persons_to_delete_now,
-        "persons_to_delete_after_phase1": persons_to_delete_after_phase1,
         "deleted_reservations": deleted_reservations,
-        "deleted_guests": deleted_guests_null,
-        "deleted_persons": deleted_persons,
     }
