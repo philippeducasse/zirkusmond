@@ -10,7 +10,6 @@ from django.db.models import (
     Min,
     OuterRef,
     Prefetch,
-    Q,
     Subquery,
     Sum,
     Value,
@@ -24,7 +23,7 @@ from events.models import (
 )
 from payments import PaymentStatus
 
-from .models import Show, UpcomingShow, PastShow, UnscheduledShow
+from .models import PastShow, Show, UnscheduledShow, UpcomingShow
 
 
 class EventInlineForm(forms.ModelForm):
@@ -264,16 +263,7 @@ class ShowAdmin(admin.ModelAdmin):
         return timezone.localtime(next_begin).strftime("%d.%m.%y %H:%M")
 
 
-class UpcomingShowAdmin(ShowAdmin):
-    default_ordering = [F("next_event_begin").asc(nulls_last=True), "title"]
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        now = timezone.now()
-        return qs.filter(Q(next_event_begin__gte=now) | Q(next_event_begin__isnull=True))
-
-
 admin.site.register(Show, ShowAdmin)
-admin.site.register(UpcomingShow, UpcomingShowAdmin)
+admin.site.register(UpcomingShow, ShowAdmin)
 admin.site.register(PastShow, ShowAdmin)
 admin.site.register(UnscheduledShow, ShowAdmin)
