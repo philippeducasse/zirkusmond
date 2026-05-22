@@ -14,4 +14,4 @@ class PastShowManager(models.Manager):
 
 class UnscheduledShowManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(event__isnull=True).distinct()
+        return super().get_queryset().filter(events__isnull=True).distinct()
