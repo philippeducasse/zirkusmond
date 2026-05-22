@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm, Form, IntegerField, CharField
 from tinymce.widgets import TinyMCE
 
-from .models import Event
+from events.models import Event
 from reservations.models import Guest, Reservation
 from shows.models import Show
 
