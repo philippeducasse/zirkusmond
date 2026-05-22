@@ -122,7 +122,9 @@ class UpcomingShow(Show):
     class Meta:
         proxy = True
         verbose_name = "upcoming show"
-        verbose_name_plural = "upcoming shows"
+        verbose_name_plural = (
+            "  Upcoming shows"  # leave spaces to have it show up first in admin panel
+        )
 
 
 class UnscheduledShow(Show):
@@ -131,7 +133,7 @@ class UnscheduledShow(Show):
     class Meta:
         proxy = True
         verbose_name = "unscheduled show"
-        verbose_name_plural = "unscheduled shows"
+        verbose_name_plural = " Unscheduled shows"
 
 
 class PastShow(Show):
