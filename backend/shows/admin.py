@@ -263,7 +263,7 @@ class ShowAdmin(admin.ModelAdmin):
         return timezone.localtime(next_begin).strftime("%d.%m.%y %H:%M")
 
 
-admin.site.register(Show, ShowAdmin)
 admin.site.register(UpcomingShow, ShowAdmin)
-admin.site.register(PastShow, ShowAdmin)
 admin.site.register(UnscheduledShow, ShowAdmin)
+admin.site.register(PastShow, ShowAdmin)
+admin.site.register(Show, ShowAdmin)
