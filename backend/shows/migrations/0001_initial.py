@@ -32,7 +32,9 @@ def copy_shows_forward(apps, schema_editor):
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies = [
+        ('events', '0015_alter_event_options_alter_guest_ticket_id'),
+    ]
 
     operations = [
         migrations.CreateModel(

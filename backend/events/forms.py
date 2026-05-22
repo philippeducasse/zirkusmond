@@ -25,7 +25,7 @@ class ReservationForm(ModelForm):
         super().__init__(*args, **kwargs)
         all_events = Event.objects.filter(show=show.pk)
         open_ids = [e.pk for e in all_events if e.reservation_open()]
-        self.fields['event'] = EventModelChoiceField(Event.objects.filter(pk__in=open_ids))
+        self.fields['event'] = EventModelChoiceField(Event.objects.filter(pk__in=open_ids).order_by("begin"))
 
     def clean(self):
         cleaned_data = super().clean()

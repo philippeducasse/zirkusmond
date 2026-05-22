@@ -31,7 +31,7 @@ class Guest(models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="guests")
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
-    ticket_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    ticket_id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, null=True, blank=True)
     checked_in = models.BooleanField(default=False)
 
     def __str__(self):
@@ -76,7 +76,7 @@ class ReservationPayment(BasePayment):
         if self.custom_ticket_price is not None:
             return self.custom_ticket_price
         show = self.reservation.event.show
-        price = show.ticket_price if show.ticket_price else show.reservation_price
+        price = show.base_ticket_price if show.base_ticket_price else show.reservation_price
         if not price:
             price = Decimal(15.0)
         return price
