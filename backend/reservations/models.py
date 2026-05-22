@@ -1,16 +1,19 @@
-# Create your models here.
 import uuid
+from decimal import Decimal
 
 from django.contrib import admin
+from django.conf import settings
 from django.db import models
+from django.urls import reverse
+from payments import PurchasedItem
+from payments.models import BasePayment
+
 from events.models import Event
 
 
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, related_name="reservations")
-
-    # add information about the person who booked directly in the reservation object
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
     email = models.EmailField()
@@ -18,10 +21,10 @@ class Reservation(models.Model):
 
     @admin.display
     def ticket_count(self):
-        return self.guests.count() + 1  # +1 because Reservation is main guest
+        return self.guests.count() + 1
 
     def __str__(self):
-        return f"Reservation for {self.event} - tickets: {self.ticket_count()} — bought by {self.last_name} {self.first_name} "
+        return f"Reservation for {self.event} - tickets: {self.ticket_count()} — bought by {self.last_name} {self.first_name}"
 
 
 class Guest(models.Model):
@@ -33,3 +36,73 @@ class Guest(models.Model):
 
     def __str__(self):
         return f"Guest: {self.first_name}, {self.last_name}"
+
+
+class ReservationPayment(BasePayment):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reservation = models.ForeignKey(Reservation, null=True, on_delete=models.SET_NULL)
+    custom_ticket_price = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Custom price selected by user (sliding scale)")
+
+    def get_metadata(self):
+        return {
+            "event": str(self.reservation),
+            "reservation_id": str(self.id),
+        }
+
+    def get_failure_url(self):
+        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{protocol}://{settings.PAYMENT_HOST}/payment-failure/%s' % self.pk
+
+    def get_success_url(self):
+        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{protocol}://{settings.PAYMENT_HOST}/payment-success/%s' % self.pk
+
+    def get_process_url(self) -> str:
+        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
+        return f'{protocol}://{settings.PAYMENT_HOST}' + reverse('process_payment', kwargs={'token': self.token})
+
+    def get_purchased_items(self):
+        yield PurchasedItem(
+            name=f'{self.reservation.event.show.title} {self.reservation.event}',
+            sku=self.reservation.event.pk,
+            quantity=self.reservation.ticket_count(),
+            price=self.ticket_price,
+            currency='EUR')
+
+    @property
+    def ticket_price(self):
+        if self.custom_ticket_price is not None:
+            return self.custom_ticket_price
+        show = self.reservation.event.show
+        price = show.ticket_price if show.ticket_price else show.reservation_price
+        if not price:
+            price = Decimal(15.0)
+        return price
+
+    def validate_custom_price(self, base_price):
+        if self.custom_ticket_price is None:
+            return True
+        show = self.reservation.event.show
+        min_price = show.get_effective_min_price(base_price)
+        max_price = show.get_effective_max_price(base_price)
+        return min_price <= self.custom_ticket_price <= max_price
+
+    @staticmethod
+    def from_reservation(reservation: Reservation, *args, **kwargs):
+        payment = ReservationPayment(*args, **kwargs)
+        payment.reservation = reservation
+        payment.billing_email = reservation.email
+        payment.description = 'Reservations for %s' % reservation.event
+        payment.total = reservation.ticket_count() * payment.ticket_price
+        payment.currency = 'EUR'
+        return payment
+
+    @admin.display
+    def ticket_count(self):
+        return self.reservation.ticket_count()
+
+    @admin.display
+    def event(self):
+        return f'{self.reservation.event}'
