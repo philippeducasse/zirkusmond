@@ -8,16 +8,13 @@ from events.models import Event
 
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
+    event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, related_name="reservations")
 
     # add information about the person who booked directly in the reservation object
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
     email = models.EmailField()
     checked_in = models.BooleanField(default=False)
-
-    def guests(self):
-        return Guest.objects.filter(event_reservation=self)
 
     @admin.display
     def ticket_count(self):
