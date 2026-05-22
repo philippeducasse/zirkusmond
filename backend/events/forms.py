@@ -1,12 +1,12 @@
-from django.forms import ModelForm, Form, ModelChoiceField, IntegerField, \
-    BooleanField, Select, CharField
+from django.core.exceptions import ValidationError
+from django.forms import ModelForm, Form, IntegerField, CharField
 from tinymce.widgets import TinyMCE
-from .models import Person, Event, Guest
+
+from .models import Event
+from reservations.models import Guest, Reservation
 from shows.models import Show
 
-from django.core.exceptions import ValidationError
-
-
+from django.forms import ModelChoiceField
 
 
 class EventModelChoiceField(ModelChoiceField):
@@ -14,97 +14,41 @@ class EventModelChoiceField(ModelChoiceField):
         return f'{obj}' if obj.reservation_open() else f'RESERVATION CLOSED - {obj}'
 
 
-class ReservationForm(Form):
-    '''
-    '''
-    event = ModelChoiceField(None)
-    attendee_count = IntegerField(min_value=1, max_value=10,
-                                  initial=1, label="Tickets")
+class ReservationForm(ModelForm):
+    attendee_count = IntegerField(min_value=1, max_value=10, initial=1, label="Tickets")
+
+    class Meta:
+        model = Reservation
+        fields = ['event', 'first_name', 'last_name', 'email']
 
     def __init__(self, show: Show, *args, **kwargs):
         super().__init__(*args, **kwargs)
         all_events = Event.objects.filter(show=show.pk)
         open_ids = [e.pk for e in all_events if e.reservation_open()]
-        choices = Event.objects.filter(pk__in=open_ids)
-        self.fields['event'] = EventModelChoiceField(choices)
-        #for i in choices:
-        #    if not i.reservation_open():
-        #        self.fields['event'].disabled_choices.append(str(i))
-
+        self.fields['event'] = EventModelChoiceField(Event.objects.filter(pk__in=open_ids))
 
     def clean(self):
         cleaned_data = super().clean()
-
-        # no more covid
-        #if not cleaned_data['covid_stuff']:
-        #    self.add_error('covid_stuff', 'You will have to be tested/vaccinated for the event')
-        if not cleaned_data['event'].reservation_open():
+        event = cleaned_data.get('event')
+        if event and not event.reservation_open():
             self.add_error('event', 'Sorry, Reservation for this Event is closed')
             raise ValidationError("Registration is closed, sorry :(")
 
 
-class PersonForm(ModelForm):
-    ''' Person Form
-    '''
-    class Meta:
-        model = Person
-        fields = ['firstname', 'surname', 'street', 'zipcode',
-                  'town', 'email', 'phonenumber']
-
-    def line_tuples(self):
-        return ((self['firstname'], self['surname']),
-                #(self['street'], self['zipcode'], self['town']),
-                (self['email'], self['phonenumber']))
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        for f in ['firstname', 'surname', 'email']:
-            if f not in cleaned_data.keys():
-                self.add_error(f, 'Missing')
-            else:
-                if cleaned_data[f] == None or cleaned_data[f] == '':
-                    self.add_error(f, 'Not Set')
-
-
 class GuestForm(ModelForm):
-    ''' Person Form
-    '''
     class Meta:
         model = Guest
-        name_address_fields = ['firstname', 'surname',
-                               'street', 'zipcode', 'town']
-        name_fields = ['firstname', 'surname']
-        fields =  name_fields
+        name_fields = ['first_name', 'last_name']
+        fields = name_fields
 
     def line_tuples(self):
-        return ((self['firstname'], self['surname']),
-                #(self['street'], self['zipcode'], self['town']),
-                )
+        return ((self['first_name'], self['last_name']),)
 
     def clean(self):
         cleaned_data = super().clean()
-
-        for f in self.Meta.name_fields:
-            if f not in cleaned_data.keys():
-                self.add_error(f, 'Please give the names of your guests')
-            else:
-                if cleaned_data[f] == None or cleaned_data[f] == '':
-                    self.add_error(f, 'Please give the names of your guests')
-        #return cleaned_data
-
-        #for f in self.Meta.name_address_fields:
-        #    if f not in cleaned_data.keys():
-        #        self.add_error(f, 'Missing')
-        #    else:
-        #        if cleaned_data[f] == None or cleaned_data[f] == '':
-        #            self.add_error(f, 'Not Set')
-
-#        if (('email' not in cleaned_data.keys() and
-#             'phonenumber' not in cleaned_data.keys()) or
-#            ((cleaned_data['email'] == None or cleaned_data['email'] == '') and
-#             (cleaned_data['phonenumber'] is None or cleaned_data['phonenumber'] ==''))):
-#            self.add_error('email', 'We need an Email or phonenumber')
+        for field in self.Meta.name_fields:
+            if not cleaned_data.get(field):
+                self.add_error(field, 'Please give the names of your guests')
 
 
 class EmailTextForm(Form):
