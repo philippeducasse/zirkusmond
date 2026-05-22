@@ -68,7 +68,7 @@ class Show(models.Model):
 
     def dates_text(self):
         # TODO
-        return "/".join(map(str, self.events.all()))
+        return "/".join(map(str, self.future_events()))
 
     def lastmod(self):
         return self.last_modified.strftime("%Y-%m-%d")

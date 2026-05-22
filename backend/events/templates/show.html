@@ -11,7 +11,7 @@
 {% block head_description %}{{ show.description|striptags|truncatechars:254 }}{% endblock %}
 {% block head_keywords %}, Zirkus Mond Tickets, Zirkus Shows Berlin, Live Performance, Bühnenperformance, Abendshow, Zirkusatmosphäre, Magie der Manege, Manege, Zirkuslicht, Dramaturgie, Storytelling Performance, Intime Bühne, zeitgenössische Artistik, Zeitgenössische Artistik, Artistische Darbietung, Performance Show, Night Show, Experimental Show, Live Musik{% endblock %}
 {% block structured_data %}
-{% for event in show.events %}
+{% for event in show.future_events %}
 {
     "@context": "https://schema.org/",
     "@type": "event",
@@ -40,7 +40,7 @@
             
             {% block show_details %}
                 <div class="flex justify-center flex-wrap">
-                    {% for event in show.events %}
+                    {% for event in show.future_events %}
                         {% if event.reservation_open %}
                         <div  class="flex mt-2 lg:mt-8 time-details ">
                             <div class="text-xl">
