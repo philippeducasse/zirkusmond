@@ -68,9 +68,6 @@ def send_email_to_reservants(request, dicts, admin_instance):
         sample_subject, sample_text = render_mail(mail_subject, mail_text, dicts[0])
 
         if "send" in request.POST.keys():
-            imap = imaplib.IMAP4(settings.EMAIL_HOST)
-            imap.starttls()
-            imap.login(settings.EMAIL_HOST_USER, settings.MAIL_HOST_CRED)
 
             for reservation_dict in dicts:
                 subject, text = render_mail(mail_subject, mail_text, reservation_dict)
@@ -80,17 +77,8 @@ def send_email_to_reservants(request, dicts, admin_instance):
                     "reservation@zirkusmond.de",
                     [f"{reservation_dict['firstname']} {reservation_dict['surname']} <{reservation_dict['email']}>"],
                 )
-                imap.append(
-                    "Sent",
-                    "\\SEEN",
-                    imaplib.Time2Internaldate(time.time()),
-                    str(message.message()).encode(),
-                )
-                print(message.send())
-                time.sleep(0.5)
+                message.send()
 
-            imap.logout()
-            admin_instance.message_user(request, f"Mail sent to {len(dicts)} recipients")
             return HttpResponseRedirect(request.get_full_path())
 
     return render(
