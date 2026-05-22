@@ -24,7 +24,7 @@ from events.models import (
 )
 from payments import PaymentStatus
 
-from .models import Show
+from .models import Show, UpcomingShow, PastShow, UnscheduledShow
 
 
 class EventInlineForm(forms.ModelForm):
@@ -274,3 +274,6 @@ class UpcomingShowAdmin(ShowAdmin):
 
 
 admin.site.register(Show, ShowAdmin)
+admin.site.register(UpcomingShow, UpcomingShowAdmin)
+admin.site.register(PastShow, ShowAdmin)
+admin.site.register(UnscheduledShow, ShowAdmin)
