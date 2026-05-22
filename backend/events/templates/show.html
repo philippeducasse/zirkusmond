@@ -5,7 +5,7 @@
 
 {% block title %}Zirkus Mond - {{ show.title }}{% endblock %}
 {% block og_image %}
-    <meta property="og:image" content="{% cropped_thumbnail show "head_img" %}" />
+    <meta property="og:image" content="{% cropped_thumbnail show "seo_image_crop" %}" />
 {% endblock %}
 
 {% block head_description %}{{ show.description|striptags|truncatechars:254 }}{% endblock %}
@@ -17,7 +17,7 @@
     "@type": "event",
     "name": "{{ show.title }}",
     "description": "{{ show.description|striptags|escapejs }}",
-    "image": "{% cropped_thumbnail show "head_img" %}",
+    "image": "{% cropped_thumbnail show "seo_image_crop" %}",
     "doorTime": "{{ event.admission_time }}",
     "startDate": "{{ event.begin.isoformat }}",
     "location": {"name": "Zirkus Mond", "address": "Lilie-Henoch Str",

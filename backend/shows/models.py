@@ -23,24 +23,35 @@ class Show(models.Model):
     card_image = models.ImageField()
     website_link = models.CharField(max_length=255, blank=True)
     banner_link = models.ImageField(blank=True)
-    head_img = ImageRatioField("banner_link", "400x225")
+    seo_image_crop = ImageRatioField("banner_link", "400x225", editable=False)
 
     private = models.BooleanField(default=False)
-    third_party_reservation = models.BooleanField(default=False)
-    third_party_reservation_link = models.CharField(max_length=255, blank=True)
+    third_party_reservation = models.BooleanField(
+        default=False,
+        help_text="Check this field if the company has their own reservation system. Tickets / reservations will not be sold on zirkusmond.de",
+    )
+    third_party_reservation_link = models.CharField(
+        max_length=255, blank=True, help_text="External link to reserve tickets"
+    )
     last_modified = models.DateTimeField(auto_now=True)
 
-    reservation_price = models.PositiveIntegerField(blank=True, null=True)
-    base_ticket_price = models.PositiveIntegerField(blank=True, null=True)
+    reservation_price = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="Only set this field if you are not selling full tickets. Guests will have to pay rest at the door",
+    )
+    base_ticket_price = models.PositiveIntegerField(
+        blank=True, null=True, help_text="The default ticket price on the sliding scale"
+    )
     min_ticket_price = models.PositiveIntegerField(
         blank=True,
         null=True,
-        help_text="Minimum price for sliding scale. Defaults to base_ticket_price - 10 EUR if not set.",
+        help_text="Minimum price for sliding scale. Defaults to base_ticket_price - 10 EUR if not set",
     )
     max_ticket_price = models.PositiveIntegerField(
         blank=True,
         null=True,
-        help_text="Maximum price for sliding scale. Defaults to base_ticket_price + 10 EUR if not set.",
+        help_text="Maximum price for sliding scale. Defaults to base_ticket_price + 10 EUR if not set",
     )
 
     def future_events(self):

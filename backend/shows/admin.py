@@ -24,6 +24,8 @@ from events.models import (
 )
 from payments import PaymentStatus
 
+from .models import Show
+
 
 class EventInlineForm(forms.ModelForm):
     event_date = forms.DateField(
@@ -268,3 +270,6 @@ class UpcomingShowAdmin(ShowAdmin):
         qs = super().get_queryset(request)
         now = timezone.now()
         return qs.filter(Q(next_event_begin__gte=now) | Q(next_event_begin__isnull=True))
+
+
+admin.site.register(Show, ShowAdmin)
