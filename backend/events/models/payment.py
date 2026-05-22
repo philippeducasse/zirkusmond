@@ -14,8 +14,8 @@ from .reservation import Reservation
 class ReservationPayment(BasePayment):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reservation = models.ForeignKey(Reservation, null=True, on_delete=models.SET_NULL)
-    custom_ticket_price = models.DecimalField(
-        max_digits=8, decimal_places=2, null=True, blank=True,
+    custom_ticket_price = models.PositiveIntegerField(
+        null=True, blank=True,
         help_text="Custom price selected by user (sliding scale)")
 
     @property
