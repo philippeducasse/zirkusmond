@@ -25,11 +25,9 @@ from . import services
 from .forms import EmailTextForm
 from .models import (
     Event,
-    Guest,
-    Person,
-    Reservation,
     ReservationPayment,
 )
+from reservations.models import Guest, Reservation
 from stats.models import SiteStats
 
 
@@ -45,28 +43,23 @@ class SiteStatsAdmin(admin.ModelAdmin):
 
 
 def reservation_to_dict(reservation):
-    """make a dict with most important reservation infos
-    usefull for templates
-    """
     return {
         "show_title": reservation.event.show.title,
         "event_time": reservation.event.time_and_date(),
-        "firstname": reservation.reservant.firstname,
-        "surname": reservation.reservant.surname,
-        "email": reservation.reservant.email,
+        "firstname": reservation.first_name,
+        "surname": reservation.last_name,
+        "email": reservation.email,
     }
 
 
 def render_mail(subject, body, context):
     context = Context(context)
-    ts = Template(subject)
-    subject = ts.render(context)
-    tb = Template(body)
-    body = tb.render(context)
-    return subject, body
+    rendered_subject = Template(subject).render(context)
+    rendered_body = Template(body).render(context)
+    return rendered_subject, rendered_body
 
 
-def send_email_to_reservants(request, dicts, admin):
+def send_email_to_reservants(request, dicts, admin_instance):
     if "text_field" in request.POST.keys():
         form = EmailTextForm(request.POST)
     else:
@@ -82,26 +75,25 @@ def send_email_to_reservants(request, dicts, admin):
             imap.starttls()
             imap.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
 
-            # render, save and send mails
-            for d in dicts:
-                subject, text = render_mail(mail_subject, mail_text, d)
-                m = EmailMessage(
+            for reservation_dict in dicts:
+                subject, text = render_mail(mail_subject, mail_text, reservation_dict)
+                message = EmailMessage(
                     subject,
                     text,
                     "reservation@zirkusmond.de",
-                    [f"{d['firstname']} {d['surname']} <{d['email']}>"],
+                    [f"{reservation_dict['firstname']} {reservation_dict['surname']} <{reservation_dict['email']}>"],
                 )
                 imap.append(
                     "Sent",
                     "\\SEEN",
                     imaplib.Time2Internaldate(time.time()),
-                    str(m.message()).encode(),
+                    str(message.message()).encode(),
                 )
-                print(m.send())
+                print(message.send())
                 time.sleep(0.5)
 
             imap.logout()
-            admin.message_user(request, f"Mail sent to {len(dicts)} recipients")
+            admin_instance.message_user(request, f"Mail sent to {len(dicts)} recipients")
             return HttpResponseRedirect(request.get_full_path())
 
     return render(
@@ -120,56 +112,30 @@ def send_email_to_reservants(request, dicts, admin):
     )
 
 
-class EventFilter(admin.SimpleListFilter):
-    """Filter for events in the Person admin list."""
-
-    title = "Event"
-    parameter_name = "event_id"
-
-    def lookups(self, request, model_admin):
-        """Return list of (id, display_name) tuples for the filter dropdown."""
-        return [(event.id, str(event)) for event in Event.objects.all()]
-
-    def queryset(self, request, queryset):
-        """ """
-        return queryset.filter(
-            Q(reservation__event=self.value()) | Q(guest__event_reservation__event=self.value())
-        )
-
-
 class ReservationPaymentEventFilter(admin.SimpleListFilter):
-    """Filter Reservation Payments by event in the admin list."""
-
     title = "Event"
     parameter_name = "event"
 
     def lookups(self, request, model_admin):
-        """Return list of (id, display_name) tuples for the filter dropdown."""
         return [(event.id, str(event)) for event in Event.objects.all()]
 
     def queryset(self, request, queryset):
-        """ """
         if self.value():
             return queryset.filter(reservation__event=self.value())
-        else:
-            return queryset
+        return queryset
 
 
 class EventAdmin(admin.ModelAdmin):
-    """ """
-
     list_display = ["show", "begin", "time_and_date", "reservation_open", "reserved_tickets"]
     list_filter = ["show", "begin", "admission"]
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        # Prefetch show to avoid N+1 queries
-        qs = qs.select_related("show")
+        queryset = super().get_queryset(request)
+        queryset = queryset.select_related("show")
 
-        # Annotate reservation count to avoid N+1 queries in reserved_tickets column
-        all_reservations = (
+        confirmed_reservations = (
             ReservationPayment.objects.filter(
                 reservation__event=OuterRef("pk"),
                 status=PaymentStatus.CONFIRMED,
@@ -179,64 +145,57 @@ class EventAdmin(admin.ModelAdmin):
             .values("count")
         )
 
-        all_guests = (
+        confirmed_guests = (
             Guest.objects.filter(
-                event_reservation__event=OuterRef("pk"),
-                event_reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
+                reservation__event=OuterRef("pk"),
+                reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
             )
-            .values("event_reservation__event")
+            .values("reservation__event")
             .annotate(count=Count("pk", distinct=True))
             .values("count")
         )
 
-        qs = qs.annotate(
+        queryset = queryset.annotate(
             annotated_reservation_count=Coalesce(
-                Subquery(all_reservations, output_field=IntegerField()),
+                Subquery(confirmed_reservations, output_field=IntegerField()),
                 Value(0),
                 output_field=IntegerField(),
             )
             + Coalesce(
-                Subquery(all_guests, output_field=IntegerField()),
+                Subquery(confirmed_guests, output_field=IntegerField()),
                 Value(0),
                 output_field=IntegerField(),
             )
         )
-        return qs
+        return queryset
 
     @admin.action(description="Print Reservation List")
     def print_reservations(self, request, queryset):
         for event in queryset:
-            rPs = ReservationPayment.objects.filter(
+            payments = ReservationPayment.objects.filter(
                 reservation__event=event, status=PaymentStatus.CONFIRMED
-            ).order_by(Lower("reservation__reservant__firstname"))
-            reservations = map(lambda x: x.reservation, rPs)
+            ).order_by(Lower("reservation__last_name"))
+            reservations = [payment.reservation for payment in payments]
 
             output = BytesIO()
             workbook = xlsxwriter.Workbook(output)
             worksheet = workbook.add_worksheet()
             worksheet.set_landscape()
             worksheet.set_paper(9)  # A4
-            worksheet.set_column(0, 5, 15)
-            # worksheet.set_column(4, 5, 5)
+            worksheet.set_column(0, 3, 15)
 
-            # Add a bold format to use to highlight cells.
             bold = workbook.add_format({"bold": True, "border": 1})
             border = workbook.add_format({"border": 1})
-            # Add a number format for cells with money.
-            money = workbook.add_format({"num_format": "$#,##0"})
 
-            columns = ["firstname", "surname", "address", "phone", "email", f"{event.date_str()}"]
+            columns = ["first_name", "last_name", "email", f"{event.date_str()}"]
 
             def add_row(worksheet, row, person, count):
                 worksheet.write_row(
-                    row,
-                    0,
+                    row, 0,
                     [
-                        person.firstname,
-                        person.surname,
-                        person.street,
-                        person.phonenumber,
-                        person.email,
+                        person.first_name,
+                        person.last_name,
+                        getattr(person, 'email', ''),
                         count,
                     ],
                     border,
@@ -246,14 +205,11 @@ class EventAdmin(admin.ModelAdmin):
             worksheet.repeat_rows(0)
             row = 1
             for reservation in reservations:
-                reservant = reservation.reservant
-
-                add_row(worksheet, row, reservation.reservant, row)
-                worksheet.write(row, 0, reservant.firstname, bold)
-
+                add_row(worksheet, row, reservation, row)
+                worksheet.write(row, 0, reservation.first_name, bold)
                 row += 1
 
-                for guest in Guest.objects.filter(event_reservation=reservation):
+                for guest in Guest.objects.filter(reservation=reservation):
                     add_row(worksheet, row, guest, row)
                     row += 1
 
@@ -268,42 +224,19 @@ class EventAdmin(admin.ModelAdmin):
             response.write(xlsx_data)
             return response
 
-    @admin.action(
-        description="Send mail to Reservants"
-    )  # ,help="Send an email to al the People who reserved")
+    @admin.action(description="Send mail to Reservants")
     def send_to_reservants(self, request, queryset):
-        events_reservations = []
+        all_payments = []
         for event in queryset:
-            events_reservations += list(
+            all_payments += list(
                 ReservationPayment.objects.filter(status="confirmed", reservation__event=event)
             )
-        # events_reservation = sum(events_reservations ,[])
-        dicts = [reservation_to_dict(r.reservation) for r in events_reservations]
+        dicts = [reservation_to_dict(payment.reservation) for payment in all_payments]
         return send_email_to_reservants(request, dicts, self)
-
-
-# class InlineCheckin(admin.StackedInline):
-#    model = Checkin
-#    extra = 1
-
-
-class PersonAdmin(admin.ModelAdmin):
-    list_display = ["firstname", "surname", "email", "phonenumber", "event"]  # , 'check-ins']
-    # list_filter = ('event')
-    list_filter = (EventFilter,)
-    search_fields = ["surname", "firstname", "email", "phonenumber"]
-
-
-#   inlines = [InlineCheckin]
 
 
 class InlineGuest(admin.StackedInline):
     model = Guest
-    extra = 0
-
-
-class InlinePerson(admin.StackedInline):
-    model = Person
     extra = 0
 
 
@@ -313,38 +246,35 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
         "status",
         "ticket_count",
         "event",
-        #'reservation__reservant__firstname', 'reservation__reservant__surname',
     ]
-    list_filter = ("status", ReservationPaymentEventFilter)  # EventFilter)
-    search_fields = ["reservation__reservant__firstname", "reservation__reservant__surname"]
+    list_filter = ("status", ReservationPaymentEventFilter)
+    search_fields = ["reservation__first_name", "reservation__last_name"]
 
     actions = ["resend_confirmation_mail", "send_to_reservants"]
 
     @admin.action(description="Resend confirmation E-Mail")
     def resend_confirmation_mail(self, request, queryset):
-        for i in queryset:
-            services.send_confirmation_mail(i.reservation)
+        for payment in queryset:
+            services.send_confirmation_mail(payment.reservation)
 
     @admin.action(description="Send mail to Reservants")
     def send_to_reservants(self, request, queryset):
-        dicts = [reservation_to_dict(o.reservation) for o in queryset]
+        dicts = [reservation_to_dict(payment.reservation) for payment in queryset]
         return send_email_to_reservants(request, dicts, self)
 
 
 class ReservationAdmin(admin.ModelAdmin):
-    # inlines = (InlinePerson, InlineGuest,)
     inlines = (InlineGuest,)
     actions = ["resend_confirmation_mail"]
-    search_fields = ["reservant__firstname", "reservant__surname"]
+    search_fields = ["first_name", "last_name"]
 
     @admin.action(description="Resend Reservation confirmation mail")
     def resend_confirmation_mail(self, request, queryset):
-        for i in queryset:
-            services.send_confirmation_mail(i)
+        for reservation in queryset:
+            services.send_confirmation_mail(reservation)
 
 
 admin.site.register(Event, EventAdmin)
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(ReservationPayment, ReservationPaymentAdmin)
 admin.site.register(Guest)
-admin.site.register(Person, PersonAdmin)

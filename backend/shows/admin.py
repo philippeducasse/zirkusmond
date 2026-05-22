@@ -18,9 +18,9 @@ from django.db.models.functions import Coalesce
 from django.utils import timezone
 from events.models import (
     Event,
-    Guest,
     ReservationPayment,
 )
+from reservations.models import Guest
 from payments import PaymentStatus
 
 from .models import PastShow, Show, UnscheduledShow, UpcomingShow
@@ -119,7 +119,6 @@ class EventInlineForm(forms.ModelForm):
         return cleaned_data
 
     def has_changed(self):
-        # For new instances, consider the form changed if event_date has a value
         if not self.instance.pk and self.data:
             prefix = self.prefix
             event_date_key = f"{prefix}-event_date" if prefix else "event_date"
@@ -172,34 +171,32 @@ class ShowAdmin(admin.ModelAdmin):
     exclude = ["seo_image_crop"]
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        queryset = super().get_queryset(request)
         events_for_show = Event.objects.filter(show=OuterRef("pk"))
         capacity_subquery = events_for_show.annotate(
             total_capacity=Sum("reservation_capacity")
         ).values("total_capacity")[:1]
 
-        all_payments = ReservationPayment.objects.filter(
-            reservation__event__show=OuterRef("pk"),
-            status=PaymentStatus.CONFIRMED,
-        )
-        all_reservations_subquery = (
-            all_payments.values("reservation__event__show")
+        confirmed_reservations_subquery = (
+            ReservationPayment.objects.filter(
+                reservation__event__show=OuterRef("pk"),
+                status=PaymentStatus.CONFIRMED,
+            )
+            .values("reservation__event__show")
             .annotate(total_reservations=Count("reservation", distinct=True))
             .values("total_reservations")[:1]
         )
 
-        all_guests_qs = Guest.objects.filter(
-            event_reservation__event__show=OuterRef("pk"),
-            event_reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
-        )
-        all_guests_subquery = (
-            all_guests_qs.values("event_reservation__event__show")
+        confirmed_guests_subquery = (
+            Guest.objects.filter(
+                reservation__event__show=OuterRef("pk"),
+                reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
+            )
+            .values("reservation__event__show")
             .annotate(total_guests=Count("pk", distinct=True))
             .values("total_guests")[:1]
         )
 
-        # Prefetch events with their reservation counts pre-calculated
-        # This prevents N+1 queries when Show.reservation_open() checks each event
         event_reservations = (
             ReservationPayment.objects.filter(
                 reservation__event=OuterRef("pk"),
@@ -212,10 +209,10 @@ class ShowAdmin(admin.ModelAdmin):
 
         event_guests = (
             Guest.objects.filter(
-                event_reservation__event=OuterRef("pk"),
-                event_reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
+                reservation__event=OuterRef("pk"),
+                reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
             )
-            .values("event_reservation__event")
+            .values("reservation__event")
             .annotate(count=Count("pk", distinct=True))
             .values("count")
         )
@@ -233,7 +230,7 @@ class ShowAdmin(admin.ModelAdmin):
             )
         )
 
-        qs = qs.prefetch_related(Prefetch("events", queryset=events_queryset)).annotate(
+        queryset = queryset.prefetch_related(Prefetch("events", queryset=events_queryset)).annotate(
             next_event_begin=Min("events__begin"),
             annotated_total_capacity=Coalesce(
                 Subquery(capacity_subquery, output_field=IntegerField()),
@@ -241,19 +238,19 @@ class ShowAdmin(admin.ModelAdmin):
                 output_field=IntegerField(),
             ),
             annotated_confirmed_reservations=Coalesce(
-                Subquery(all_reservations_subquery, output_field=IntegerField()),
+                Subquery(confirmed_reservations_subquery, output_field=IntegerField()),
                 Value(0),
                 output_field=IntegerField(),
             ),
             annotated_confirmed_guests=Coalesce(
-                Subquery(all_guests_subquery, output_field=IntegerField()),
+                Subquery(confirmed_guests_subquery, output_field=IntegerField()),
                 Value(0),
                 output_field=IntegerField(),
             ),
         )
         if "o" not in request.GET and getattr(self, "default_ordering", None):
-            qs = qs.order_by(*self.default_ordering)
-        return qs
+            queryset = queryset.order_by(*self.default_ordering)
+        return queryset
 
     @admin.display(ordering="next_event_begin", description="Next event")
     def next_event_date(self, obj):
