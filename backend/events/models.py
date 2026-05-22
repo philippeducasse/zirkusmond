@@ -69,6 +69,6 @@ class Event(models.Model):
 
         result = ReservationPayment.objects.filter(reservation__event=self).aggregate(
             reservations=Count("reservation", distinct=True),
-            guests=Count("reservation__guest", distinct=True),
+            guests=Count("reservation__guests", distinct=True),
         )
         return (result["reservations"] or 0) + (result["guests"] or 0)
