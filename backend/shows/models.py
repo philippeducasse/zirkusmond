@@ -81,7 +81,7 @@ class Show(models.Model):
     def show_in_preview(self):
         events = self.events.all()
         return not self.private and (
-            not len(events) or events[-1].begin + timedelta(hours=4) > timezone.now()
+            not len(events) or events.last().begin + timedelta(hours=4) > timezone.now()
         )
 
     def clean(self):
