@@ -59,13 +59,13 @@ def reserve(request, show_id):
                 payment = ReservationPayment.from_reservation(
                     reservation, variant=variant, customer_ip_address=_get_ip(request))
 
-                if show.ticket_price:
+                if show.base_ticket_price:
                     custom_price = request.POST.get('custom-price')
                     if custom_price:
                         try:
                             custom_price = Decimal(custom_price)
                             payment.custom_ticket_price = custom_price
-                            base_price = show.ticket_price or Decimal(5.0)
+                            base_price = show.base_ticket_price or Decimal(5.0)
                             if not payment.validate_custom_price(base_price):
                                 reservation_form.add_error(None, 'Invalid ticket price selected')
                                 return render(request, 'reserve.html', {
@@ -85,7 +85,7 @@ def reserve(request, show_id):
         reservation_form = ReservationForm(show, prefix='res')
         guest_formset = GuestFormSet(prefix='gues')
 
-    base_price = show.ticket_price or show.reservation_price or Decimal(15.0)
+    base_price = show.base_ticket_price or show.reservation_price or Decimal(15.0)
     min_price = show.get_effective_min_price(base_price)
     max_price = show.get_effective_max_price(base_price)
 

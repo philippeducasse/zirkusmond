@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('events', '0017_delete_show_delete_sitestats_delete_upcomingshow'),
+        ('reservations', '0001_initial'),
     ]
 
     operations = [
