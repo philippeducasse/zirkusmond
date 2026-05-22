@@ -65,8 +65,7 @@ class Event(models.Model):
             return self.annotated_reservation_count
 
         from django.db.models import Count
-        # Lazy import to avoid circular dependency: Event → ReservationPayment → Reservation → Event
-        from .payment import ReservationPayment
+        from reservations.models import ReservationPayment
 
         result = ReservationPayment.objects.filter(reservation__event=self).aggregate(
             reservations=Count("reservation", distinct=True),
