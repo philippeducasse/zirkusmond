@@ -13,7 +13,6 @@
                     <div class="flex flex-col text-center my-auto items-center p-6 lg:p-2 justify-between">
                         <h3 class="card-title text-center text-xl md:text-2xl ">{{ show.title }}</h3>
                         <div class="card-text w-full md:text-lg text-white text-lg pt-2 w-80 text-center lg:p-2">
-                        <p>EVENTS</p>
                             {% for event in show.future_events|slice:":3" %}
                                 <p>{{ event }}</p>
                             {% endfor %}
