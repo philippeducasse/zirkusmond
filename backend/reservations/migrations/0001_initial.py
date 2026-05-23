@@ -6,6 +6,7 @@ from django.db import migrations, models
 
 def copy_reservations(apps, schema_editor):
     OldReservation = apps.get_model('events', 'Reservation')
+    OldPerson = apps.get_model('events', 'Person')
     OldGuest = apps.get_model('events', 'Guest')
     NewReservation = apps.get_model('reservations', 'Reservation')
     NewGuest = apps.get_model('reservations', 'Guest')
@@ -20,11 +21,14 @@ def copy_reservations(apps, schema_editor):
             email=p.email or '',
             checked_in=old.checked_in,
         )
-        for old_guest in OldGuest.objects.select_related('person_ptr').filter(event_reservation=old):
+        for old_guest in OldGuest.objects.filter(event_reservation=old):
+            # Guest uses MTI from Person; historical models don't support MTI field
+            # access, so fetch the parent Person row explicitly (Guest.pk == Person.pk)
+            person = OldPerson.objects.get(pk=old_guest.pk)
             NewGuest.objects.create(
                 reservation=new,
-                first_name=old_guest.firstname,
-                last_name=old_guest.surname,
+                first_name=person.firstname,
+                last_name=person.surname,
                 ticket_id=old_guest.ticket_id or uuid.uuid4(),
                 checked_in=old_guest.checked_in,
             )
