@@ -158,6 +158,11 @@ class ReservationPaymentModelTest(TestCase):
         payment.custom_ticket_price = 25
         self.assertEqual(payment.ticket_price, 25)
 
+    def test_ticket_price_is_decimal_when_custom_set(self):
+        payment = ReservationPayment.from_reservation(self.reservation, variant='paypal')
+        payment.custom_ticket_price = 25
+        self.assertIsInstance(payment.ticket_price, Decimal)
+
     def test_ticket_price_uses_show_price(self):
         payment = ReservationPayment.from_reservation(self.reservation, variant='paypal')
         self.assertEqual(payment.ticket_price, 20)
