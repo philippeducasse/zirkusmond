@@ -29,7 +29,7 @@ def copy_payments(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0002_reservationpayment'),
+        ('reservations', '0003_alter_guest_ticket_id_nullable'),
     ]
 
     operations = [
