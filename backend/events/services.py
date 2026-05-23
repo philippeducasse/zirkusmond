@@ -76,6 +76,10 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list) -> BytesIO:
 
 
 def send_confirmation_mail(reservation: Reservation):
+    logger.info(
+        'send_confirmation_mail: reservation=%s event=%s email=%s tickets=%s',
+        reservation.id, reservation.event, reservation.email, reservation.ticket_count(),
+    )
     show = reservation.event.show
     guests = list(reservation.guests.all())
     payment = ReservationPayment.objects.filter(reservation=reservation).first()
@@ -154,6 +158,7 @@ See you at Zirkus Mond and have fun.
     )
     email.attach(f'tickets_{reservation.id}.pdf', pdf_buffer.read(), 'application/pdf')
     email.send()
+    logger.info('confirmation email delivered for reservation=%s', reservation.id)
 
 
 def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):
