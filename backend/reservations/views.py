@@ -134,7 +134,7 @@ def payment_success(request, payment_id):
         reservation_payment.reservation_id,
     )
 
-    if reservation_payment.reservation and reservation_payment.status not in (PaymentStatus.REJECTED, PaymentStatus.ERROR):
+    if reservation_payment.reservation and reservation_payment.status == PaymentStatus.CONFIRMED:
         try:
             services.send_confirmation_mail(reservation_payment.reservation)
             logger.info('confirmation email sent for payment=%s to=%s', payment_id, reservation_payment.reservation.email)
