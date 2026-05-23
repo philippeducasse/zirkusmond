@@ -9,8 +9,12 @@ from django.test import TestCase
 from django.utils import timezone
 from PIL import Image
 
+from django.contrib.admin import AdminSite
+from django.test import RequestFactory
+
 from events.forms import ReservationForm
 from events.models import Event
+from payments import PaymentStatus
 from reservations.models import Reservation, ReservationPayment
 from shows.models import Show
 
@@ -304,3 +308,101 @@ class PurgeOldPaymentsViewTest(TestCase):
         response = self.client.post('/mondmin-purge-old-payments',
                                     {'dry_run': False, 'confirmed_only': False})
         self.assertEqual(response.status_code, 302)
+
+
+# ---------------------------------------------------------------------------
+# EventAdmin revenue annotation and display
+# ---------------------------------------------------------------------------
+
+class EventAdminRevenueTest(TestCase):
+    def setUp(self):
+        from events.admin import EventAdmin
+        self.show = make_show(base_ticket_price=15)
+        self.event = make_event(self.show)
+        self.user = User.objects.create_superuser('admin', 'admin@example.com', 'password')
+        self.site = AdminSite()
+        self.admin = EventAdmin(Event, self.site)
+        self.factory = RequestFactory()
+
+    def _get_annotated_event(self):
+        request = self.factory.get('/')
+        request.user = self.user
+        return self.admin.get_queryset(request).get(pk=self.event.pk)
+
+    def _make_payment(self, reservation, total, status=PaymentStatus.CONFIRMED):
+        payment = ReservationPayment.from_reservation(reservation, variant='paypal')
+        payment.total = total
+        payment.status = status
+        payment.save()
+        return payment
+
+    def test_revenue_display_returns_dash_when_no_payments(self):
+        event = self._get_annotated_event()
+        self.assertIsNone(event.total_revenue)
+        self.assertEqual(self.admin.revenue(event), '—')
+
+    def test_revenue_display_returns_formatted_euro_amount(self):
+        reservation = make_reservation(self.event)
+        self._make_payment(reservation, Decimal('30.00'))
+        event = self._get_annotated_event()
+        self.assertEqual(self.admin.revenue(event), '€ 30.00')
+
+    def test_total_revenue_sums_multiple_confirmed_payments(self):
+        for i, amount in enumerate([Decimal('15.00'), Decimal('30.00'), Decimal('45.00')]):
+            reservation = make_reservation(self.event, email=f'p{i}@example.com')
+            self._make_payment(reservation, amount)
+        event = self._get_annotated_event()
+        self.assertEqual(event.total_revenue, Decimal('90.00'))
+        self.assertEqual(self.admin.revenue(event), '€ 90.00')
+
+    def test_total_revenue_excludes_non_confirmed_payments(self):
+        reservation = make_reservation(self.event)
+        self._make_payment(reservation, Decimal('50.00'), status=PaymentStatus.WAITING)
+        event = self._get_annotated_event()
+        self.assertIsNone(event.total_revenue)
+        self.assertEqual(self.admin.revenue(event), '—')
+
+    def test_total_revenue_only_counts_confirmed_among_mixed_statuses(self):
+        reservation = make_reservation(self.event)
+        self._make_payment(reservation, Decimal('20.00'), status=PaymentStatus.CONFIRMED)
+        reservation2 = make_reservation(self.event, email='b@example.com')
+        self._make_payment(reservation2, Decimal('100.00'), status=PaymentStatus.WAITING)
+        event = self._get_annotated_event()
+        self.assertEqual(event.total_revenue, Decimal('20.00'))
+
+
+# ---------------------------------------------------------------------------
+# ReservationPaymentAdmin confirmed_total display
+# ---------------------------------------------------------------------------
+
+class ReservationPaymentAdminConfirmedTotalTest(TestCase):
+    def setUp(self):
+        from events.admin import ReservationPaymentAdmin
+        self.show = make_show(base_ticket_price=15)
+        self.event = make_event(self.show)
+        self.reservation = make_reservation(self.event)
+        self.site = AdminSite()
+        self.admin = ReservationPaymentAdmin(ReservationPayment, self.site)
+
+    def _make_payment(self, total, status):
+        payment = ReservationPayment.from_reservation(self.reservation, variant='paypal')
+        payment.total = total
+        payment.status = status
+        payment.save()
+        return payment
+
+    def test_confirmed_total_shows_amount_for_confirmed_payment(self):
+        payment = self._make_payment(Decimal('30.00'), PaymentStatus.CONFIRMED)
+        self.assertEqual(self.admin.confirmed_total(payment), '€ 30.00')
+
+    def test_confirmed_total_shows_zero_for_waiting_payment(self):
+        payment = self._make_payment(Decimal('30.00'), PaymentStatus.WAITING)
+        self.assertEqual(self.admin.confirmed_total(payment), '€ 0.00')
+
+    def test_confirmed_total_shows_zero_for_rejected_payment(self):
+        payment = self._make_payment(Decimal('30.00'), PaymentStatus.REJECTED)
+        self.assertEqual(self.admin.confirmed_total(payment), '€ 0.00')
+
+    def test_confirmed_total_shows_zero_for_refunded_payment(self):
+        payment = self._make_payment(Decimal('30.00'), PaymentStatus.REFUNDED)
+        self.assertEqual(self.admin.confirmed_total(payment), '€ 0.00')

@@ -57,7 +57,7 @@
 
                     {% if show.third_party_reservation %}
                         <a class="button reserve__button" href="{{show.third_party_reservation_link}}">Zur Reservierung</a>
-                    {% elif show.ticket_price %}
+                    {% elif show.base_ticket_price %}
                         <a class="button reserve__button" href="/reserve/{{show.pk}}">Tickets Kaufen</a>
                     {% else %}
                         <a class="button reserve__button" href="/reserve/{{show.pk}}">Zur Reservierung</a>
@@ -111,7 +111,7 @@
                     <div class="show-btn">
                         {% if show.third_party_reservation %}
                             <a class="button reserve" href="{{show.third_party_reservation_link}}">Zur Reservierung</a>
-                        {% elif show.ticket_price %}
+                        {% elif show.base_ticket_price %}
                             <a class="button reserve" href="/reserve/{{show.pk}}">Tickets Kaufen</a>
                         {% else %}
                             <a class="button reserve" href="/reserve/{{show.pk}}">Zur Reservierung</a>
