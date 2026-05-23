@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template.response import TemplateResponse
 from django.utils import timezone
-from payments import RedirectNeeded
+from payments import PaymentStatus, RedirectNeeded
 
 from events.forms import ReservationForm, GuestForm
 from events.models import Event
@@ -47,26 +47,17 @@ def reserve(request, show_id):
             guest_forms_valid = all(guest_formset[i].is_valid() for i in range(guest_count))
 
             if guest_forms_valid:
-                with transaction.atomic():
-                    reservation = reservation_form.save()
-
-                    for i in range(guest_count):
-                        guest = guest_formset[i].save(commit=False)
-                        guest.reservation = reservation
-                        guest.save()
-
                 variant = request.POST['payment-method']
-                payment = ReservationPayment.from_reservation(
-                    reservation, variant=variant, customer_ip_address=_get_ip(request))
-
+                custom_price = None
                 if show.base_ticket_price:
-                    custom_price = request.POST.get('custom-price')
-                    if custom_price:
+                    raw_custom_price = request.POST.get('custom-price')
+                    if raw_custom_price:
                         try:
-                            custom_price = Decimal(custom_price)
-                            payment.custom_ticket_price = custom_price
+                            custom_price = Decimal(raw_custom_price)
                             base_price = show.base_ticket_price or Decimal(5.0)
-                            if not payment.validate_custom_price(base_price):
+                            min_price = show.get_effective_min_price(base_price)
+                            max_price = show.get_effective_max_price(base_price)
+                            if not (min_price <= custom_price <= max_price):
                                 reservation_form.add_error(None, 'Invalid ticket price selected')
                                 return render(request, 'reserve.html', {
                                     'show': show,
@@ -75,11 +66,24 @@ def reserve(request, show_id):
                                     'newsletter': newsletter,
                                     'base_price': base_price,
                                 })
-                            payment.total = reservation.ticket_count() * payment.ticket_price
                         except (ValueError, TypeError):
-                            pass
+                            custom_price = None
 
-                payment.save()
+                with transaction.atomic():
+                    reservation = reservation_form.save()
+
+                    for i in range(guest_count):
+                        guest = guest_formset[i].save(commit=False)
+                        guest.reservation = reservation
+                        guest.save()
+
+                    payment = ReservationPayment.from_reservation(
+                        reservation, variant=variant, customer_ip_address=_get_ip(request))
+                    if custom_price is not None:
+                        payment.custom_ticket_price = custom_price
+                        payment.total = reservation.ticket_count() * payment.ticket_price
+                    payment.save()
+
                 return redirect('/payment/%s' % payment.pk)
     else:
         reservation_form = ReservationForm(show, prefix='res')
@@ -124,10 +128,16 @@ def payment(request, payment_id, payment_variant=None):
 
 def payment_success(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
+    logger.info(
+        'payment_success: payment=%s status=%s reservation=%s',
+        payment_id, reservation_payment.status,
+        reservation_payment.reservation_id,
+    )
 
-    if reservation_payment.reservation:
+    if reservation_payment.reservation and reservation_payment.status not in (PaymentStatus.REJECTED, PaymentStatus.ERROR):
         try:
             services.send_confirmation_mail(reservation_payment.reservation)
+            logger.info('confirmation email sent for payment=%s to=%s', payment_id, reservation_payment.reservation.email)
         except Exception as error:
             logger.error(f'Failed to send confirmation email for payment {payment_id}: {error}')
             try:
@@ -148,6 +158,11 @@ def payment_success(request, payment_id):
                 )
             except Exception:
                 pass
+    else:
+        logger.warning(
+            'skipping confirmation email for payment=%s: no reservation or bad status=%s',
+            payment_id, reservation_payment.status,
+        )
 
     return redirect('/reservation_status/%s' % reservation_payment.id)
 

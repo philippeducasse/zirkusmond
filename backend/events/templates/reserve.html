@@ -15,7 +15,7 @@
 
     <form id="reservation-form" method="post" onsubmit="showSpinner()">
         {% csrf_token %}
-        <div class="form-container w-full flex justify-center mx-auto">
+        <div class="form-container w-full flex justify-center items-start mx-auto">
 
             <div class="ticket-form p-2 pr-6 mr-8 my-4">
                     <h3 class="text-3xl text-zm-yellow">Tickets</h3>
@@ -29,14 +29,14 @@
 
                     {{ reservation_form.attendee_count.label_tag }}
                     {{ reservation_form.attendee_count }}
-                    {% if not show.ticket_price %}
+                    {% if not show.base_ticket_price %}
                         <p class="w-full my-4 ">
                             For your Reservation, you will have to pay {{ show.reservation_price|default:5 }} Euro per Ticket. This will be fully deducted from your entree fee at the box office.
                         </p>
                     {% endif %}
             </div>
 
-            <div class="input-form w-full p-2">
+            <div class="input-form p-2">
                 <h3 class="text-3xl text-zm-yellow">Personal Information</h3>
                 <div class="row">
                     <div class="col-md-6">
@@ -113,7 +113,7 @@
             <div class="my-6">
                 <h3 class="text-4xl text-zm-yellow">Payment</h3>
                 <!-- Sliding Scale Price Input -->
-                  {% if show.ticket_price %}
+                  {% if show.base_ticket_price %}
                     <div class="my-6">
                         <h4 class="text-2xl text-zm-yellow mb-3">Choose Your Price</h4>
                         <p class="text-white my-8 text-lg">
@@ -175,7 +175,7 @@
             <div class="my-4"
                  id="total-price-container"
                  data-reservation-price="{{ show.reservation_price|default:5 }}"
-                 data-has-ticket-price="{% if show.ticket_price %}true{% else %}false{% endif %}">
+                 data-has-ticket-price="{% if show.base_ticket_price %}true{% else %}false{% endif %}">
                 <h4 class="text-2xl text-zm-yellow mb-3">Total Price: <span id="total-price-display" class="font-bold">0.00</span> €</h4>
             </div>
 
