@@ -28,9 +28,9 @@
 
 {% block content-header %}
 {% include "navbar.html" %}
-{% if show.banner_link %}
+{% if show.banner_image %}
 
-        <img class="banner-img mx-auto" src="{{ MEDIA_URL }}{{ show.banner_link }}" alt="{{ show.title }} Banner"></img>
+        <img class="banner-img mx-auto" src="{{ MEDIA_URL }}{{ show.banner_image }}" alt="{{ show.title }} Banner"></img>
 
 {% endif %}
 {% endblock %}
