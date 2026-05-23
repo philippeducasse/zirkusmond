@@ -25,7 +25,7 @@ def copy_reservations(apps, schema_editor):
                 reservation=new,
                 first_name=old_guest.firstname,
                 last_name=old_guest.surname,
-                ticket_id=old_guest.ticket_id,
+                ticket_id=old_guest.ticket_id or uuid.uuid4(),
                 checked_in=old_guest.checked_in,
             )
 
