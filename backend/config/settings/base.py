@@ -90,7 +90,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', BASE_DIR / 'media')
 
 LOGGING_CONFIG = None
 LOGLEVEL = os.getenv("DJANGO_LOGLEVEL", "debug").upper()
