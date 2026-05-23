@@ -22,8 +22,8 @@ class Show(models.Model):
     video_link = models.CharField(max_length=255, blank=True)
     card_image = models.ImageField()
     website_link = models.CharField(max_length=255, blank=True)
-    banner_link = models.ImageField(blank=True)
-    seo_image_crop = ImageRatioField("banner_link", "400x225")
+    banner_image = models.ImageField(blank=True)
+    seo_image_crop = ImageRatioField("banner_image", "400x225")
 
     private = models.BooleanField(default=False)
     third_party_reservation = models.BooleanField(
