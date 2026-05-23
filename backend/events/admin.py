@@ -1,17 +1,15 @@
-import imaplib
-import time
 from io import BytesIO
 
 import xlsxwriter
-from django.conf import settings
 from django.contrib import admin
 from django.core.mail import EmailMessage
 from django.db.models import (
     Count,
+    DecimalField,
     IntegerField,
     OuterRef,
-    Q,
     Subquery,
+    Sum,
     Value,
 )
 from django.db.models.functions import Coalesce, Lower
@@ -111,7 +109,7 @@ class ReservationPaymentEventFilter(admin.SimpleListFilter):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ["show", "begin", "time_and_date", "reservation_open", "reserved_tickets"]
+    list_display = ["show", "begin", "time_and_date", "reservation_open", "reserved_tickets", "revenue"]
     list_filter = ["show", "begin", "admission"]
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
@@ -140,6 +138,16 @@ class EventAdmin(admin.ModelAdmin):
             .values("count")
         )
 
+        revenue_subquery = (
+            ReservationPayment.objects.filter(
+                reservation__event=OuterRef("pk"),
+                status=PaymentStatus.CONFIRMED,
+            )
+            .values("reservation__event")
+            .annotate(total=Sum("total"))
+            .values("total")
+        )
+
         queryset = queryset.annotate(
             annotated_reservation_count=Coalesce(
                 Subquery(confirmed_reservations, output_field=IntegerField()),
@@ -150,9 +158,16 @@ class EventAdmin(admin.ModelAdmin):
                 Subquery(confirmed_guests, output_field=IntegerField()),
                 Value(0),
                 output_field=IntegerField(),
-            )
+            ),
+            total_revenue=Subquery(revenue_subquery, output_field=DecimalField()),
         )
         return queryset
+
+    @admin.display(description="Revenue", ordering="total_revenue")
+    def revenue(self, obj):
+        if obj.total_revenue is None:
+            return "—"
+        return f"€ {obj.total_revenue:.2f}"
 
     @admin.action(description="Print Reservation List")
     def print_reservations(self, request, queryset):
@@ -231,11 +246,20 @@ class ReservationPaymentAdmin(admin.ModelAdmin):
         "status",
         "ticket_count",
         "event",
+        "ticket_price",
+        "confirmed_total",
     ]
     list_filter = ("status", ReservationPaymentEventFilter)
     search_fields = ["reservation__first_name", "reservation__last_name"]
+    readonly_fields = ["reservation"]
 
     actions = ["resend_confirmation_mail", "send_to_reservants"]
+
+    @admin.display(description="Total")
+    def confirmed_total(self, obj):
+        if obj.status != PaymentStatus.CONFIRMED:
+            return "€ 0.00"
+        return f"€ {obj.total:.2f}"
 
     @admin.action(description="Resend confirmation E-Mail")
     def resend_confirmation_mail(self, request, queryset):
