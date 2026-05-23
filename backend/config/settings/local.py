@@ -17,7 +17,6 @@ DATABASES = {
 }
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_ROOT = os.environ.get('MEDIA_ROOT', BASE_DIR / 'media')
 
 PAYMENT_HOST = 'localhost:8000'
 PAYMENT_USES_SSL = False
