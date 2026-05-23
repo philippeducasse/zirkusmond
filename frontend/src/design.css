@@ -196,7 +196,6 @@ a.card-link  {
 
 .input-form{
   padding: 1em;
-  width: 66%
 }
 .input-form * {
 
@@ -243,10 +242,6 @@ a.card-link  {
     height: 50vh!important;
   }
 
-  .form-container{
-    flex-direction: column;
-  }
-
   .banner-img{
     display: none;
   }
@@ -278,9 +273,9 @@ a.card-link  {
 }
 
 @media only screen and (min-width: 768px) {
-    .ticket-form {
+    /* .ticket-form {
         border-right: 2px solid #E7B548;
-    }
+    } */
 }
 @media only screen and (max-width:500px){
   .banner-image-container{
@@ -552,13 +547,13 @@ a.card-link  {
   .input-form input{
     color: #000;
   }
-  .ticket-form{
+  /* .ticket-form{
     padding: 2em 6em 2em 2em
-  }
+  } */
 
-  .ticket-form p{
+  /* .ticket-form p{
     margin: 1em 0;
-  }
+  } */
 
   .guest-form{
     padding: 2em;

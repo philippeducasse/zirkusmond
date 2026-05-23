@@ -755,10 +755,6 @@ video {
   margin-right: 1rem;
 }
 
-.mr-8 {
-  margin-right: 2rem;
-}
-
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -938,6 +934,10 @@ video {
   justify-content: space-evenly;
 }
 
+.gap-16 {
+  gap: 4rem;
+}
+
 .gap-3 {
   gap: 0.75rem;
 }
@@ -991,6 +991,11 @@ video {
 .border-yellow-200 {
   --tw-border-opacity: 1;
   border-color: rgb(254 240 138 / var(--tw-border-opacity, 1));
+}
+
+.border-zm-yellow {
+  --tw-border-opacity: 1;
+  border-color: rgb(246 174 66 / var(--tw-border-opacity, 1));
 }
 
 .bg-blue-500 {
@@ -1087,10 +1092,6 @@ video {
 
 .pb-8 {
   padding-bottom: 2rem;
-}
-
-.pr-6 {
-  padding-right: 1.5rem;
 }
 
 .pt-10 {
@@ -1434,7 +1435,6 @@ a.card-link  {
 
 .input-form{
   padding: 1em;
-  width: 66%
 }
 
 .input-form * {
@@ -1480,10 +1480,6 @@ a.card-link  {
     height: 50vh!important;
   }
 
-  .form-container{
-    flex-direction: column;
-  }
-
   .banner-img{
     display: none;
   }
@@ -1518,9 +1514,9 @@ a.card-link  {
 }
 
 @media only screen and (min-width: 768px) {
-  .ticket-form {
-    border-right: 2px solid #E7B548;
-  }
+  /* .ticket-form {
+        border-right: 2px solid #E7B548;
+    } */
 }
 
 @media only screen and (max-width:500px){
@@ -1796,13 +1792,13 @@ a.card-link  {
   color: #000;
 }
 
-.ticket-form{
-  padding: 2em 6em 2em 2em
-}
+/* .ticket-form{
+    padding: 2em 6em 2em 2em
+  } */
 
-.ticket-form p{
-  margin: 1em 0;
-}
+/* .ticket-form p{
+    margin: 1em 0;
+  } */
 
 .guest-form{
   padding: 2em;
