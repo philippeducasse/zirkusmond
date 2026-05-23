@@ -71,7 +71,7 @@ Build from project root:
 ### paypal
 
 - User: `sb-f2wjp5409330@business.example.com`
-- Password: `iR2#,z,l`
+- Password: iR2#,z,l
 
 ### stripe
 
