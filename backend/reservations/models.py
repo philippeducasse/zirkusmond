@@ -74,7 +74,7 @@ class ReservationPayment(BasePayment):
     @property
     def ticket_price(self):
         if self.custom_ticket_price is not None:
-            return self.custom_ticket_price
+            return Decimal(self.custom_ticket_price)
         show = self.reservation.event.show
         price = show.base_ticket_price if show.base_ticket_price else show.reservation_price
         if not price:
