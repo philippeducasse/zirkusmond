@@ -15,9 +15,9 @@
 
     <form id="reservation-form" method="post" onsubmit="showSpinner()">
         {% csrf_token %}
-        <div class="form-container w-full flex justify-center items-start mx-auto">
+        <div class="w-full flex flex-col md:flex-row justify-center mx-auto gap-16 my-8">
 
-            <div class="ticket-form p-2 pr-6 mr-8 my-4">
+            <div class="ticket-form">
                     <h3 class="text-3xl text-zm-yellow">Tickets</h3>
                     {{ reservation_form.event.label_tag }}
                     {{ reservation_form.event }}
@@ -35,7 +35,7 @@
                         </p>
                     {% endif %}
             </div>
-
+            <div class="border border-zm-yellow border-right"></div>
             <div class="input-form p-2">
                 <h3 class="text-3xl text-zm-yellow">Personal Information</h3>
                 <div class="row">
