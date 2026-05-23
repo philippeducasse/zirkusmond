@@ -10,6 +10,8 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 from PIL import Image
 
+from payments import PaymentStatus
+
 from events.models import Event
 from events import services
 from reservations.models import Guest, Reservation, ReservationPayment
@@ -417,6 +419,35 @@ class ReserveViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Reservation.objects.count(), 0)
 
+    def test_invalid_custom_price_creates_no_db_records(self):
+        # Price below minimum must not leave orphaned reservation+guests in the DB.
+        data = self._post_data(**{
+            'res-attendee_count': 2,
+            'gues-0-first_name': 'Bob',
+            'gues-0-last_name': 'Smith',
+            'custom-price': '1',  # below effective minimum (max(5, 15-10)=5)
+        })
+        response = self.client.post(f'/reserve/{self.show.pk}', data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
+        self.assertEqual(Guest.objects.count(), 0)
+        self.assertEqual(ReservationPayment.objects.count(), 0)
+
+    def test_valid_custom_price_with_guests_creates_all_records(self):
+        data = self._post_data(**{
+            'res-attendee_count': 2,
+            'gues-0-first_name': 'Bob',
+            'gues-0-last_name': 'Smith',
+            'custom-price': '15',  # within range [5, 25]
+        })
+        self.client.post(f'/reserve/{self.show.pk}', data)
+        self.assertEqual(Reservation.objects.count(), 1)
+        self.assertEqual(Guest.objects.count(), 1)
+        self.assertEqual(ReservationPayment.objects.count(), 1)
+        payment = ReservationPayment.objects.first()
+        self.assertEqual(payment.custom_ticket_price, 15)
+        self.assertEqual(payment.total, 30)  # 2 tickets * 15 EUR
+
     def test_get_nonexistent_show_returns_404(self):
         response = self.client.get('/reserve/99999')
         self.assertEqual(response.status_code, 404)
@@ -491,11 +522,18 @@ class PaymentSuccessViewTest(TestCase):
         )
 
     def test_sends_confirmation_email(self):
+        self.payment.change_status(PaymentStatus.CONFIRMED)
         self.client.get(f'/payment-success/{self.payment.pk}')
         self.assertEqual(len(self.outbox), 1)
         self.assertIn('test@example.com', self.outbox[0].to)
 
+    def test_email_not_sent_for_unconfirmed_payment(self):
+        response = self.client.get(f'/payment-success/{self.payment.pk}')
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(self.outbox), 0)
+
     def test_email_send_failure_still_redirects(self):
+        self.payment.change_status(PaymentStatus.CONFIRMED)
         with patch('events.services.send_confirmation_mail', side_effect=Exception('mail error')):
             response = self.client.get(f'/payment-success/{self.payment.pk}')
         self.assertEqual(response.status_code, 302)
