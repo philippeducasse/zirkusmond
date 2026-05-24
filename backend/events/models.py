@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from shows.models import Show
 from events.utils import format_datetime
-
+from .managers import UpcomingEventManager, PastEventManager
 
 class Event(models.Model):
     show = models.ForeignKey(Show, on_delete=models.SET_NULL, null=True, related_name="events")
@@ -14,6 +14,7 @@ class Event(models.Model):
 
     class Meta:
         ordering = ["admission"]
+        verbose_name_plural = "all events"
 
     def __str__(self):
         return format_datetime(self.begin, "%A %d.%m.%y at %H:%M")
@@ -72,3 +73,21 @@ class Event(models.Model):
             guests=Count("reservation__guests", distinct=True),
         )
         return (result["reservations"] or 0) + (result["guests"] or 0)
+
+class UpcomingEvent(Event):
+    objects = UpcomingEventManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "upcoming event"
+        verbose_name_plural = (
+            "  Upcoming events"  # leave spaces to have it Event up first in admin panel
+        )
+
+class PastEvent(Event):
+    objects = PastEventManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "past event"
+        verbose_name_plural = "past events"
