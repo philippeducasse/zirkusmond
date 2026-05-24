@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 import views
 from events import views as event_views
 from reservations import views as reservation_views
-from events.views_admin import purge_old_payments_view
+from reservations.admin import purge_old_payments_view
 from shows import views as show_views
 
 urlpatterns = [

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views_admin import purge_old_payments_view
+from reservations.admin import purge_old_payments_view
 
 app_name = "events_admin"
 urlpatterns = [
