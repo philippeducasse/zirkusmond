@@ -8,13 +8,6 @@ from tinymce import models as tinymce_models
 
 from .managers import PastShowManager, UnscheduledShowManager, UpcomingShowManager
 
-# class SiteStats(models.Model):
-#     deleted_visitors = models.PositiveIntegerField(default=0)
-
-#     def __str__(self):
-#         return f"Site Stats (deleted_visitors={self.deleted_visitors})"
-
-
 class Show(models.Model):
     title = models.CharField(max_length=255)
     description = tinymce_models.HTMLField()
