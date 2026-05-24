@@ -104,8 +104,30 @@ sudo docker-compose up zirkusmond
 # early bird tickets
 # tickets umbuchen
 
-# Notes to migrate to new architecture:
- - make sure newsletter subsciptions have been exported. this table will be wiped clean
- - make sure to git clone into a fresh repo / folder -> git clone -b organise-backend git@git.ableph.net:ableph/zirkusmond_de.git ~/
- - make sure env file is correctly defined
- - testing docker compose file is slightly different and shares prod nginx setting. this will get removed / become redundant once we use CICD
+  # Notes to migrate to new architecture:
+  - docker exec ubuntu-zm_db-1 pg_dump -U mond monddb > ~/zirkusmond_latest.sql
+  - make sure newsletter subscriptions have been exported — this table will be wiped clean
+  - make sure env file is correctly defined
+  - git switch organise-backend in zirkusmond_de
+  - rebuild containers: docker compose up -d --build --remove-orphans
+  - docker-compose.yml: zm_db service renamed to postgres (old line commented out for easy revert)
+
+  
+  ## If something goes wrong — full rollback
+  
+  1. Switch code back:
+     cd ~/zirkusmond_de && git switch main
+
+  2. Revert docker-compose.yml — swap the postgres/zm_db comments back
+  
+  3. Stop the app, keep DB running:
+     docker compose stop zirkusmond_de
+
+  4. Drop and restore the database:
+     docker exec ubuntu-zm_db-1 psql -U mond -c "DROP DATABASE monddb WITH (FORCE);"
+     docker exec ubuntu-zm_db-1 psql -U mond -c "CREATE DATABASE monddb OWNER mond;"
+     docker exec -i ubuntu-zm_db-1 psql -U mond monddb < ~/zirkusmond_backup.sql
+  
+  5. Rebuild and restart:
+     docker compose up -d --build
+
