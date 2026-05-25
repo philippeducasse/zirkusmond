@@ -23,7 +23,7 @@ class Event(models.Model):
         from django.core.exceptions import ValidationError
 
         errors = {}
-        if self.begin < self.admission:
+        if self.begin and self.admission and self.begin < self.admission:
             errors["begin"] = "Event cannot start before admission opens."
         if errors:
             raise ValidationError(errors)
