@@ -508,15 +508,12 @@ class PaymentViewTest(TestCase):
 # Payment success view
 # ---------------------------------------------------------------------------
 
-@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
 class PaymentSuccessViewTest(TestCase):
     def setUp(self):
-        from django.core import mail
-        self.outbox = mail.outbox
         show = make_show()
         event = make_event(show)
-        self.reservation = make_reservation(event)
-        self.payment = ReservationPayment.from_reservation(self.reservation, variant='paypal')
+        reservation = make_reservation(event)
+        self.payment = ReservationPayment.from_reservation(reservation, variant='paypal')
         self.payment.save()
 
     def test_redirects_to_reservation_status(self):
@@ -525,23 +522,6 @@ class PaymentSuccessViewTest(TestCase):
             response, f'/reservation_status/{self.payment.pk}',
             fetch_redirect_response=False
         )
-
-    def test_sends_confirmation_email(self):
-        self.payment.change_status(PaymentStatus.CONFIRMED)
-        self.client.get(f'/payment-success/{self.payment.pk}')
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn('test@example.com', self.outbox[0].to)
-
-    def test_email_not_sent_for_unconfirmed_payment(self):
-        response = self.client.get(f'/payment-success/{self.payment.pk}')
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(self.outbox), 0)
-
-    def test_email_send_failure_still_redirects(self):
-        self.payment.change_status(PaymentStatus.CONFIRMED)
-        with patch('events.services.send_confirmation_mail', side_effect=Exception('mail error')):
-            response = self.client.get(f'/payment-success/{self.payment.pk}')
-        self.assertEqual(response.status_code, 302)
 
 
 # ---------------------------------------------------------------------------
@@ -648,3 +628,133 @@ class CheckInViewTest(TestCase):
         response = self.client.get(self._url(self.reservation.id))
         names = response.json()['guests']
         self.assertTrue(any('Test' in name for name in names))
+
+
+# ---------------------------------------------------------------------------
+# parse_custom_price service
+# ---------------------------------------------------------------------------
+
+class ParseCustomPriceTest(TestCase):
+    def setUp(self):
+        from reservations.services import parse_custom_price
+        self.parse = parse_custom_price
+        self.show = make_show(base_ticket_price=20, min_ticket_price=10, max_ticket_price=30)
+
+    def test_none_returns_none(self):
+        self.assertIsNone(self.parse(self.show, None))
+
+    def test_empty_string_returns_none(self):
+        self.assertIsNone(self.parse(self.show, ''))
+
+    def test_unparseable_string_returns_none(self):
+        self.assertIsNone(self.parse(self.show, 'abc'))
+
+    def test_valid_price_returns_decimal(self):
+        self.assertEqual(self.parse(self.show, '20'), Decimal('20'))
+
+    def test_price_at_minimum_is_valid(self):
+        self.assertEqual(self.parse(self.show, '10'), Decimal('10'))
+
+    def test_price_at_maximum_is_valid(self):
+        self.assertEqual(self.parse(self.show, '30'), Decimal('30'))
+
+    def test_price_below_minimum_raises(self):
+        with self.assertRaises(ValueError):
+            self.parse(self.show, '1')
+
+    def test_price_above_maximum_raises(self):
+        with self.assertRaises(ValueError):
+            self.parse(self.show, '99')
+
+
+# ---------------------------------------------------------------------------
+# Payment confirmed signal
+# ---------------------------------------------------------------------------
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class PaymentConfirmedSignalTest(TestCase):
+    def setUp(self):
+        from django.core import mail
+        self.outbox = mail.outbox
+        show = make_show()
+        event = make_event(show)
+        self.reservation = make_reservation(event, email='test@example.com')
+        self.payment = ReservationPayment.from_reservation(self.reservation, variant='paypal')
+        self.payment.save()
+
+    def test_email_sent_on_confirmed(self):
+        self.payment.change_status(PaymentStatus.CONFIRMED)
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn('test@example.com', self.outbox[0].to)
+
+    def test_email_not_sent_on_waiting(self):
+        self.payment.change_status(PaymentStatus.WAITING)
+        self.assertEqual(len(self.outbox), 0)
+
+    def test_email_not_sent_on_rejected(self):
+        self.payment.change_status(PaymentStatus.REJECTED)
+        self.assertEqual(len(self.outbox), 0)
+
+    def test_send_failure_does_not_raise(self):
+        with patch('events.services.send_confirmation_mail', side_effect=Exception('smtp error')):
+            self.payment.change_status(PaymentStatus.CONFIRMED)
+        # signal should swallow the exception; payment status is still updated
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.status, PaymentStatus.CONFIRMED)
+
+    def test_payment_without_reservation_does_not_raise(self):
+        from reservations.signals import on_payment_confirmed
+        self.payment.reservation = None
+        on_payment_confirmed(sender=ReservationPayment, instance=self.payment)
+        self.assertEqual(len(self.outbox), 0)
+
+
+# ---------------------------------------------------------------------------
+# PayPal webhook view
+# ---------------------------------------------------------------------------
+
+import json as _json
+
+
+class PaypalWebhookViewTest(TestCase):
+    URL = '/payments/paypal-webhook/'
+
+    def _post(self, body):
+        return self.client.post(
+            self.URL, data=_json.dumps(body), content_type='application/json'
+        )
+
+    def _make_payment(self, transaction_id):
+        show = make_show()
+        event = make_event(show)
+        reservation = make_reservation(event)
+        payment = ReservationPayment.from_reservation(reservation, variant='paypal')
+        payment.transaction_id = transaction_id
+        payment.save()
+        return payment
+
+    def test_get_returns_405(self):
+        response = self.client.get(self.URL)
+        self.assertEqual(response.status_code, 405)
+
+    def test_capture_completed_confirms_payment(self):
+        payment = self._make_payment('txn_001')
+        response = self._post({'event_type': 'PAYMENT.CAPTURE.COMPLETED', 'resource': {'id': 'txn_001'}})
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+
+    def test_unknown_event_type_returns_200(self):
+        response = self._post({'event_type': 'CHECKOUT.ORDER.APPROVED', 'resource': {}})
+        self.assertEqual(response.status_code, 200)
+
+    def test_unknown_transaction_id_returns_200_without_crash(self):
+        response = self._post({'event_type': 'PAYMENT.CAPTURE.COMPLETED', 'resource': {'id': 'nonexistent'}})
+        self.assertEqual(response.status_code, 200)
+
+    def test_already_confirmed_payment_stays_confirmed(self):
+        payment = self._make_payment('txn_002')
+        payment.change_status(PaymentStatus.CONFIRMED)
+        self._post({'event_type': 'PAYMENT.CAPTURE.COMPLETED', 'resource': {'id': 'txn_002'}})
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
