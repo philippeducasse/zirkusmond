@@ -25,6 +25,7 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ["show", "begin", "admission"]
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
+    ordering = ["begin"]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

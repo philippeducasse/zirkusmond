@@ -1,6 +1,13 @@
 from django.db import migrations
 
 
+def reset_sequence(apps, schema_editor):
+    if schema_editor.connection.vendor == 'postgresql':
+        schema_editor.execute(
+            "SELECT setval(pg_get_serial_sequence('shows_show', 'id'), MAX(id)) FROM shows_show;"
+        )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -8,8 +15,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="SELECT setval(pg_get_serial_sequence('shows_show', 'id'), MAX(id)) FROM shows_show;",
-            reverse_sql=migrations.RunSQL.noop,
-        ),
+        migrations.RunPython(reset_sequence, migrations.RunPython.noop),
     ]
