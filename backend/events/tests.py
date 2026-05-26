@@ -94,10 +94,12 @@ class EventModelTest(TestCase):
 
     def test_reservation_closed_when_over_capacity(self):
         event = make_event(self.show, capacity=1)
-        reservation = make_reservation(event)
-        ReservationPayment.from_reservation(reservation, variant='paypal').save()
-        reservation2 = make_reservation(event, email='other@example.com')
-        ReservationPayment.from_reservation(reservation2, variant='paypal').save()
+        p1 = ReservationPayment.from_reservation(make_reservation(event), variant='paypal')
+        p1.save()
+        p1.change_status(PaymentStatus.CONFIRMED)
+        p2 = ReservationPayment.from_reservation(make_reservation(event, email='other@example.com'), variant='paypal')
+        p2.save()
+        p2.change_status(PaymentStatus.CONFIRMED)
         self.assertFalse(event.reservation_open())
 
     def test_reservation_count_empty(self):
@@ -105,19 +107,30 @@ class EventModelTest(TestCase):
 
     def test_reservation_count_with_payment(self):
         reservation = make_reservation(self.event)
-        ReservationPayment.from_reservation(reservation, variant='paypal').save()
+        payment = ReservationPayment.from_reservation(reservation, variant='paypal')
+        payment.save()
+        payment.change_status(PaymentStatus.CONFIRMED)
         self.assertEqual(self.event.reservation_count(), 1)
+
+    def test_reservation_count_unconfirmed_not_counted(self):
+        reservation = make_reservation(self.event)
+        ReservationPayment.from_reservation(reservation, variant='paypal').save()
+        self.assertEqual(self.event.reservation_count(), 0)
 
     def test_reservation_count_includes_guests(self):
         from reservations.models import Guest
         reservation = make_reservation(self.event)
-        ReservationPayment.from_reservation(reservation, variant='paypal').save()
+        payment = ReservationPayment.from_reservation(reservation, variant='paypal')
+        payment.save()
+        payment.change_status(PaymentStatus.CONFIRMED)
         Guest.objects.create(reservation=reservation, first_name='G', last_name='H')
         self.assertEqual(self.event.reservation_count(), 2)
 
     def test_reserved_tickets_display_format(self):
         reservation = make_reservation(self.event)
-        ReservationPayment.from_reservation(reservation, variant='paypal').save()
+        payment = ReservationPayment.from_reservation(reservation, variant='paypal')
+        payment.save()
+        payment.change_status(PaymentStatus.CONFIRMED)
         self.assertEqual(self.event.reserved_tickets(), f'1/150')
 
     def test_clean_raises_if_begin_before_admission(self):
@@ -248,10 +261,10 @@ class ReservationFormTest(TestCase):
 
     def test_over_capacity_event_excluded(self):
         event = self._make_event(self.future, capacity=1)
-        r1 = make_reservation(event)
-        r2 = make_reservation(event, email='other@example.com')
-        ReservationPayment.from_reservation(r1, variant='paypal').save()
-        ReservationPayment.from_reservation(r2, variant='paypal').save()
+        for r in [make_reservation(event), make_reservation(event, email='other@example.com')]:
+            p = ReservationPayment.from_reservation(r, variant='paypal')
+            p.save()
+            p.change_status(PaymentStatus.CONFIRMED)
         form = ReservationForm(self.show)
         self.assertNotIn(event, form.fields['event'].queryset)
 
@@ -289,23 +302,23 @@ class PurgeOldPaymentsViewTest(TestCase):
         self.staff = User.objects.create_user('staff', password='pass', is_staff=True)
 
     def test_get_requires_staff(self):
-        response = self.client.get('/mondmin-purge-old-payments')
+        response = self.client.get('/mondmin/events/purge-old-payments/')
         self.assertNotEqual(response.status_code, 200)
 
     def test_get_returns_200_for_staff(self):
         self.client.force_login(self.staff)
-        response = self.client.get('/mondmin-purge-old-payments')
+        response = self.client.get('/mondmin/events/purge-old-payments/')
         self.assertEqual(response.status_code, 200)
 
     def test_post_dry_run_redirects(self):
         self.client.force_login(self.staff)
-        response = self.client.post('/mondmin-purge-old-payments',
+        response = self.client.post('/mondmin/events/purge-old-payments/',
                                     {'dry_run': True, 'confirmed_only': False})
         self.assertEqual(response.status_code, 302)
 
     def test_post_live_run_redirects(self):
         self.client.force_login(self.staff)
-        response = self.client.post('/mondmin-purge-old-payments',
+        response = self.client.post('/mondmin/events/purge-old-payments/',
                                     {'dry_run': False, 'confirmed_only': False})
         self.assertEqual(response.status_code, 302)
 
@@ -377,7 +390,7 @@ class EventAdminRevenueTest(TestCase):
 
 class ReservationPaymentAdminConfirmedTotalTest(TestCase):
     def setUp(self):
-        from events.admin import ReservationPaymentAdmin
+        from reservations.admin import ReservationPaymentAdmin
         self.show = make_show(base_ticket_price=15)
         self.event = make_event(self.show)
         self.reservation = make_reservation(self.event)

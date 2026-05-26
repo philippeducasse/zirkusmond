@@ -6,8 +6,8 @@ from django.urls import path, re_path, include
 
 urlpatterns = [
     # Admin
-    path('mondmin/', admin.site.urls),
     path('mondmin/events/', include('events.urls', namespace='events_admin')),
+    path('mondmin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
 
     # Static pages
