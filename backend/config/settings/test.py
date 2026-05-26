@@ -17,5 +17,5 @@ PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
     'default': ('payments.dummy.DummyProvider', {}),
     'paypal': ('payments.dummy.DummyProvider', {}),
-    'bank card': ('payments.dummy.DummyProvider', {}),
+    'stripe': ('payments.dummy.DummyProvider', {}),
 }

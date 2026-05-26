@@ -36,8 +36,10 @@ if IS_TESTING:
             'endpoint': 'https://api.sandbox.paypal.com',
             'capture': True,
         }),
-        'bank card': ('events.StripePaymentProvider.StripeProvider', {
-            'secret_key': os.environ['STRIPE_TEST_SECRET_KEY'],
+        'stripe': ('payments.stripe.providers.StripeProviderV3', {
+            'api_key': os.environ['STRIPE_TEST_SECRET_KEY'],
+            'endpoint_secret': os.environ.get('STRIPE_TEST_WEBHOOK_SECRET', ''),
+            'secure_endpoint': True,
         }),
     }
 else:
@@ -49,7 +51,9 @@ else:
             'endpoint': 'https://api.paypal.com',
             'capture': True,
         }),
-        'bank card': ('events.StripePaymentProvider.StripeProvider', {
-            'secret_key': os.environ['STRIPE_LIVE_SECRET_KEY'],
+        'stripe': ('payments.stripe.providers.StripeProviderV3', {
+            'api_key': os.environ['STRIPE_LIVE_SECRET_KEY'],
+            'endpoint_secret': os.environ['STRIPE_LIVE_WEBHOOK_SECRET'],
+            'secure_endpoint': True,
         }),
     }
