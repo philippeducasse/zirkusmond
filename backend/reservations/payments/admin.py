@@ -11,7 +11,7 @@ from events.models import Event
 from events.services import purge_old_payments
 from payments import PaymentStatus
 
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 
 
 def reservation_to_dict(reservation):

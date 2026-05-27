@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from payments import RedirectNeeded
 
 from reservations.payments import paypal as paypal_handler
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 
 logger = logging.getLogger(__name__)
 

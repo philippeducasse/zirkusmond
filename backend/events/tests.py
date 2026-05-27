@@ -16,7 +16,7 @@ from events.forms import ReservationForm
 from events.models import Event
 from payments import PaymentStatus
 from reservations.models import Reservation
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 from shows.models import Show
 
 

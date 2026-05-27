@@ -65,7 +65,7 @@ THUMBNAIL_PROCESSORS = (
     "image_cropping.thumbnail_processors.crop_corners",
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-PAYMENT_MODEL = "reservations.payments.ReservationPayment"
+PAYMENT_MODEL = "reservations.ReservationPayment"
 
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 ANYMAIL = {

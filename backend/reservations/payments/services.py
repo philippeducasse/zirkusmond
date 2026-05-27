@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.db import transaction
 
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 
 
 def parse_custom_price(show, raw_custom_price):
