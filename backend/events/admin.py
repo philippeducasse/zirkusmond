@@ -18,7 +18,7 @@ from payments import PaymentStatus
 from events.models import Event, UpcomingEvent, PastEvent
 from reservations.payments.admin import reservation_to_dict, send_email_to_reservants
 from reservations.models import Guest
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 
 
 class EventAdmin(admin.ModelAdmin):

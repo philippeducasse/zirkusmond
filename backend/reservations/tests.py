@@ -8,7 +8,7 @@ from PIL import Image
 
 from events.models import Event
 from reservations.models import Guest, Reservation
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 from shows.models import Show
 
 

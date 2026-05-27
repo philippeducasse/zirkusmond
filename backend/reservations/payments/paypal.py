@@ -6,7 +6,7 @@ import requests
 from django.conf import settings
 from payments import PaymentStatus
 
-from reservations.payments.models import ReservationPayment
+from reservations.models import ReservationPayment
 
 logger = logging.getLogger(__name__)
 
