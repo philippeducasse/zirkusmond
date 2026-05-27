@@ -446,3 +446,67 @@ class PaypalWebhookViewTest(TestCase):
         self._post({'event_type': 'PAYMENT.CAPTURE.COMPLETED', 'resource': {'id': 'txn_002'}})
         payment.refresh_from_db()
         self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+
+
+# ---------------------------------------------------------------------------
+# Stripe webhook view
+# ---------------------------------------------------------------------------
+
+STRIPE_TEST_SETTINGS = {
+    'stripe': ('reservations.payments.stripe_provider.StripeProviderV3', {
+        'api_key': 'test',
+        'endpoint_secret': '',
+        'secure_endpoint': False,
+    }),
+}
+
+
+@override_settings(PAYMENT_VARIANTS=STRIPE_TEST_SETTINGS)
+class StripeWebhookViewTest(TestCase):
+    URL = '/payments/process/stripe/'
+
+    def _make_payment(self):
+        show = make_show()
+        event = make_event(show)
+        reservation = make_reservation(event)
+        payment = ReservationPayment.from_reservation(reservation, variant='stripe')
+        payment.save()
+        return payment
+
+    def _post_event(self, token, event_type, status='complete', payment_status='paid'):
+        body = {
+            'type': event_type,
+            'data': {
+                'object': {
+                    'client_reference_id': str(token),
+                    'status': status,
+                    'payment_status': payment_status,
+                }
+            }
+        }
+        return self.client.post(self.URL, data=_json.dumps(body), content_type='application/json')
+
+    def test_completed_paid_session_confirms_payment(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.completed')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+
+    def test_expired_session_rejects_payment(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.REJECTED)
+
+    def test_unknown_event_type_does_not_change_status(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'payment_intent.created')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.WAITING)
+
+    def test_unknown_token_returns_404(self):
+        response = self._post_event(uuid.uuid4(), 'checkout.session.completed')
+        self.assertEqual(response.status_code, 404)
