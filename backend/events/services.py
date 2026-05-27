@@ -13,7 +13,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as rl_canvas
 
-from reservations.models import ReservationPayment, Reservation
+from reservations.models import Reservation
+from reservations.payments.models import ReservationPayment
 from stats.models import SiteStats
 from payments import PaymentStatus
 
