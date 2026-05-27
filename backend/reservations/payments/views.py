@@ -19,7 +19,6 @@ def payment(request, payment_id):
         print("FORM: ", form)
     except RedirectNeeded as redirect_to:
         return redirect(str(redirect_to))
-    return TemplateResponse(request, "payment.html", {"form": form, "payment": payment})
 
 
 def payment_success(request, payment_id):
