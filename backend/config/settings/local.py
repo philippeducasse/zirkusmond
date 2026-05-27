@@ -23,14 +23,14 @@ PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
     'default': ('payments.dummy.DummyProvider', {}),
     'paypal': ('payments.paypal.PaypalProvider', {
-        'client_id': os.environ.get('PAYPAL_SANDBOX_CLIENT_ID', ''),
-        'secret': os.environ.get('PAYPAL_SANDBOX_SECRET', ''),
-        'endpoint': 'https://api.sandbox.paypal.com',
+        'client_id': os.environ.get('PAYPAL_CLIENT_ID', ''),
+        'secret': os.environ.get('PAYPAL_SECRET', ''),
+        'endpoint': os.environ.get('PAYPAL_ENDPOINT', 'https://api.sandbox.paypal.com'),
         'capture': True,
     }),
     'stripe': ('payments.stripe.providers.StripeProviderV3', {
         'api_key': os.environ.get('STRIPE_TEST_SECRET_KEY', ''),
-        'endpoint_secret': os.environ.get('STRIPE_TEST_WEBHOOK_SECRET', ''),
+        'endpoint_secret': os.environ.get('STRIPE_WEBHOOK_SECRET', ''),
         'secure_endpoint': False,
     }),
 }
