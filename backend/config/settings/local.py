@@ -28,7 +28,7 @@ PAYMENT_VARIANTS = {
         'endpoint': os.environ.get('PAYPAL_ENDPOINT', 'https://api.sandbox.paypal.com'),
         'capture': True,
     }),
-    'stripe': ('payments.stripe.providers.StripeProviderV3', {
+    'stripe': ('reservations.payments.stripe_provider.StripeProviderV3', {
         'api_key': os.environ.get('STRIPE_TEST_SECRET_KEY', ''),
         'endpoint_secret': os.environ.get('STRIPE_WEBHOOK_SECRET', ''),
         'secure_endpoint': False,
