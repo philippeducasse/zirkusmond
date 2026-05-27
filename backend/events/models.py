@@ -67,7 +67,7 @@ class Event(models.Model):
 
         from django.db.models import Count
         from payments import PaymentStatus
-        from reservations.models import ReservationPayment
+        from reservations.payments.models import ReservationPayment
 
         result = ReservationPayment.objects.filter(
             reservation__event=self, status=PaymentStatus.CONFIRMED
