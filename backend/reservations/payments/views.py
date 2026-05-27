@@ -15,14 +15,18 @@ logger = logging.getLogger(__name__)
 def payment(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
     try:
-        reservation_payment.get_form(data=request.POST or None)
+        form = reservation_payment.get_form(data=request.POST or None)
+        print("FORM: ", form)
     except RedirectNeeded as redirect_to:
         return redirect(str(redirect_to))
+    return TemplateResponse(request, "payment.html", {"form": form, "payment": payment})
 
 
 def payment_success(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    logger.info("payment_success: payment=%s status=%s", payment_id, reservation_payment.status)
+    logger.info(
+        "payment_success: payment=%s status=%s", payment_id, reservation_payment.status
+    )
     return TemplateResponse(
         request,
         "reservation_success.html",
@@ -35,7 +39,9 @@ def payment_success(request, payment_id):
 
 def payment_fail(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
+    return TemplateResponse(
+        request, "payment_failure.html", {"payment": reservation_payment}
+    )
 
 
 @csrf_exempt
