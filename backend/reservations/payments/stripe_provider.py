@@ -28,7 +28,7 @@ class StripeProviderV3(BaseStripeProviderV3):
             success_url=payment.get_success_url(),
             cancel_url=payment.get_failure_url(),
             customer_email=payment.billing_email,
-            client_reference_id=str(payment.pk),
+            client_reference_id=str(payment.token),
         )
 
         raise RedirectNeeded(session.url)
