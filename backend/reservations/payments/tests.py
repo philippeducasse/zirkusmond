@@ -510,3 +510,71 @@ class StripeWebhookViewTest(TestCase):
     def test_unknown_token_returns_404(self):
         response = self._post_event(uuid.uuid4(), 'checkout.session.completed')
         self.assertEqual(response.status_code, 404)
+
+    def test_async_payment_succeeded_confirms_payment(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.async_payment_succeeded', payment_status='paid')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+
+    def test_async_payment_failed_does_not_confirm(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.async_payment_failed', payment_status='unpaid')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.WAITING)
+
+    def test_completed_with_unpaid_status_does_not_confirm(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.completed', payment_status='unpaid')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.WAITING)
+
+    def test_already_confirmed_payment_stays_confirmed(self):
+        payment = self._make_payment()
+        payment.change_status(PaymentStatus.CONFIRMED)
+        response = self._post_event(payment.token, 'checkout.session.completed')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+
+    def test_rejected_payment_updated_to_confirmed_by_completed_webhook(self):
+        """Webhook updates payment status, so rejected can become confirmed if webhook says so"""
+        payment = self._make_payment()
+        payment.change_status(PaymentStatus.REJECTED)
+        response = self._post_event(payment.token, 'checkout.session.completed')
+        self.assertEqual(response.status_code, 200)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+
+    def test_missing_client_reference_id_raises_error(self):
+        from payments import PaymentError
+        body = {
+            'type': 'checkout.session.completed',
+            'data': {
+                'object': {
+                    'status': 'complete',
+                    'payment_status': 'paid',
+                }
+            }
+        }
+        with self.assertRaises(PaymentError):
+            self.client.post(self.URL, data=_json.dumps(body), content_type='application/json')
+
+    def test_missing_object_raises_error(self):
+        from payments import PaymentError
+        body = {
+            'type': 'checkout.session.completed',
+            'data': {}
+        }
+        with self.assertRaises(PaymentError):
+            self.client.post(self.URL, data=_json.dumps(body), content_type='application/json')
+
+    def test_invalid_json_raises_error(self):
+        import json
+        with self.assertRaises(json.JSONDecodeError):
+            self.client.post(
+                self.URL, data='invalid json', content_type='application/json'
+            )
