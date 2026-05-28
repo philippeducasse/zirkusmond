@@ -26,7 +26,6 @@ urlpatterns = [
     # Apps
     path('', include('shows.urls')),
     path('', include('reservations.urls')),
-    path('payments/', include('payments.urls')),
 ]
 
 if settings.DEBUG:
