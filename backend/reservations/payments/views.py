@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from reservations.models import ReservationPayment
-from reservations.payments import paypal as paypal_handler
+from reservations.payments import paypal_provider as paypal_handler
 
 from payments import RedirectNeeded
 
