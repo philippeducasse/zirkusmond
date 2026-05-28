@@ -4,16 +4,17 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
-from payments import RedirectNeeded
-
-from reservations.payments import paypal as paypal_handler
 from reservations.models import ReservationPayment
+from reservations.payments import paypal as paypal_handler
+
+from payments import RedirectNeeded
 
 logger = logging.getLogger(__name__)
 
 
 def payment(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
+    print("REQ: ", request.POST)
     try:
         form = reservation_payment.get_form(data=request.POST or None)
         print("FORM: ", form)
@@ -23,9 +24,7 @@ def payment(request, payment_id):
 
 def payment_success(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    logger.info(
-        "payment_success: payment=%s status=%s", payment_id, reservation_payment.status
-    )
+    logger.info("payment_success: payment=%s status=%s", payment_id, reservation_payment.status)
     return TemplateResponse(
         request,
         "reservation_success.html",
@@ -38,9 +37,7 @@ def payment_success(request, payment_id):
 
 def payment_fail(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    return TemplateResponse(
-        request, "payment_failure.html", {"payment": reservation_payment}
-    )
+    return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
 
 
 @csrf_exempt
