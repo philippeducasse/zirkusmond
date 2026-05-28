@@ -391,7 +391,7 @@ class EventAdminRevenueTest(TestCase):
 
 class ReservationPaymentAdminConfirmedTotalTest(TestCase):
     def setUp(self):
-        from reservations.admin import ReservationPaymentAdmin
+        from reservations.payments.admin import ReservationPaymentAdmin
         self.show = make_show(base_ticket_price=15)
         self.event = make_event(self.show)
         self.reservation = make_reservation(self.event)
