@@ -578,3 +578,66 @@ class StripeWebhookViewTest(TestCase):
             self.client.post(
                 self.URL, data='invalid json', content_type='application/json'
             )
+
+
+# ---------------------------------------------------------------------------
+# Stripe payment rejection/failure emails
+# ---------------------------------------------------------------------------
+
+@override_settings(PAYMENT_VARIANTS=STRIPE_TEST_SETTINGS)
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class StripePaymentRejectionEmailTest(TestCase):
+    URL = '/payments/process/stripe/'
+
+    def setUp(self):
+        from django.core import mail
+        self.outbox = mail.outbox
+
+    def _make_payment(self):
+        show = make_show()
+        event = make_event(show)
+        reservation = make_reservation(event)
+        payment = ReservationPayment.from_reservation(reservation, variant='stripe')
+        payment.save()
+        return payment
+
+    def _post_event(self, token, event_type, status='complete', payment_status='paid'):
+        body = {
+            'type': event_type,
+            'data': {
+                'object': {
+                    'client_reference_id': str(token),
+                    'status': status,
+                    'payment_status': payment_status,
+                }
+            }
+        }
+        return self.client.post(self.URL, data=_json.dumps(body), content_type='application/json')
+
+    def test_rejected_payment_sends_failure_email(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn('Failed', self.outbox[0].subject)
+        self.assertIn(payment.reservation.email, self.outbox[0].to)
+
+    def test_confirmed_payment_sends_confirmation_email(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'checkout.session.completed')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn('thank you', self.outbox[0].subject.lower())
+        self.assertIn(payment.reservation.email, self.outbox[0].to)
+
+    def test_rejection_email_includes_order_id(self):
+        payment = self._make_payment()
+        self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn(str(payment.pk), self.outbox[0].body)
+
+    def test_rejection_email_includes_event_info(self):
+        payment = self._make_payment()
+        self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn(payment.reservation.event.show.title, self.outbox[0].body)
