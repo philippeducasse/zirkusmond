@@ -1,4 +1,6 @@
-from payments import RedirectNeeded
+from django.http import JsonResponse
+
+from payments import PaymentStatus, RedirectNeeded
 from payments.stripe.providers import StripeProviderV3 as BaseStripeProviderV3
 
 
@@ -32,3 +34,57 @@ class StripeProviderV3(BaseStripeProviderV3):
         )
 
         raise RedirectNeeded(session.url)
+
+    def process_data(self, payment, request):
+        """Override to handle explicit payment failures (not session expiration)."""
+        event = self.return_event_payload(request)
+        event_type = event.get("type")
+
+        if event_type in [
+            "checkout.session.completed",
+            "checkout.session.async_payment_succeeded",
+        ]:
+            try:
+                session_info = event["data"]["object"]
+            except Exception as e:
+                from payments import PaymentError
+
+                raise PaymentError(
+                    code=400, message="session not present, check Stripe Dashboard"
+                ) from e
+
+            if session_info.get("payment_status") == "paid":
+                payment.change_status(PaymentStatus.CONFIRMED)
+
+            payment.attrs.session = session_info
+            payment.save()
+        elif event_type == "checkout.session.expired":
+            payment.change_status(PaymentStatus.ERROR)
+            try:
+                session_info = event["data"]["object"]
+            except Exception as e:
+                from payments import PaymentError
+
+                raise PaymentError(
+                    code=400, message="session not present, check Stripe Dashboard"
+                ) from e
+
+            payment.attrs.session = session_info
+            payment.save()
+        elif event_type in [
+            "charge.failed",
+            "payment_intent.payment_failed",
+            "checkout.session.async_payment_failed",
+        ]:
+            # Explicit payment failures - send rejection email
+            payment.change_status(PaymentStatus.REJECTED)
+            try:
+                obj = event["data"]["object"]
+                payment.attrs.session = obj
+                payment.save()
+            except Exception as e:
+                from payments import PaymentError
+
+                raise PaymentError(code=400, message="object not present in event") from e
+
+        return JsonResponse({"status": "OK"})
