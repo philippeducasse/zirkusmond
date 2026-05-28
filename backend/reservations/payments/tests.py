@@ -616,7 +616,7 @@ class StripePaymentRejectionEmailTest(TestCase):
 
     def test_rejected_payment_sends_failure_email(self):
         payment = self._make_payment()
-        response = self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        response = self._post_event(payment.token, 'checkout.session.async_payment_failed', status='requires_payment_method', payment_status='unpaid')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.outbox), 1)
         self.assertIn('Failed', self.outbox[0].subject)
@@ -632,12 +632,37 @@ class StripePaymentRejectionEmailTest(TestCase):
 
     def test_rejection_email_includes_order_id(self):
         payment = self._make_payment()
-        self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self._post_event(payment.token, 'checkout.session.async_payment_failed', status='requires_payment_method', payment_status='unpaid')
         self.assertEqual(len(self.outbox), 1)
         self.assertIn(str(payment.pk), self.outbox[0].body)
 
     def test_rejection_email_includes_event_info(self):
         payment = self._make_payment()
-        self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self._post_event(payment.token, 'checkout.session.async_payment_failed', status='requires_payment_method', payment_status='unpaid')
         self.assertEqual(len(self.outbox), 1)
         self.assertIn(payment.reservation.event.show.title, self.outbox[0].body)
+
+    def test_expired_session_does_not_send_email(self):
+        payment = self._make_payment()
+        self._post_event(payment.token, 'checkout.session.expired', status='expired')
+        self.assertEqual(len(self.outbox), 0)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.ERROR)
+
+    def test_charge_failed_sends_rejection_email(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'charge.failed', status='failed')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn('Failed', self.outbox[0].subject)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.REJECTED)
+
+    def test_payment_intent_payment_failed_sends_rejection_email(self):
+        payment = self._make_payment()
+        response = self._post_event(payment.token, 'payment_intent.payment_failed', status='requires_payment_method')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn('Failed', self.outbox[0].subject)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.REJECTED)
