@@ -1,10 +1,37 @@
 from django.http import JsonResponse
 
-from payments import PaymentStatus, RedirectNeeded
+from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.stripe.providers import StripeProviderV3 as BaseStripeProviderV3
 
 
 class StripeProviderV3(BaseStripeProviderV3):
+    def get_token_from_request(self, payment, request) -> str:
+        event = self.return_event_payload(request)
+        event_type = event.get("type", "")
+
+        if event_type == "charge.failed":
+            pi_id = event.get("data", {}).get("object", {}).get("payment_intent")
+            return self._token_from_payment_intent(pi_id, event_type)
+
+        if event_type == "payment_intent.payment_failed":
+            pi_id = event.get("data", {}).get("object", {}).get("id")
+            return self._token_from_payment_intent(pi_id, event_type)
+
+        return super().get_token_from_request(payment, request)
+
+    def _token_from_payment_intent(self, pi_id, event_type):
+        from payments import get_payment_model
+        if not pi_id:
+            raise PaymentError(code=400, message=f"no payment_intent in {event_type} event")
+        Payment = get_payment_model()
+        try:
+            p = Payment.objects.get(extra_data__contains=pi_id)
+            return str(p.token)
+        except Payment.DoesNotExist:
+            raise PaymentError(code=400, message=f"no payment found for payment_intent {pi_id}")
+        except Payment.MultipleObjectsReturned:
+            raise PaymentError(code=400, message=f"multiple payments found for payment_intent {pi_id}")
+
     def get_form(self, payment, data=None):
         """Override to avoid storing the Session object."""
         import stripe
