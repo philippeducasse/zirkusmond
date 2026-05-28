@@ -6,10 +6,11 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
+from payments import PaymentStatus
 from PIL import Image
 
 from events.models import Event
-from reservations.models import Guest, Reservation
+from reservations.models import Guest, Reservation, ReservationPayment
 from shows.models import Show
 
 
@@ -155,3 +156,38 @@ class CheckInViewTest(TestCase):
         response = self.client.get(self._url(self.reservation.id))
         names = response.json()['guests']
         self.assertTrue(any('Test' in name for name in names))
+
+    def _make_payment(self, status):
+        payment = ReservationPayment.from_reservation(self.reservation, variant='stripe')
+        payment.save()
+        payment.change_status(status)
+        return payment
+
+    def test_rejected_payment_blocks_reservation_check_in(self):
+        self._make_payment(PaymentStatus.REJECTED)
+        response = self.client.get(self._url(self.reservation.id))
+        self.assertEqual(response.status_code, 402)
+        self.assertIn('rejected', response.json()['error'].lower())
+
+    def test_rejected_payment_blocks_guest_check_in(self):
+        self._make_payment(PaymentStatus.REJECTED)
+        response = self.client.get(self._url(self.guest.ticket_id))
+        self.assertEqual(response.status_code, 402)
+        self.assertIn('rejected', response.json()['error'].lower())
+
+    def test_rejected_payment_does_not_mark_checked_in(self):
+        self._make_payment(PaymentStatus.REJECTED)
+        self.client.get(self._url(self.reservation.id))
+        self.reservation.refresh_from_db()
+        self.assertFalse(self.reservation.checked_in)
+
+    def test_confirmed_payment_allows_check_in(self):
+        self._make_payment(PaymentStatus.CONFIRMED)
+        response = self.client.get(self._url(self.reservation.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+
+    def test_no_payment_allows_check_in(self):
+        response = self.client.get(self._url(self.reservation.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
