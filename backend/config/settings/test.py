@@ -1,3 +1,5 @@
+import logging.config
+
 from .base import *
 
 DEBUG = True
@@ -19,3 +21,25 @@ PAYMENT_VARIANTS = {
     'paypal': ('payments.dummy.DummyProvider', {}),
     'stripe': ('payments.dummy.DummyProvider', {}),
 }
+
+logging.config.dictConfig({
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+    },
+    "formatters": {
+        "console": {
+            "format": "%(levelname)s [%(name)s] %(message)s",
+        },
+    },
+    "loggers": {
+        "": {"level": "WARNING", "handlers": ["console"]},
+        "django.db.backends": {"level": "WARNING", "handlers": ["console"], "propagate": False},
+        "django.template": {"level": "WARNING", "handlers": ["console"], "propagate": False},
+        "PIL": {"level": "WARNING", "handlers": ["console"], "propagate": False},
+    },
+})

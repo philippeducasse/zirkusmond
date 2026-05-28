@@ -383,9 +383,10 @@ class PaymentConfirmedSignalTest(TestCase):
         self.payment.change_status(PaymentStatus.WAITING)
         self.assertEqual(len(self.outbox), 0)
 
-    def test_email_not_sent_on_rejected(self):
+    def test_rejection_email_sent_on_rejected(self):
         self.payment.change_status(PaymentStatus.REJECTED)
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(len(self.outbox), 1)
+        self.assertIn('test@example.com', self.outbox[0].to)
 
     def test_send_failure_does_not_raise(self):
         with patch('events.services.send_confirmation_mail', side_effect=Exception('smtp error')):
@@ -394,9 +395,9 @@ class PaymentConfirmedSignalTest(TestCase):
         self.assertEqual(self.payment.status, PaymentStatus.CONFIRMED)
 
     def test_payment_without_reservation_does_not_raise(self):
-        from reservations.payments.signals import on_payment_confirmed
+        from reservations.payments.signals import on_payment_status_changed
         self.payment.reservation = None
-        on_payment_confirmed(sender=ReservationPayment, instance=self.payment)
+        on_payment_status_changed(sender=ReservationPayment, instance=self.payment)
         self.assertEqual(len(self.outbox), 0)
 
 
@@ -493,12 +494,12 @@ class StripeWebhookViewTest(TestCase):
         payment.refresh_from_db()
         self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
 
-    def test_expired_session_rejects_payment(self):
+    def test_expired_session_sets_error_status(self):
         payment = self._make_payment()
         response = self._post_event(payment.token, 'checkout.session.expired', status='expired')
         self.assertEqual(response.status_code, 200)
         payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.REJECTED)
+        self.assertEqual(payment.status, PaymentStatus.ERROR)
 
     def test_unknown_event_type_does_not_change_status(self):
         payment = self._make_payment()
@@ -518,12 +519,12 @@ class StripeWebhookViewTest(TestCase):
         payment.refresh_from_db()
         self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
 
-    def test_async_payment_failed_does_not_confirm(self):
+    def test_async_payment_failed_rejects_payment(self):
         payment = self._make_payment()
         response = self._post_event(payment.token, 'checkout.session.async_payment_failed', payment_status='unpaid')
         self.assertEqual(response.status_code, 200)
         payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.WAITING)
+        self.assertEqual(payment.status, PaymentStatus.REJECTED)
 
     def test_completed_with_unpaid_status_does_not_confirm(self):
         payment = self._make_payment()
@@ -651,7 +652,13 @@ class StripePaymentRejectionEmailTest(TestCase):
 
     def test_charge_failed_sends_rejection_email(self):
         payment = self._make_payment()
-        response = self._post_event(payment.token, 'charge.failed', status='failed')
+        payment.attrs.session = {'payment_intent': 'pi_test_charge_abc123'}
+        payment.save()
+        body = {
+            'type': 'charge.failed',
+            'data': {'object': {'id': 'ch_test_abc123', 'payment_intent': 'pi_test_charge_abc123', 'status': 'failed'}},
+        }
+        response = self.client.post(self.URL, data=_json.dumps(body), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.outbox), 1)
         self.assertIn('Failed', self.outbox[0].subject)
@@ -660,7 +667,13 @@ class StripePaymentRejectionEmailTest(TestCase):
 
     def test_payment_intent_payment_failed_sends_rejection_email(self):
         payment = self._make_payment()
-        response = self._post_event(payment.token, 'payment_intent.payment_failed', status='requires_payment_method')
+        payment.attrs.session = {'payment_intent': 'pi_test_pi_failed_xyz789'}
+        payment.save()
+        body = {
+            'type': 'payment_intent.payment_failed',
+            'data': {'object': {'id': 'pi_test_pi_failed_xyz789', 'status': 'requires_payment_method'}},
+        }
+        response = self.client.post(self.URL, data=_json.dumps(body), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.outbox), 1)
         self.assertIn('Failed', self.outbox[0].subject)
