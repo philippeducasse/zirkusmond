@@ -14,10 +14,8 @@ logger = logging.getLogger(__name__)
 
 def payment(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    print("REQ: ", request.POST)
     try:
-        form = reservation_payment.get_form(data=request.POST or None)
-        print("FORM: ", form)
+        reservation_payment.get_form(data=request.POST or None)
     except RedirectNeeded as redirect_to:
         return redirect(str(redirect_to))
 
