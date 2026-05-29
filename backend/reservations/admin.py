@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from events import services
 from events.models import Event
-from reservations.models import Guest, PastReservation, Reservation, UpcomingReservation
+from reservations.models import Guest, Reservation
 
 
 class InlineGuest(admin.StackedInline):
@@ -11,7 +11,26 @@ class InlineGuest(admin.StackedInline):
     extra = 0
 
 
-class BaseReservationAdmin(admin.ModelAdmin):
+class ReservationStatusFilter(admin.SimpleListFilter):
+    title = "event status"
+    parameter_name = "event_status"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("upcoming", "Upcoming"),
+            ("past", "Past"),
+        ]
+
+    def queryset(self, request, queryset):
+        now = timezone.now()
+        if self.value() == "upcoming":
+            return queryset.filter(event__begin__gte=now)
+        elif self.value() == "past":
+            return queryset.filter(event__begin__lt=now)
+        return queryset
+
+
+class ReservationAdmin(admin.ModelAdmin):
     list_display = [
         "last_name",
         "first_name",
@@ -20,9 +39,28 @@ class BaseReservationAdmin(admin.ModelAdmin):
         "ticket_count",
         "checked_in",
     ]
+    list_filter = [ReservationStatusFilter]
     inlines = (InlineGuest,)
     actions = ["resend_confirmation_mail"]
     search_fields = ["first_name", "last_name", "email"]
+    ordering = ["-event__begin"]
+    fields = ["event", "first_name", "last_name", "email", "checked_in"]
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        is_detail_view = request.resolver_match.url_name.endswith("_change")
+        if not request.GET.get("event_status") and not is_detail_view:
+            queryset = queryset.filter(event__begin__gte=timezone.now())
+        return queryset
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "event":
+            is_upcoming = (
+                not request.GET.get("event_status") or request.GET.get("event_status") == "upcoming"
+            )
+            if is_upcoming:
+                kwargs["queryset"] = Event.objects.filter(begin__gte=timezone.now())
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     @admin.display(ordering="last_name")
     def last_name(self, obj):
@@ -46,28 +84,6 @@ class BaseReservationAdmin(admin.ModelAdmin):
     def resend_confirmation_mail(self, request, queryset):
         for reservation in queryset:
             services.send_confirmation_mail(reservation)
-
-
-class ReservationAdmin(BaseReservationAdmin):
-    ordering = ["-event__begin"]
-    fields = ["event", "first_name", "last_name", "email", "checked_in"]
-    readonly_fields = ["event"]
-
-
-class UpcomingReservationAdmin(BaseReservationAdmin):
-    ordering = ["-event__begin"]
-    fields = ["event", "first_name", "last_name", "email", "checked_in"]
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "event":
-            kwargs["queryset"] = Event.objects.filter(begin__gte=timezone.now())
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-class PastReservationAdmin(BaseReservationAdmin):
-    ordering = ["-event__begin"]
-    fields = ["event", "first_name", "last_name", "email", "checked_in"]
-    readonly_fields = ["event"]
 
 
 class GuestAdmin(admin.ModelAdmin):
@@ -98,6 +114,4 @@ class GuestAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Reservation, ReservationAdmin)
-admin.site.register(UpcomingReservation, UpcomingReservationAdmin)
-admin.site.register(PastReservation, PastReservationAdmin)
 admin.site.register(Guest, GuestAdmin)
