@@ -2,13 +2,15 @@ from django.db import migrations
 
 
 def copy_payments(apps, schema_editor):
-    OldPayment = apps.get_model('events', 'ReservationPayment')
-    NewPayment = apps.get_model('reservations', 'ReservationPayment')
+    OldPayment = apps.get_model("events", "ReservationPayment")
+    NewPayment = apps.get_model("reservations", "ReservationPayment")
 
-    for old in OldPayment.objects.select_related('reservation').all():
+    for old in OldPayment.objects.select_related("reservation").all():
         if old.reservation_id is None:
             continue
-        custom_price = round(old.custom_ticket_price) if old.custom_ticket_price is not None else None
+        custom_price = (
+            round(old.custom_ticket_price) if old.custom_ticket_price is not None else None
+        )
         NewPayment.objects.get_or_create(
             id=old.id,
             defaults=dict(
@@ -27,9 +29,8 @@ def copy_payments(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0003_alter_guest_ticket_id_nullable'),
+        ("reservations", "0003_alter_guest_ticket_id_nullable"),
     ]
 
     operations = [

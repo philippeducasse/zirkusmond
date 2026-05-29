@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from reservations.models import Guest, Reservation
 from events import services
+from reservations.models import Guest, Reservation
 
 
 class InlineGuest(admin.StackedInline):

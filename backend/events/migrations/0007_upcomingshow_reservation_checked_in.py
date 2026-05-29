@@ -4,28 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0006_alter_show_cast_alter_show_description'),
+        ("events", "0006_alter_show_cast_alter_show_description"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UpcomingShow',
-            fields=[
-            ],
+            name="UpcomingShow",
+            fields=[],
             options={
-                'verbose_name': 'Upcoming show',
-                'verbose_name_plural': 'Upcoming shows',
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "verbose_name": "Upcoming show",
+                "verbose_name_plural": "Upcoming shows",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('events.show',),
+            bases=("events.show",),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='checked_in',
+            model_name="reservation",
+            name="checked_in",
             field=models.BooleanField(default=False),
         ),
     ]

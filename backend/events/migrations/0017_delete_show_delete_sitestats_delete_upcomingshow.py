@@ -4,19 +4,18 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0016_alter_event_reservation_capacity_alter_event_show_and_more'),
+        ("events", "0016_alter_event_reservation_capacity_alter_event_show_and_more"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='Show',
+            name="Show",
         ),
         migrations.DeleteModel(
-            name='SiteStats',
+            name="SiteStats",
         ),
         migrations.DeleteModel(
-            name='UpcomingShow',
+            name="UpcomingShow",
         ),
     ]

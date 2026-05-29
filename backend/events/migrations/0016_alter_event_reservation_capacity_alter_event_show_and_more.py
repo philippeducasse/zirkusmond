@@ -5,26 +5,32 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0015_alter_event_options_alter_guest_ticket_id'),
-        ('shows', '0001_initial'),
+        ("events", "0015_alter_event_options_alter_guest_ticket_id"),
+        ("shows", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='reservation_capacity',
+            model_name="event",
+            name="reservation_capacity",
             field=models.PositiveIntegerField(default=300),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='show',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='events', to='shows.show'),
+            model_name="event",
+            name="show",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="events",
+                to="shows.show",
+            ),
         ),
         migrations.AlterField(
-            model_name='reservationpayment',
-            name='custom_ticket_price',
-            field=models.PositiveIntegerField(blank=True, help_text='Custom price selected by user (sliding scale)', null=True),
+            model_name="reservationpayment",
+            name="custom_ticket_price",
+            field=models.PositiveIntegerField(
+                blank=True, help_text="Custom price selected by user (sliding scale)", null=True
+            ),
         ),
     ]

@@ -5,15 +5,23 @@ from reservations.models import Guest, Reservation
 
 
 def _payment_rejected(reservation):
-    payment = reservation.reservationpayment_set.order_by('-created').first()
+    payment = reservation.reservationpayment_set.order_by("-created").first()
     return payment is not None and payment.status == PaymentStatus.REJECTED
 
 
 def _do_check_in(entity, reservation, ticket_id, names, **extra):
     if _payment_rejected(reservation):
-        return {"error": "Payment rejected", "reservation_number": str(ticket_id), "guests": names}, 402
+        return {
+            "error": "Payment rejected",
+            "reservation_number": str(ticket_id),
+            "guests": names,
+        }, 402
     if entity.checked_in:
-        return {"error": "Ticket already checked in", "reservation_number": str(ticket_id), "guests": names}, 400
+        return {
+            "error": "Ticket already checked in",
+            "reservation_number": str(ticket_id),
+            "guests": names,
+        }, 400
     entity.checked_in = True
     entity.save()
     return {"success": True, "reservation_number": str(ticket_id), "guests": names, **extra}, 200

@@ -1,31 +1,30 @@
-import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, re_path, include
+from django.urls import include, path, re_path
+
+import views
 
 urlpatterns = [
     # Admin
-    path('mondmin/events/', include('events.urls', namespace='events_admin')),
-    path('mondmin/', admin.site.urls),
-    path('tinymce/', include('tinymce.urls')),
-
+    path("mondmin/events/", include("events.urls", namespace="events_admin")),
+    path("mondmin/", admin.site.urls),
+    path("tinymce/", include("tinymce.urls")),
     # Static pages
-    path('', views.plain),
-    path('events', views.event_list),
-    path('about', views.about),
-    path('contact', views.contact),
-    path('rentals', views.rentals),
-    path('international', views.international),
-    path('newsletter_registration', views.newsletter_registration),
-    re_path('^impressum.*', views.impressum),
-    re_path('^datenschutz.*', views.datenschutz),
-    path('robots.txt', views.robots),
-    path('sitemap.xml', views.sitemap),
-
+    path("", views.plain),
+    path("events", views.event_list),
+    path("about", views.about),
+    path("contact", views.contact),
+    path("rentals", views.rentals),
+    path("international", views.international),
+    path("newsletter_registration", views.newsletter_registration),
+    re_path("^impressum.*", views.impressum),
+    re_path("^datenschutz.*", views.datenschutz),
+    path("robots.txt", views.robots),
+    path("sitemap.xml", views.sitemap),
     # Apps
-    path('', include('shows.urls')),
-    path('', include('reservations.urls')),
+    path("", include("shows.urls")),
+    path("", include("reservations.urls")),
 ]
 
 if settings.DEBUG:

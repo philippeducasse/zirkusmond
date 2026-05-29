@@ -4,35 +4,34 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0017_delete_show_delete_sitestats_delete_upcomingshow'),
-        ('reservations', '0004_migrate_payment_data'),
+        ("events", "0017_delete_show_delete_sitestats_delete_upcomingshow"),
+        ("reservations", "0004_migrate_payment_data"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='reservation',
-            name='reservant',
+            model_name="reservation",
+            name="reservant",
         ),
         migrations.RemoveField(
-            model_name='reservation',
-            name='event',
+            model_name="reservation",
+            name="event",
         ),
         migrations.RemoveField(
-            model_name='reservationpayment',
-            name='reservation',
+            model_name="reservationpayment",
+            name="reservation",
         ),
         migrations.DeleteModel(
-            name='Guest',
+            name="Guest",
         ),
         migrations.DeleteModel(
-            name='Person',
+            name="Person",
         ),
         migrations.DeleteModel(
-            name='Reservation',
+            name="Reservation",
         ),
         migrations.DeleteModel(
-            name='ReservationPayment',
+            name="ReservationPayment",
         ),
     ]

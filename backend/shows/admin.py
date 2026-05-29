@@ -16,10 +16,10 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce
 from django.utils import timezone
-from events.models import Event
-from reservations.models import Guest
-from reservations.models import ReservationPayment
 from payments import PaymentStatus
+
+from events.models import Event
+from reservations.models import Guest, ReservationPayment
 
 from .models import PastShow, Show, UnscheduledShow, UpcomingShow
 
