@@ -26,12 +26,15 @@ DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["tests.py", "test_*.py"]
 
 [tool.ruff]
-line-length = 120
+line-length = 100
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = ["E", "W", "F", "I", "N", "UP"]
+ignore = ["F403", "F405", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"config/settings/*.py" = ["E501"]
+"*/migrations/*.py" = ["E501", "N806"]
 
 [dependency-groups]
-dev = [
-    "ruff",
-]
+dev = ["ruff"]
