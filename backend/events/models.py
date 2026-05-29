@@ -20,7 +20,7 @@ class Event(models.Model):
         verbose_name_plural = "all events"
 
     def __str__(self):
-        return format_datetime(self.begin, "%A %d.%m.%y at %H:%M")
+        return format_datetime(self.begin, "%A %d.%m.%y at %H:%M") + self.show.title
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -31,7 +31,7 @@ class Event(models.Model):
         if errors:
             raise ValidationError(errors)
 
-    @admin.display
+    @admin.display(ordering="begin")
     def time_and_date(self):
         return format_datetime(self.begin, "%d.%m.%y at %H:%M")
 
@@ -47,13 +47,13 @@ class Event(models.Model):
     def begin_time(self):
         return format_datetime(self.begin, "%H:%M")
 
-    @admin.display
+    @admin.display(ordering="annotated_reservation_count")
     def reserved_tickets(self):
         if hasattr(self, "annotated_reservation_count"):
             return f"{self.annotated_reservation_count}/{self.reservation_capacity}"
         return f"{self.reservation_count()}/{self.reservation_capacity}"
 
-    @admin.display(boolean=True)
+    @admin.display(boolean=True, ordering="open_for_reservation")
     def reservation_open(self) -> bool:
         if not self.open_for_reservation:
             return False

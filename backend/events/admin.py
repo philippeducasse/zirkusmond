@@ -20,7 +20,7 @@ from reservations.models import Guest, ReservationPayment
 from reservations.payments.admin import reservation_to_dict, send_email_to_reservants
 
 
-class EventAdmin(admin.ModelAdmin):
+class BaseEventAdmin(admin.ModelAdmin):
     list_display = [
         "show",
         "begin",
@@ -29,10 +29,9 @@ class EventAdmin(admin.ModelAdmin):
         "reserved_tickets",
         "revenue",
     ]
-    list_filter = ["show", "begin", "admission"]
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
-    ordering = ["begin"]
+    ordering = ["-begin"]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -156,6 +155,18 @@ class EventAdmin(admin.ModelAdmin):
         return send_email_to_reservants(request, dicts, self)
 
 
+class EventAdmin(BaseEventAdmin):
+    list_filter = ["begin"]
+
+
+class UpcomingEventAdmin(BaseEventAdmin):
+    list_filter = ["open_for_reservation"]
+
+
+class PastEventAdmin(BaseEventAdmin):
+    list_filter = []
+
+
 admin.site.register(Event, EventAdmin)
-admin.site.register(UpcomingEvent, EventAdmin)
-admin.site.register(PastEvent, EventAdmin)
+admin.site.register(UpcomingEvent, UpcomingEventAdmin)
+admin.site.register(PastEvent, PastEventAdmin)
