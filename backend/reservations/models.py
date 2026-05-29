@@ -9,6 +9,7 @@ from payments import PurchasedItem
 from payments.models import BasePayment
 
 from events.models import Event
+from reservations.managers import PastReservationManager, UpcomingReservationManager
 
 
 class Reservation(models.Model):
@@ -21,12 +22,33 @@ class Reservation(models.Model):
     email = models.EmailField()
     checked_in = models.BooleanField(default=False)
 
+    class Meta:
+        verbose_name_plural = " All reservations"
+
     @admin.display
     def ticket_count(self):
         return self.guests.count() + 1
 
     def __str__(self):
         return f"Reservation for {self.event} - tickets: {self.ticket_count()} — bought by {self.last_name} {self.first_name}"
+
+
+class UpcomingReservation(Reservation):
+    objects = UpcomingReservationManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "upcoming reservation"
+        verbose_name_plural = "  Upcoming reservations"
+
+
+class PastReservation(Reservation):
+    objects = PastReservationManager()
+
+    class Meta:
+        proxy = True
+        verbose_name = "past reservation"
+        verbose_name_plural = " Past reservations"
 
 
 class Guest(models.Model):
