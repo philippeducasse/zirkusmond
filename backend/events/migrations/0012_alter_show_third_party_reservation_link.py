@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0011_show_third_party_reservation_and_more'),
+        ("events", "0011_show_third_party_reservation_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='show',
-            name='third_party_reservation_link',
+            model_name="show",
+            name="third_party_reservation_link",
             field=models.CharField(blank=True, max_length=255),
         ),
     ]

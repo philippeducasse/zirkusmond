@@ -15,14 +15,20 @@ from django.db.models.functions import Coalesce, Lower
 from django.http import HttpResponse
 from payments import PaymentStatus
 
-from events.models import Event, UpcomingEvent, PastEvent
+from events.models import Event, PastEvent, UpcomingEvent
+from reservations.models import Guest, ReservationPayment
 from reservations.payments.admin import reservation_to_dict, send_email_to_reservants
-from reservations.models import Guest
-from reservations.models import ReservationPayment
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ["show", "begin", "time_and_date", "reservation_open", "reserved_tickets", "revenue"]
+    list_display = [
+        "show",
+        "begin",
+        "time_and_date",
+        "reservation_open",
+        "reserved_tickets",
+        "revenue",
+    ]
     list_filter = ["show", "begin", "admission"]
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
@@ -105,11 +111,12 @@ class EventAdmin(admin.ModelAdmin):
 
             def add_row(worksheet, row, person, count):
                 worksheet.write_row(
-                    row, 0,
+                    row,
+                    0,
                     [
                         person.first_name,
                         person.last_name,
-                        getattr(person, 'email', ''),
+                        getattr(person, "email", ""),
                         count,
                     ],
                     border,

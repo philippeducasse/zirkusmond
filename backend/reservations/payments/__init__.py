@@ -1,1 +1,1 @@
-default_app_config = 'reservations.payments.apps.PaymentsConfig'
+default_app_config = "reservations.payments.apps.PaymentsConfig"

@@ -5,49 +5,77 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('shows', '0001_initial'),
+        ("shows", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='show',
-            name='head_img',
+            model_name="show",
+            name="head_img",
         ),
         migrations.AddField(
-            model_name='show',
-            name='seo_image_crop',
-            field=image_cropping.fields.ImageRatioField('banner_link', '400x225', adapt_rotation=False, allow_fullsize=False, free_crop=False, help_text=None, hide_image_field=False, size_warning=False, verbose_name='seo image crop'),
+            model_name="show",
+            name="seo_image_crop",
+            field=image_cropping.fields.ImageRatioField(
+                "banner_link",
+                "400x225",
+                adapt_rotation=False,
+                allow_fullsize=False,
+                free_crop=False,
+                help_text=None,
+                hide_image_field=False,
+                size_warning=False,
+                verbose_name="seo image crop",
+            ),
         ),
         migrations.AlterField(
-            model_name='show',
-            name='base_ticket_price',
-            field=models.PositiveIntegerField(blank=True, help_text='The default ticket price on the sliding scale', null=True),
+            model_name="show",
+            name="base_ticket_price",
+            field=models.PositiveIntegerField(
+                blank=True, help_text="The default ticket price on the sliding scale", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='show',
-            name='max_ticket_price',
-            field=models.PositiveIntegerField(blank=True, help_text='Maximum price for sliding scale. Defaults to base_ticket_price + 10 EUR if not set', null=True),
+            model_name="show",
+            name="max_ticket_price",
+            field=models.PositiveIntegerField(
+                blank=True,
+                help_text="Maximum price for sliding scale. Defaults to base_ticket_price + 10 EUR if not set",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='show',
-            name='min_ticket_price',
-            field=models.PositiveIntegerField(blank=True, help_text='Minimum price for sliding scale. Defaults to base_ticket_price - 10 EUR if not set', null=True),
+            model_name="show",
+            name="min_ticket_price",
+            field=models.PositiveIntegerField(
+                blank=True,
+                help_text="Minimum price for sliding scale. Defaults to base_ticket_price - 10 EUR if not set",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='show',
-            name='reservation_price',
-            field=models.PositiveIntegerField(blank=True, help_text='Only set this field if you are not selling full tickets. Guests will have to pay rest at the door', null=True),
+            model_name="show",
+            name="reservation_price",
+            field=models.PositiveIntegerField(
+                blank=True,
+                help_text="Only set this field if you are not selling full tickets. Guests will have to pay rest at the door",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='show',
-            name='third_party_reservation',
-            field=models.BooleanField(default=False, help_text='Check this field if the company has their own reservation system. Tickets / reservations will not be sold on zirkusmond.de'),
+            model_name="show",
+            name="third_party_reservation",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check this field if the company has their own reservation system. Tickets / reservations will not be sold on zirkusmond.de",
+            ),
         ),
         migrations.AlterField(
-            model_name='show',
-            name='third_party_reservation_link',
-            field=models.CharField(blank=True, help_text='External link to reserve tickets', max_length=255),
+            model_name="show",
+            name="third_party_reservation_link",
+            field=models.CharField(
+                blank=True, help_text="External link to reserve tickets", max_length=255
+            ),
         ),
     ]

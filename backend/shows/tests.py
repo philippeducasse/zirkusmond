@@ -1,7 +1,6 @@
 from datetime import timedelta
 from io import BytesIO
 
-from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
@@ -10,21 +9,26 @@ from PIL import Image
 from events.models import Event
 from shows.models import PastShow, Show, UnscheduledShow, UpcomingShow
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def make_image():
     buf = BytesIO()
-    Image.new('RGB', (10, 10), color='red').save(buf, format='JPEG')
+    Image.new("RGB", (10, 10), color="red").save(buf, format="JPEG")
     buf.seek(0)
-    return SimpleUploadedFile('test.jpg', buf.read(), content_type='image/jpeg')
+    return SimpleUploadedFile("test.jpg", buf.read(), content_type="image/jpeg")
 
 
 def make_show(**kwargs):
-    defaults = dict(title='Test Show', description='A description', cast='A cast',
-                    card_image=make_image(), private=False)
+    defaults = dict(
+        title="Test Show",
+        description="A description",
+        cast="A cast",
+        card_image=make_image(),
+        private=False,
+    )
     defaults.update(kwargs)
     return Show.objects.create(**defaults)
 
@@ -44,12 +48,13 @@ def make_event(show, offset_days=7):
 # Show model
 # ---------------------------------------------------------------------------
 
+
 class ShowModelTest(TestCase):
     def setUp(self):
         self.show = make_show()
 
     def test_str_is_title(self):
-        self.assertEqual(str(self.show), 'Test Show')
+        self.assertEqual(str(self.show), "Test Show")
 
     def test_future_events_returns_upcoming(self):
         event = make_event(self.show, offset_days=5)
@@ -101,29 +106,29 @@ class ShowModelTest(TestCase):
         make_event(self.show, offset_days=3)
         make_event(self.show, offset_days=10)
         result = self.show.dates_text()
-        self.assertIn('/', result)
+        self.assertIn("/", result)
 
     def test_dates_text_empty_when_no_future_events(self):
-        self.assertEqual(self.show.dates_text(), '')
+        self.assertEqual(self.show.dates_text(), "")
 
     def test_lastmod_format(self):
-        import re
-        self.assertRegex(self.show.lastmod(), r'\d{4}-\d{2}-\d{2}')
+        self.assertRegex(self.show.lastmod(), r"\d{4}-\d{2}-\d{2}")
 
 
 # ---------------------------------------------------------------------------
 # Show managers
 # ---------------------------------------------------------------------------
 
+
 class ShowManagerTest(TestCase):
     def setUp(self):
-        self.upcoming_show = make_show(title='Upcoming')
+        self.upcoming_show = make_show(title="Upcoming")
         make_event(self.upcoming_show, offset_days=5)
 
-        self.past_show = make_show(title='Past')
+        self.past_show = make_show(title="Past")
         make_event(self.past_show, offset_days=-5)
 
-        self.unscheduled_show = make_show(title='Unscheduled')
+        self.unscheduled_show = make_show(title="Unscheduled")
 
     def test_upcoming_includes_shows_with_future_events(self):
         self.assertIn(self.upcoming_show, UpcomingShow.objects.all())
@@ -152,20 +157,21 @@ class ShowManagerTest(TestCase):
 # Show view
 # ---------------------------------------------------------------------------
 
+
 class ShowViewTest(TestCase):
     def setUp(self):
         self.show = make_show()
 
     def test_show_page_returns_200(self):
-        response = self.client.get(f'/show/{self.show.pk}')
+        response = self.client.get(f"/show/{self.show.pk}")
         self.assertEqual(response.status_code, 200)
 
     def test_show_in_context(self):
-        response = self.client.get(f'/show/{self.show.pk}')
-        self.assertEqual(response.context['show'], self.show)
+        response = self.client.get(f"/show/{self.show.pk}")
+        self.assertEqual(response.context["show"], self.show)
 
     def test_nonexistent_show_returns_404(self):
-        response = self.client.get('/show/99999')
+        response = self.client.get("/show/99999")
         self.assertEqual(response.status_code, 404)
 
 
@@ -173,53 +179,54 @@ class ShowViewTest(TestCase):
 # Site-wide views
 # ---------------------------------------------------------------------------
 
+
 class SiteViewsTest(TestCase):
     def test_home_returns_200(self):
-        response = self.client.get('/')
+        response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
 
     def test_home_with_upcoming_show(self):
         show = make_show()
         make_event(show)
-        response = self.client.get('/')
+        response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(show, response.context['upcoming_shows'])
+        self.assertIn(show, response.context["upcoming_shows"])
 
     def test_about_returns_200(self):
-        self.assertEqual(self.client.get('/about').status_code, 200)
+        self.assertEqual(self.client.get("/about").status_code, 200)
 
     def test_contact_returns_200(self):
-        self.assertEqual(self.client.get('/contact').status_code, 200)
+        self.assertEqual(self.client.get("/contact").status_code, 200)
 
     def test_rentals_returns_200(self):
-        self.assertEqual(self.client.get('/rentals').status_code, 200)
+        self.assertEqual(self.client.get("/rentals").status_code, 200)
 
     def test_international_returns_200(self):
-        self.assertEqual(self.client.get('/international').status_code, 200)
+        self.assertEqual(self.client.get("/international").status_code, 200)
 
     def test_events_list_returns_200(self):
-        self.assertEqual(self.client.get('/events').status_code, 200)
+        self.assertEqual(self.client.get("/events").status_code, 200)
 
     def test_impressum_returns_200(self):
-        self.assertEqual(self.client.get('/impressum').status_code, 200)
+        self.assertEqual(self.client.get("/impressum").status_code, 200)
 
     def test_datenschutz_returns_200(self):
-        self.assertEqual(self.client.get('/datenschutz').status_code, 200)
+        self.assertEqual(self.client.get("/datenschutz").status_code, 200)
 
     def test_robots_txt_returns_200(self):
-        self.assertEqual(self.client.get('/robots.txt').status_code, 200)
+        self.assertEqual(self.client.get("/robots.txt").status_code, 200)
 
     def test_sitemap_returns_200(self):
-        self.assertEqual(self.client.get('/sitemap.xml').status_code, 200)
+        self.assertEqual(self.client.get("/sitemap.xml").status_code, 200)
 
     def test_newsletter_get_redirects(self):
-        response = self.client.get('/newsletter_registration')
+        response = self.client.get("/newsletter_registration")
         self.assertEqual(response.status_code, 302)
 
     def test_newsletter_post_valid_email_shows_confirmation(self):
-        response = self.client.post('/newsletter_registration', {'email': 'user@example.com'})
+        response = self.client.post("/newsletter_registration", {"email": "user@example.com"})
         self.assertEqual(response.status_code, 200)
 
     def test_newsletter_post_invalid_email_redirects(self):
-        response = self.client.post('/newsletter_registration', {'email': 'not-an-email'})
+        response = self.client.post("/newsletter_registration", {"email": "not-an-email"})
         self.assertEqual(response.status_code, 302)

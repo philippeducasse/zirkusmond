@@ -2,22 +2,22 @@
 
 from django.db import migrations, models
 
+
 def migrate_reservation_price(apps, schema_editor):
-    Show = apps.get_model('events', 'Show')
-    Event = apps.get_model('events', 'Event')
+    Show = apps.get_model("events", "Show")
+    Event = apps.get_model("events", "Event")
 
     for show in Show.objects.all():
-        events = Event.objects.filter(show=show).order_by('admission')
+        events = Event.objects.filter(show=show).order_by("admission")
         if events.exists():
             # Example: take the first event's reservation price
             first_event = events.first()
-            if hasattr(first_event, 'reservation_price'):
+            if hasattr(first_event, "reservation_price"):
                 show.reservation_price = first_event.reservation_price
                 show.save()
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("events", "0001_initial"),
     ]
@@ -26,9 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="show",
             name="reservation_price",
-            field=models.DecimalField(
-                blank=True, decimal_places=2, max_digits=8, null=True
-            ),
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=8, null=True),
         ),
         migrations.RunPython(migrate_reservation_price),
     ]

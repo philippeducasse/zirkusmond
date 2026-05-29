@@ -4,15 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0005_remove_event_end'),
+        ("events", "0005_remove_event_end"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservationpayment',
-            name='custom_ticket_price',
-            field=models.DecimalField(blank=True, decimal_places=2, help_text='Custom price selected by user (sliding scale)', max_digits=8, null=True),
+            model_name="reservationpayment",
+            name="custom_ticket_price",
+            field=models.DecimalField(
+                blank=True,
+                decimal_places=2,
+                help_text="Custom price selected by user (sliding scale)",
+                max_digits=8,
+                null=True,
+            ),
         ),
     ]

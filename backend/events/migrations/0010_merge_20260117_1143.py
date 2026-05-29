@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0007_upcomingshow_reservation_checked_in'),
-        ('events', '0009_show_ticket_or_reservation_price_only'),
+        ("events", "0007_upcomingshow_reservation_checked_in"),
+        ("events", "0009_show_ticket_or_reservation_price_only"),
     ]
 
-    operations = [
-    ]
+    operations = []

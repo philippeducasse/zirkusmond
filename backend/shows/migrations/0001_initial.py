@@ -6,7 +6,6 @@ import tinymce.models
 from django.db import migrations, models
 
 
-
 def copy_shows_forward(apps, schema_editor):
     Show = apps.get_model("shows", "Show")
     OldShow = apps.get_model("events", "Show")
@@ -35,7 +34,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('events', '0015_alter_event_options_alter_guest_ticket_id'),
+        ("events", "0015_alter_event_options_alter_guest_ticket_id"),
     ]
 
     operations = [

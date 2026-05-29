@@ -9,4 +9,4 @@ def show(request, show_id):
         s = Show.objects.get(id=show_id)
     except Show.DoesNotExist:
         raise Http404("Show does not exist")
-    return render(request, 'show.html', {'show': s})
+    return render(request, "show.html", {"show": s})
