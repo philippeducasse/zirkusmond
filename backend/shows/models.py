@@ -8,6 +8,7 @@ from tinymce import models as tinymce_models
 
 from .managers import PastShowManager, UnscheduledShowManager, UpcomingShowManager
 
+
 class Show(models.Model):
     title = models.CharField(max_length=255)
     description = tinymce_models.HTMLField()

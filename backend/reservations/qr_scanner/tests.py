@@ -13,22 +13,25 @@ from events.models import Event
 from reservations.models import Guest, Reservation, ReservationPayment
 from shows.models import Show
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def make_image():
     buf = BytesIO()
-    Image.new('RGB', (10, 10), color='red').save(buf, format='JPEG')
+    Image.new("RGB", (10, 10), color="red").save(buf, format="JPEG")
     buf.seek(0)
-    return SimpleUploadedFile('test.jpg', buf.read(), content_type='image/jpeg')
+    return SimpleUploadedFile("test.jpg", buf.read(), content_type="image/jpeg")
 
 
 def make_show(**kwargs):
     defaults = dict(
-        title='Test Show', description='', cast='',
-        card_image=make_image(), private=False,
+        title="Test Show",
+        description="",
+        cast="",
+        card_image=make_image(),
+        private=False,
         base_ticket_price=15,
     )
     defaults.update(kwargs)
@@ -47,7 +50,7 @@ def make_event(show, offset_days=7, capacity=150):
 
 
 def make_reservation(event, **kwargs):
-    defaults = dict(first_name='Test', last_name='User', email='test@example.com')
+    defaults = dict(first_name="Test", last_name="User", email="test@example.com")
     defaults.update(kwargs)
     return Reservation.objects.create(event=event, **defaults)
 
@@ -56,39 +59,40 @@ def make_reservation(event, **kwargs):
 # QR scanner views
 # ---------------------------------------------------------------------------
 
+
 class QrScannerViewTest(TestCase):
     def setUp(self):
-        self.staff = User.objects.create_user('staff', password='pass', is_staff=True)
+        self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
 
     def test_scanner_page_requires_staff(self):
-        response = self.client.get('/qr-scanner/')
+        response = self.client.get("/qr-scanner/")
         self.assertNotEqual(response.status_code, 200)
 
     def test_scanner_page_accessible_to_staff(self):
         self.client.force_login(self.staff)
-        response = self.client.get('/qr-scanner/')
+        response = self.client.get("/qr-scanner/")
         self.assertEqual(response.status_code, 200)
 
     def test_get_events_requires_staff(self):
-        response = self.client.get('/qr-scanner/get-events')
+        response = self.client.get("/qr-scanner/get-events")
         self.assertNotEqual(response.status_code, 200)
 
     def test_get_events_returns_json(self):
         self.client.force_login(self.staff)
         show = make_show()
         make_event(show)
-        response = self.client.get('/qr-scanner/get-events')
+        response = self.client.get("/qr-scanner/get-events")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIsInstance(data, list)
         self.assertEqual(len(data), 1)
-        self.assertIn('title', data[0])
+        self.assertIn("title", data[0])
 
     def test_get_events_excludes_past_events(self):
         self.client.force_login(self.staff)
         show = make_show()
         make_event(show, offset_days=-5)
-        response = self.client.get('/qr-scanner/get-events')
+        response = self.client.get("/qr-scanner/get-events")
         self.assertEqual(response.json(), [])
 
 
@@ -96,32 +100,33 @@ class QrScannerViewTest(TestCase):
 # Check-in view
 # ---------------------------------------------------------------------------
 
+
 class CheckInViewTest(TestCase):
     def setUp(self):
-        self.staff = User.objects.create_user('staff', password='pass', is_staff=True)
+        self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
         self.client.force_login(self.staff)
 
         show = make_show()
         event = make_event(show)
         self.reservation = make_reservation(event)
         self.guest = Guest.objects.create(
-            reservation=self.reservation, first_name='Guest', last_name='One'
+            reservation=self.reservation, first_name="Guest", last_name="One"
         )
 
     def _url(self, ticket_id):
-        return f'/qr-scanner/{ticket_id}/check-in'
+        return f"/qr-scanner/{ticket_id}/check-in"
 
     def test_check_in_by_reservation_id(self):
         response = self.client.get(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()['success'])
+        self.assertTrue(response.json()["success"])
         self.reservation.refresh_from_db()
         self.assertTrue(self.reservation.checked_in)
 
     def test_check_in_by_guest_ticket_id(self):
         response = self.client.get(self._url(self.guest.ticket_id))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()['success'])
+        self.assertTrue(response.json()["success"])
         self.guest.refresh_from_db()
         self.assertTrue(self.guest.checked_in)
 
@@ -135,14 +140,14 @@ class CheckInViewTest(TestCase):
         self.reservation.save()
         response = self.client.get(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 400)
-        self.assertIn('already checked in', response.json()['error'])
+        self.assertIn("already checked in", response.json()["error"])
 
     def test_already_checked_in_guest_returns_400(self):
         self.guest.checked_in = True
         self.guest.save()
         response = self.client.get(self._url(self.guest.ticket_id))
         self.assertEqual(response.status_code, 400)
-        self.assertIn('already checked in', response.json()['error'])
+        self.assertIn("already checked in", response.json()["error"])
 
     def test_unknown_uuid_returns_404(self):
         response = self.client.get(self._url(uuid.uuid4()))
@@ -150,15 +155,15 @@ class CheckInViewTest(TestCase):
 
     def test_reservation_check_in_returns_is_group_true(self):
         response = self.client.get(self._url(self.reservation.id))
-        self.assertTrue(response.json().get('is_group'))
+        self.assertTrue(response.json().get("is_group"))
 
     def test_response_includes_guest_names(self):
         response = self.client.get(self._url(self.reservation.id))
-        names = response.json()['guests']
-        self.assertTrue(any('Test' in name for name in names))
+        names = response.json()["guests"]
+        self.assertTrue(any("Test" in name for name in names))
 
     def _make_payment(self, status):
-        payment = ReservationPayment.from_reservation(self.reservation, variant='stripe')
+        payment = ReservationPayment.from_reservation(self.reservation, variant="stripe")
         payment.save()
         payment.change_status(status)
         return payment
@@ -167,13 +172,13 @@ class CheckInViewTest(TestCase):
         self._make_payment(PaymentStatus.REJECTED)
         response = self.client.get(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 402)
-        self.assertIn('rejected', response.json()['error'].lower())
+        self.assertIn("rejected", response.json()["error"].lower())
 
     def test_rejected_payment_blocks_guest_check_in(self):
         self._make_payment(PaymentStatus.REJECTED)
         response = self.client.get(self._url(self.guest.ticket_id))
         self.assertEqual(response.status_code, 402)
-        self.assertIn('rejected', response.json()['error'].lower())
+        self.assertIn("rejected", response.json()["error"].lower())
 
     def test_rejected_payment_does_not_mark_checked_in(self):
         self._make_payment(PaymentStatus.REJECTED)
@@ -185,9 +190,9 @@ class CheckInViewTest(TestCase):
         self._make_payment(PaymentStatus.CONFIRMED)
         response = self.client.get(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()['success'])
+        self.assertTrue(response.json()["success"])
 
     def test_no_payment_allows_check_in(self):
         response = self.client.get(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()['success'])
+        self.assertTrue(response.json()["success"])

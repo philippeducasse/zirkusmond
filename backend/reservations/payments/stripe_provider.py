@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.stripe.providers import StripeProviderV3 as BaseStripeProviderV3
 
@@ -21,16 +20,19 @@ class StripeProviderV3(BaseStripeProviderV3):
 
     def _token_from_payment_intent(self, pi_id, event_type):
         from payments import get_payment_model
+
         if not pi_id:
             raise PaymentError(code=400, message=f"no payment_intent in {event_type} event")
-        Payment = get_payment_model()
+        payment_model = get_payment_model()
         try:
-            p = Payment.objects.get(extra_data__contains=pi_id)
+            p = payment_model.objects.get(extra_data__contains=pi_id)
             return str(p.token)
-        except Payment.DoesNotExist:
+        except payment_model.DoesNotExist:
             raise PaymentError(code=400, message=f"no payment found for payment_intent {pi_id}")
-        except Payment.MultipleObjectsReturned:
-            raise PaymentError(code=400, message=f"multiple payments found for payment_intent {pi_id}")
+        except payment_model.MultipleObjectsReturned:
+            raise PaymentError(
+                code=400, message=f"multiple payments found for payment_intent {pi_id}"
+            )
 
     def get_form(self, payment, data=None):
         """Override to avoid storing the Session object."""

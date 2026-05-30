@@ -10,13 +10,11 @@ from events import services
 logger = logging.getLogger(__name__)
 
 
-
-    
 @receiver(status_changed)
 def on_payment_status_changed(sender, instance, **kwargs):
-    reservation = getattr(instance, 'reservation', None)
+    reservation = getattr(instance, "reservation", None)
     if not reservation:
-        logger.error('failed to send retrieve reservation %s', instance)
+        logger.error("failed to send retrieve reservation %s", instance)
 
         return
 
@@ -25,21 +23,25 @@ def on_payment_status_changed(sender, instance, **kwargs):
     if instance.status == PaymentStatus.CONFIRMED:
         try:
             services.send_confirmation_mail(reservation)
-            logger.info('confirmation email sent for payment=%s to=%s', payment_id, reservation.email)
+            logger.info(
+                "confirmation email sent for payment=%s to=%s", payment_id, reservation.email
+            )
         except Exception as error:
-            logger.error('failed to send confirmation email for payment=%s: %s', payment_id, error)
+            logger.error("failed to send confirmation email for payment=%s: %s", payment_id, error)
 
     elif instance.status == PaymentStatus.REJECTED:
         try:
             send_mail(
-                subject='Payment Failed - Please Try Again',
-                message=f'Your payment for {reservation.event.show.title} on {reservation.event.admission.strftime("%Y-%m-%d")} failed.\n\nPlease try again or contact us for assistance.\n\nOrder ID: {payment_id}',
-                from_email='noreply@zirkusmond.de',
+                subject="Payment Failed - Please Try Again",
+                message=f"Your payment for {reservation.event.show.title} on {reservation.event.admission.strftime('%Y-%m-%d')} failed.\n\nPlease try again or contact us for assistance.\n\nOrder ID: {payment_id}",
+                from_email="noreply@zirkusmond.de",
                 recipient_list=[reservation.email],
                 fail_silently=False,
             )
-            logger.info('payment failure email sent for payment=%s to=%s', payment_id, reservation.email)
+            logger.info(
+                "payment failure email sent for payment=%s to=%s", payment_id, reservation.email
+            )
         except Exception as error:
-            logger.error('failed to send payment failure email for payment=%s: %s', payment_id, error)
-
-
+            logger.error(
+                "failed to send payment failure email for payment=%s: %s", payment_id, error
+            )

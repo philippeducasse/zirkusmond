@@ -3,7 +3,7 @@ import logging.config
 import os
 from pathlib import Path
 
-from easy_thumbnails.conf import Settings as thumbnail_settings
+from easy_thumbnails.conf import Settings as ThumbnailSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # zirkusmond/ project root
 
@@ -63,7 +63,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 THUMBNAIL_PROCESSORS = (
     "image_cropping.thumbnail_processors.crop_corners",
-) + thumbnail_settings.THUMBNAIL_PROCESSORS
+) + ThumbnailSettings.THUMBNAIL_PROCESSORS
 
 PAYMENT_MODEL = "reservations.ReservationPayment"
 
@@ -90,7 +90,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.environ.get('MEDIA_ROOT', BASE_DIR / 'media')
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "media")
 
 LOGGING_CONFIG = None
 LOGLEVEL = os.getenv("DJANGO_LOGLEVEL", "debug").upper()

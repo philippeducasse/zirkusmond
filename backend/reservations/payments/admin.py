@@ -5,12 +5,12 @@ from django.core.mail import EmailMessage
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import Context, Template
+from payments import PaymentStatus
+
 from events import services
 from events.forms import EmailTextForm
 from events.models import Event
 from events.services import purge_old_payments
-from payments import PaymentStatus
-
 from reservations.models import ReservationPayment
 
 

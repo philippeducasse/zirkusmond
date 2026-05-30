@@ -3,20 +3,19 @@ import json
 import logging
 from io import BytesIO
 
+import qrcode
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import Exists, F, OuterRef
 from django.utils import timezone
-import qrcode
+from payments import PaymentStatus
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as rl_canvas
 
-from reservations.models import Reservation
-from reservations.models import ReservationPayment
+from reservations.models import Reservation, ReservationPayment
 from stats.models import SiteStats
-from payments import PaymentStatus
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ def _make_qr_buffer(data: dict) -> BytesIO:
     qr.add_data(json.dumps(data))
     qr.make(fit=True)
     buffer = BytesIO()
-    qr.make_image(fill_color="black", back_color="white").save(buffer, format='PNG')
+    qr.make_image(fill_color="black", back_color="white").save(buffer, format="PNG")
     buffer.seek(0)
     return buffer
 
@@ -63,10 +62,16 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list) -> BytesIO:
         canvas.drawCentredString(center_x, qr_y - 36, reservation.event.date_str())
 
         canvas.setFont("Helvetica", 12)
-        canvas.drawCentredString(center_x, qr_y - 54,
-                            f"Einlass {reservation.event.admission_time()}  ·  Beginn {reservation.event.begin_time()}")
-        canvas.drawCentredString(center_x, qr_y - 72,
-                            "Bitte QR-Code an der Tür vorzeigen  ·  Please show QR code at the door")
+        canvas.drawCentredString(
+            center_x,
+            qr_y - 54,
+            f"Einlass {reservation.event.admission_time()}  ·  Beginn {reservation.event.begin_time()}",
+        )
+        canvas.drawCentredString(
+            center_x,
+            qr_y - 72,
+            "Bitte QR-Code an der Tür vorzeigen  ·  Please show QR code at the door",
+        )
 
         canvas.showPage()
 
@@ -77,24 +82,31 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list) -> BytesIO:
 
 def send_confirmation_mail(reservation: Reservation):
     logger.info(
-        'send_confirmation_mail: reservation=%s event=%s email=%s tickets=%s',
-        reservation.id, reservation.event, reservation.email, reservation.ticket_count(),
+        "send_confirmation_mail: reservation=%s event=%s email=%s tickets=%s",
+        reservation.id,
+        reservation.event,
+        reservation.email,
+        reservation.ticket_count(),
     )
     show = reservation.event.show
     guests = list(reservation.guests.all())
     payment = ReservationPayment.objects.filter(reservation=reservation).first()
 
-    tickets = [(
-        f"{reservation.first_name} {reservation.last_name}",
-        _make_qr_buffer({"ticket": str(reservation.id), "event": reservation.event.id}),
-    )]
+    tickets = [
+        (
+            f"{reservation.first_name} {reservation.last_name}",
+            _make_qr_buffer({"ticket": str(reservation.id), "event": reservation.event.id}),
+        )
+    ]
     for guest in guests:
         if guest.ticket_id is None:
             continue
-        tickets.append((
-            f"{guest.first_name} {guest.last_name}",
-            _make_qr_buffer({"ticket": str(guest.ticket_id), "event": reservation.event.id}),
-        ))
+        tickets.append(
+            (
+                f"{guest.first_name} {guest.last_name}",
+                _make_qr_buffer({"ticket": str(guest.ticket_id), "event": reservation.event.id}),
+            )
+        )
 
     pdf_buffer = _build_tickets_pdf(reservation, tickets)
 
@@ -151,14 +163,14 @@ See you at Zirkus Mond and have fun.
 """
 
     email = EmailMultiAlternatives(
-        subject=f'🎪 Thank you for your Reservation for {show.title} 🌙',
+        subject=f"🎪 Thank you for your Reservation for {show.title} 🌙",
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[reservation.email]
+        to=[reservation.email],
     )
-    email.attach(f'tickets_{reservation.id}.pdf', pdf_buffer.read(), 'application/pdf')
+    email.attach(f"tickets_{reservation.id}.pdf", pdf_buffer.read(), "application/pdf")
     email.send()
-    logger.info('confirmation email delivered for reservation=%s', reservation.id)
+    logger.info("confirmation email delivered for reservation=%s", reservation.id)
 
 
 def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):

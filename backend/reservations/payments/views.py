@@ -4,10 +4,10 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
+from payments import RedirectNeeded
+
 from reservations.models import ReservationPayment
 from reservations.payments import paypal_provider as paypal_handler
-
-from payments import RedirectNeeded
 
 logger = logging.getLogger(__name__)
 
@@ -57,15 +57,18 @@ def stripe_webhook(request):
 
     try:
         from payments.urls import static_callback
-        return static_callback(request, variant='stripe')
+
+        return static_callback(request, variant="stripe")
     except Exception as e:
         import json
+
         from django.core.mail import send_mail
+
         logger.error("stripe webhook error: %s", e, exc_info=True)
 
         try:
             body = json.loads(request.body)
-            token = body.get('data', {}).get('object', {}).get('client_reference_id')
+            token = body.get("data", {}).get("object", {}).get("client_reference_id")
             if token:
                 try:
                     payment = ReservationPayment.objects.get(token=token)
@@ -78,7 +81,11 @@ def stripe_webhook(request):
                             recipient_list=[reservation.email],
                             fail_silently=True,
                         )
-                        logger.info("sent webhook error notification to %s for payment %s", reservation.email, payment.pk)
+                        logger.info(
+                            "sent webhook error notification to %s for payment %s",
+                            reservation.email,
+                            payment.pk,
+                        )
                 except ReservationPayment.DoesNotExist:
                     logger.warning("stripe webhook error: payment not found for token %s", token)
         except Exception as notification_error:

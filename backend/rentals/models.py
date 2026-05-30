@@ -13,4 +13,4 @@ class RentalObject(models.Model):
         return self.name
 
     def lastmod(self):
-        return self.last_modified.strftime('%Y-%m-%d')
+        return self.last_modified.strftime("%Y-%m-%d")

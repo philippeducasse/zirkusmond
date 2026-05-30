@@ -1,17 +1,15 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, Form, IntegerField, CharField
+from django.forms import CharField, Form, IntegerField, ModelChoiceField, ModelForm
 from tinymce.widgets import TinyMCE
 
 from events.models import Event
 from reservations.models import Guest, Reservation
 from shows.models import Show
 
-from django.forms import ModelChoiceField
-
 
 class EventModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
-        return f'{obj}' if obj.reservation_open() else f'RESERVATION CLOSED - {obj}'
+        return f"{obj}" if obj.reservation_open() else f"RESERVATION CLOSED - {obj}"
 
 
 class ReservationForm(ModelForm):
@@ -19,36 +17,38 @@ class ReservationForm(ModelForm):
 
     class Meta:
         model = Reservation
-        fields = ['event', 'first_name', 'last_name', 'email']
+        fields = ["event", "first_name", "last_name", "email"]
 
     def __init__(self, show: Show, *args, **kwargs):
         super().__init__(*args, **kwargs)
         all_events = Event.objects.filter(show=show.pk)
         open_ids = [e.pk for e in all_events if e.reservation_open()]
-        self.fields['event'] = EventModelChoiceField(Event.objects.filter(pk__in=open_ids).order_by("begin"))
+        self.fields["event"] = EventModelChoiceField(
+            Event.objects.filter(pk__in=open_ids).order_by("begin")
+        )
 
     def clean(self):
         cleaned_data = super().clean()
-        event = cleaned_data.get('event')
+        event = cleaned_data.get("event")
         if event and not event.reservation_open():
-            self.add_error('event', 'Sorry, Reservation for this Event is closed')
+            self.add_error("event", "Sorry, Reservation for this Event is closed")
             raise ValidationError("Registration is closed, sorry :(")
 
 
 class GuestForm(ModelForm):
     class Meta:
         model = Guest
-        name_fields = ['first_name', 'last_name']
+        name_fields = ["first_name", "last_name"]
         fields = name_fields
 
     def line_tuples(self):
-        return ((self['first_name'], self['last_name']),)
+        return ((self["first_name"], self["last_name"]),)
 
     def clean(self):
         cleaned_data = super().clean()
         for field in self.Meta.name_fields:
             if not cleaned_data.get(field):
-                self.add_error(field, 'Please give the names of your guests')
+                self.add_error(field, "Please give the names of your guests")
 
 
 class EmailTextForm(Form):
