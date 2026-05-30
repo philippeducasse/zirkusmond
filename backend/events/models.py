@@ -1,9 +1,12 @@
 from django.contrib import admin
 from django.db import models
 from django.utils import timezone
-from shows.models import Show
+
 from events.utils import format_datetime
-from .managers import UpcomingEventManager, PastEventManager
+from shows.models import Show
+
+from .managers import PastEventManager, UpcomingEventManager
+
 
 class Event(models.Model):
     show = models.ForeignKey(Show, on_delete=models.SET_NULL, null=True, related_name="events")
@@ -17,7 +20,7 @@ class Event(models.Model):
         verbose_name_plural = "all events"
 
     def __str__(self):
-        return format_datetime(self.begin, "%A %d.%m.%y at %H:%M")
+        return format_datetime(self.begin, "%A %d.%m.%y at %H:%M") + self.show.title
 
     def clean(self):
         from django.core.exceptions import ValidationError
@@ -28,7 +31,7 @@ class Event(models.Model):
         if errors:
             raise ValidationError(errors)
 
-    @admin.display
+    @admin.display(ordering="begin")
     def time_and_date(self):
         return format_datetime(self.begin, "%d.%m.%y at %H:%M")
 
@@ -44,13 +47,13 @@ class Event(models.Model):
     def begin_time(self):
         return format_datetime(self.begin, "%H:%M")
 
-    @admin.display
+    @admin.display(ordering="annotated_reservation_count")
     def reserved_tickets(self):
         if hasattr(self, "annotated_reservation_count"):
             return f"{self.annotated_reservation_count}/{self.reservation_capacity}"
         return f"{self.reservation_count()}/{self.reservation_capacity}"
 
-    @admin.display(boolean=True)
+    @admin.display(boolean=True, ordering="open_for_reservation")
     def reservation_open(self) -> bool:
         if not self.open_for_reservation:
             return False
@@ -67,6 +70,7 @@ class Event(models.Model):
 
         from django.db.models import Count
         from payments import PaymentStatus
+
         from reservations.models import ReservationPayment
 
         result = ReservationPayment.objects.filter(
@@ -77,6 +81,7 @@ class Event(models.Model):
         )
         return (result["reservations"] or 0) + (result["guests"] or 0)
 
+
 class UpcomingEvent(Event):
     objects = UpcomingEventManager()
 
@@ -86,6 +91,7 @@ class UpcomingEvent(Event):
         verbose_name_plural = (
             "  Upcoming events"  # leave spaces to have it Event up first in admin panel
         )
+
 
 class PastEvent(Event):
     objects = PastEventManager()

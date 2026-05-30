@@ -2,20 +2,20 @@ from decimal import Decimal
 
 from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, redirect, render
-from events.forms import GuestForm, ReservationForm
-from shows.models import Show
 
+from events.forms import GuestForm, ReservationForm
 from reservations.payments import services
+from shows.models import Show
 
 
 def reserve(request, show_id):
     show = get_object_or_404(Show, pk=show_id)
-    GuestFormSet = formset_factory(GuestForm, max_num=9, extra=9)
+    guest_form_set = formset_factory(GuestForm, max_num=9, extra=9)
     newsletter = False
 
     if request.method == "POST":
         reservation_form = ReservationForm(show, request.POST, prefix="res")
-        guest_formset = GuestFormSet(request.POST, prefix="gues")
+        guest_formset = guest_form_set(request.POST, prefix="gues")
         newsletter = request.POST.get("newsletter", False)
         guest_count = 0
 
@@ -55,10 +55,10 @@ def reserve(request, show_id):
                 variant,
                 custom_price,
             )
-            return redirect("/payments/%s" % payment.pk)
+            return redirect(f"/payments/{payment.pk}")
     else:
         reservation_form = ReservationForm(show, prefix="res")
-        guest_formset = GuestFormSet(prefix="gues")
+        guest_formset = guest_form_set(prefix="gues")
 
     base_price = show.base_ticket_price or show.reservation_price or Decimal(15.0)
     return render(

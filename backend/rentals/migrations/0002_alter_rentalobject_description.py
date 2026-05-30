@@ -5,15 +5,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rentals', '0001_initial'),
+        ("rentals", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rentalobject',
-            name='description',
+            model_name="rentalobject",
+            name="description",
             field=tinymce.models.HTMLField(),
         ),
     ]

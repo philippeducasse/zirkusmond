@@ -1,8 +1,8 @@
 import uuid
 from decimal import Decimal
 
-from django.contrib import admin
 from django.conf import settings
+from django.contrib import admin
 from django.db import models
 from django.urls import reverse
 from payments import PurchasedItem
@@ -15,8 +15,8 @@ class ReservationPayment(BasePayment):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reservation = models.ForeignKey(Reservation, null=True, on_delete=models.SET_NULL)
     custom_ticket_price = models.PositiveIntegerField(
-        null=True, blank=True,
-        help_text="Custom price selected by user (sliding scale)")
+        null=True, blank=True, help_text="Custom price selected by user (sliding scale)"
+    )
 
     def get_metadata(self):
         return {
@@ -25,24 +25,27 @@ class ReservationPayment(BasePayment):
         }
 
     def get_failure_url(self):
-        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
-        return f'{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/failure'
+        protocol = "https" if settings.PAYMENT_USES_SSL else "http"
+        return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/failure"
 
     def get_success_url(self):
-        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
-        return f'{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/success'
+        protocol = "https" if settings.PAYMENT_USES_SSL else "http"
+        return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/success"
 
     def get_process_url(self) -> str:
-        protocol = 'https' if settings.PAYMENT_USES_SSL else 'http'
-        return f'{protocol}://{settings.PAYMENT_HOST}' + reverse('process_payment', kwargs={'token': self.token})
+        protocol = "https" if settings.PAYMENT_USES_SSL else "http"
+        return f"{protocol}://{settings.PAYMENT_HOST}" + reverse(
+            "process_payment", kwargs={"token": self.token}
+        )
 
     def get_purchased_items(self):
         yield PurchasedItem(
-            name=f'{self.reservation.event.show.title} {self.reservation.event}',
+            name=f"{self.reservation.event.show.title} {self.reservation.event}",
             sku=self.reservation.event.pk,
             quantity=self.reservation.ticket_count(),
             price=self.ticket_price,
-            currency='EUR')
+            currency="EUR",
+        )
 
     @property
     def ticket_price(self):
@@ -68,8 +71,8 @@ class ReservationPayment(BasePayment):
             reservation=reservation,
             variant=variant,
             billing_email=reservation.email,
-            description=f'Reservations for {reservation.event}',
-            currency='EUR',
+            description=f"Reservations for {reservation.event}",
+            currency="EUR",
             custom_ticket_price=custom_ticket_price,
         )
         payment.total = reservation.ticket_count() * payment.ticket_price
@@ -81,4 +84,4 @@ class ReservationPayment(BasePayment):
 
     @admin.display
     def event(self):
-        return f'{self.reservation.event}'
+        return f"{self.reservation.event}"

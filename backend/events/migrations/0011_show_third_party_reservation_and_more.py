@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0010_merge_20260117_1143'),
+        ("events", "0010_merge_20260117_1143"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='show',
-            name='third_party_reservation',
+            model_name="show",
+            name="third_party_reservation",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='show',
-            name='third_party_reservation_link',
+            model_name="show",
+            name="third_party_reservation_link",
             field=models.CharField(default=False),
         ),
     ]

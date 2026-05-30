@@ -6,4 +6,4 @@ from .models import NewsletterRegistration
 class NewsletterRegistrationForm(ModelForm):
     class Meta:
         model = NewsletterRegistration
-        fields = ['email']
+        fields = ["email"]

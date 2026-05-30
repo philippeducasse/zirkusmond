@@ -9,9 +9,7 @@ def convert_markdown_to_html(apps, schema_editor):
     try:
         import markdown
     except ImportError:
-        print(
-            "Warning: Neither 'markdown' nor 'markdown2' package found. Skipping conversion."
-        )
+        print("Warning: Neither 'markdown' nor 'markdown2' package found. Skipping conversion.")
         return
 
     Show = apps.get_model("events", "Show")
@@ -35,9 +33,7 @@ class Migration(migrations.Migration):
 
     operations = [
         # First, convert existing markdown data to HTML
-        migrations.RunPython(
-            convert_markdown_to_html, reverse_code=migrations.RunPython.noop
-        ),
+        migrations.RunPython(convert_markdown_to_html, reverse_code=migrations.RunPython.noop),
         # Then change the field types
         migrations.AlterField(
             model_name="show",

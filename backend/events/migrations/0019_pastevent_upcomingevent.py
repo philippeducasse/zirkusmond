@@ -4,36 +4,33 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0018_remove_reservation_reservant_and_more'),
+        ("events", "0018_remove_reservation_reservant_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PastEvent',
-            fields=[
-            ],
+            name="PastEvent",
+            fields=[],
             options={
-                'verbose_name': 'past event',
-                'verbose_name_plural': 'past events',
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "verbose_name": "past event",
+                "verbose_name_plural": "past events",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('events.event',),
+            bases=("events.event",),
         ),
         migrations.CreateModel(
-            name='UpcomingEvent',
-            fields=[
-            ],
+            name="UpcomingEvent",
+            fields=[],
             options={
-                'verbose_name': 'upcoming event',
-                'verbose_name_plural': '  Upcoming events',
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "verbose_name": "upcoming event",
+                "verbose_name_plural": "  Upcoming events",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('events.event',),
+            bases=("events.event",),
         ),
     ]

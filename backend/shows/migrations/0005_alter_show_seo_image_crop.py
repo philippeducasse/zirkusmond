@@ -5,15 +5,24 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('shows', '0004_rename_banner_link_show_banner_image'),
+        ("shows", "0004_rename_banner_link_show_banner_image"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='show',
-            name='seo_image_crop',
-            field=image_cropping.fields.ImageRatioField('banner_image', '400x225', adapt_rotation=False, allow_fullsize=False, free_crop=False, help_text=None, hide_image_field=False, size_warning=False, verbose_name='seo image crop'),
+            model_name="show",
+            name="seo_image_crop",
+            field=image_cropping.fields.ImageRatioField(
+                "banner_image",
+                "400x225",
+                adapt_rotation=False,
+                allow_fullsize=False,
+                free_crop=False,
+                help_text=None,
+                hide_image_field=False,
+                size_warning=False,
+                verbose_name="seo image crop",
+            ),
         ),
     ]

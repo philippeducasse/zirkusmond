@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0012_alter_show_third_party_reservation_link'),
+        ("events", "0012_alter_show_third_party_reservation_link"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='guest',
-            name='checked_in',
+            model_name="guest",
+            name="checked_in",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='guest',
-            name='ticket_id',
+            model_name="guest",
+            name="ticket_id",
             field=models.UUIDField(editable=False, null=True, unique=True),
         ),
     ]

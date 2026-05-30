@@ -1,6 +1,7 @@
 import datetime
 
 from django.shortcuts import redirect, render
+
 from newsletter.forms import NewsletterRegistrationForm
 from rentals.models import RentalObject
 from shows.models import Show
