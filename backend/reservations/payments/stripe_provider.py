@@ -5,7 +5,7 @@ from payments.stripe.providers import StripeProviderV3 as BaseStripeProviderV3
 
 class StripeProviderV3(BaseStripeProviderV3):
     def get_token_from_request(self, payment, request) -> str:
-        event = self.return_event_payload(request)
+        event = self.return_event_payload(request)._to_dict_recursive()
         event_type = event.get("type", "")
 
         if event_type == "charge.failed":
@@ -66,7 +66,7 @@ class StripeProviderV3(BaseStripeProviderV3):
 
     def process_data(self, payment, request):
         """Override to handle explicit payment failures (not session expiration)."""
-        event = self.return_event_payload(request)
+        event = self.return_event_payload(request)._to_dict_recursive()
         event_type = event.get("type")
 
         if event_type in [
