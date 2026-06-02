@@ -20,7 +20,7 @@ class Event(models.Model):
         verbose_name_plural = "all events"
 
     def __str__(self):
-        return format_datetime(self.begin, "%A %d.%m.%y at %H:%M") + self.show.title
+        return format_datetime(self.begin, "%A %d.%m.%y at %H:%M")
 
     def clean(self):
         from django.core.exceptions import ValidationError
