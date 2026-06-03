@@ -45,6 +45,8 @@ class ReservationAdmin(admin.ModelAdmin):
     search_fields = ["first_name", "last_name", "email"]
     ordering = ["-event__begin"]
     fields = ["event", "first_name", "last_name", "email", "checked_in"]
+    list_select_related = ["event"]
+    date_hierarchy = "event__begin"
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -97,6 +99,7 @@ class GuestAdmin(admin.ModelAdmin):
     search_fields = ["first_name", "last_name", "ticket_id"]
     raw_id_fields = ["reservation"]
     ordering = ["-reservation__event__begin"]
+    list_select_related = ["reservation__event"]
 
     @admin.display(ordering="last_name")
     def last_name(self, obj):

@@ -32,6 +32,7 @@ class BaseEventAdmin(admin.ModelAdmin):
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
     ordering = ["-begin"]
+    date_hierarchy = "begin"
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
