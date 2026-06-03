@@ -24,10 +24,10 @@ PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
     "default": ("payments.dummy.DummyProvider", {}),
     "paypal": (
-        "reservations.payments.paypal_provider.PaypalProvider",
+        "payments.paypal.PaypalProvider",
         {
-            "client_id": os.environ.get("PAYPAL_SANDBOX_CLIENT_ID", ""),
-            "secret": os.environ.get("PAYPAL_SANDBOX_SECRET", ""),
+            "client_id": os.environ.get("PAYPAL_CLIENT_ID", ""),
+            "secret": os.environ.get("PAYPAL_SECRET", ""),
             "endpoint": os.environ.get("PAYPAL_ENDPOINT", "https://api.sandbox.paypal.com"),
             "capture": True,
         },
