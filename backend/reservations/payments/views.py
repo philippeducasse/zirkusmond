@@ -1,13 +1,10 @@
 import logging
 
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.views.decorators.csrf import csrf_exempt
 from payments import RedirectNeeded
 
 from reservations.models import ReservationPayment
-from reservations.payments import paypal_provider as paypal_handler
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +35,3 @@ def payment_fail(request, payment_id):
     return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
 
 
-@csrf_exempt
-def paypal_webhook(request):
-    if request.method != "POST":
-        return HttpResponse(status=405)
-    try:
-        _, status_code = paypal_handler.process_webhook(request)
-        return HttpResponse(status=status_code)
-    except Exception as e:
-        logger.error("paypal webhook error: %s", e)
-        return HttpResponse(status=500)
