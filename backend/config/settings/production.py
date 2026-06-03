@@ -32,7 +32,7 @@ if IS_TESTING:
     PAYMENT_VARIANTS = {
         "default": ("payments.dummy.DummyProvider", {}),
         "paypal": (
-            "payments.paypal.PaypalProvider",
+            "reservations.payments.paypal_provider.PaypalProvider",
             {
                 "client_id": os.environ["PAYPAL_SANDBOX_CLIENT_ID"],
                 "secret": os.environ["PAYPAL_SANDBOX_SECRET"],
@@ -53,7 +53,7 @@ else:
     PAYMENT_HOST = "zirkusmond.de"
     PAYMENT_VARIANTS = {
         "paypal": (
-            "payments.paypal.PaypalProvider",
+            "reservations.payments.paypal_provider.PaypalProvider",
             {
                 "client_id": os.environ["PAYPAL_LIVE_CLIENT_ID"],
                 "secret": os.environ["PAYPAL_LIVE_SECRET"],
