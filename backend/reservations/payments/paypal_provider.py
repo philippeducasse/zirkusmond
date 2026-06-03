@@ -1,54 +1,112 @@
 import json
 import logging
 import os
+from decimal import ROUND_HALF_UP, Decimal
 
 import requests
 from django.conf import settings
-from payments import PaymentStatus
-from payments.paypal import PaypalProvider as BasePaypalProvider
+from payments import PaymentStatus, RedirectNeeded
+from payments.core import BasicProvider
 
 from reservations.models import ReservationPayment
 
 logger = logging.getLogger(__name__)
 
+CENTS = Decimal("0.01")
 
-class PaypalProvider(BasePaypalProvider):
+
+class PaypalProvider(BasicProvider):
+    def __init__(self, client_id, secret, endpoint="https://api.sandbox.paypal.com", capture=True):
+        self.client_id = client_id
+        self.secret = secret
+        self.endpoint = endpoint
+        self.orders_url = f"{endpoint}/v2/checkout/orders"
+        super().__init__(capture=capture)
+
+    def _auth_headers(self):
+        token = _get_access_token(self.endpoint, self.client_id, self.secret)
+        return {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
+
+    def get_form(self, payment, data=None):
+        if not payment.id:
+            payment.save()
+
+        extra_data = json.loads(payment.extra_data or "{}")
+        approval_url = extra_data.get("approval_url")
+
+        if not approval_url:
+            return_url = self.get_return_url(payment)
+            total = str(payment.total.quantize(CENTS, rounding=ROUND_HALF_UP))
+            response = requests.post(
+                self.orders_url,
+                json={
+                    "intent": "CAPTURE",
+                    "purchase_units": [{
+                        "amount": {"currency_code": payment.currency, "value": total},
+                        "description": payment.description,
+                    }],
+                    "payment_source": {
+                        "paypal": {
+                            "experience_context": {
+                                "return_url": return_url,
+                                "cancel_url": return_url,
+                                "user_action": "PAY_NOW",
+                            }
+                        }
+                    },
+                },
+                headers=self._auth_headers(),
+            )
+            response.raise_for_status()
+            order = response.json()
+            payment.transaction_id = order["id"]
+            approval_url = next(link["href"] for link in order["links"] if link["rel"] == "payer-action")
+            extra_data["approval_url"] = approval_url
+            payment.extra_data = json.dumps(extra_data)
+
+        payment.change_status(PaymentStatus.WAITING)
+        raise RedirectNeeded(approval_url)
+
     def process_data(self, payment, request):
-        from django.http import HttpResponseBadRequest, HttpResponseForbidden
+        from django.http import HttpResponseForbidden
         from django.shortcuts import redirect
-        from payments import PaymentError
 
         success_url = payment.get_success_url()
         failure_url = payment.get_failure_url()
 
-        if "token" not in request.GET:
+        order_id = request.GET.get("token")
+        if not order_id:
             return HttpResponseForbidden("FAILED")
 
         payer_id = request.GET.get("PayerID")
         if not payer_id:
             if payment.status != PaymentStatus.CONFIRMED:
                 payment.change_status(PaymentStatus.REJECTED)
-                return redirect(failure_url)
-            return redirect(success_url)
+            return redirect(failure_url)
 
         try:
-            executed_payment = self.execute_payment(payment, payer_id)
-        except PaymentError:
+            response = requests.post(
+                f"{self.orders_url}/{order_id}/capture",
+                json={},
+                headers=self._auth_headers(),
+            )
+            response.raise_for_status()
+            capture = response.json()
+        except Exception as e:
+            logger.error("paypal v2 capture failed order_id=%s error=%s", order_id, e)
+            payment.change_status(PaymentStatus.ERROR)
             return redirect(failure_url)
-        except KeyError:
-            return HttpResponseBadRequest()
 
-        self.set_response_links(payment, executed_payment)
-        payment.attrs.payer_info = executed_payment["payer"]["payer_info"]
-        if self._capture:
-            payment.captured_amount = payment.total
-            type(payment).objects.filter(pk=payment.pk).update(captured_amount=payment.captured_amount)
-            # Leave status as WAITING — webhook (PAYMENT.CAPTURE.COMPLETED) confirms the payment
-        else:
-            payment.change_status(PaymentStatus.PREAUTH)
+        capture_status = capture.get("status")
+        if capture_status in ("DECLINED", "FAILED", "VOIDED"):
+            payment.change_status(PaymentStatus.REJECTED)
+            return redirect(failure_url)
 
+        payment.captured_amount = payment.total
+        type(payment).objects.filter(pk=payment.pk).update(captured_amount=payment.captured_amount)
         payment.save()
-        logger.info("paypal execute complete payment=%s status=%s awaiting webhook", payment.pk, payment.status)
+        # Leave WAITING — PAYMENT.CAPTURE.COMPLETED webhook confirms
+        logger.info("paypal v2 captured order_id=%s status=%s awaiting webhook", order_id, capture_status)
         return redirect(success_url)
 
 
@@ -85,10 +143,14 @@ def verify_webhook_signature(request, endpoint, client_id, secret, webhook_id):
 
 def _handle_capture_completed(event):
     resource = event.get("resource", {})
-    # parent_payment is the PAY-xxx ID stored on the payment; fall back to resource.id for Orders v2
-    transaction_id = resource.get("parent_payment") or resource.get("id")
+    # v2: order_id in supplementary_data.related_ids; v1 fallback: parent_payment
+    transaction_id = (
+        resource.get("supplementary_data", {}).get("related_ids", {}).get("order_id")
+        or resource.get("parent_payment")
+        or resource.get("id")
+    )
     if not transaction_id:
-        logger.warning("paypal PAYMENT.CAPTURE.COMPLETED missing resource.id")
+        logger.warning("paypal PAYMENT.CAPTURE.COMPLETED missing transaction id")
         return
     payment = ReservationPayment.objects.filter(transaction_id=transaction_id).first()
     if not payment:
