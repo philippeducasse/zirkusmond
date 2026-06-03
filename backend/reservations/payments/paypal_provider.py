@@ -14,9 +14,42 @@ logger = logging.getLogger(__name__)
 
 class PaypalProvider(BasePaypalProvider):
     def process_data(self, payment, request):
-        result = super().process_data(payment, request)
-        logger.info("paypal process_data payment=%s status=%s", payment.pk, payment.status)
-        return result
+        from django.http import HttpResponseBadRequest, HttpResponseForbidden
+        from django.shortcuts import redirect
+        from payments import PaymentError
+
+        success_url = payment.get_success_url()
+        failure_url = payment.get_failure_url()
+
+        if "token" not in request.GET:
+            return HttpResponseForbidden("FAILED")
+
+        payer_id = request.GET.get("PayerID")
+        if not payer_id:
+            if payment.status != PaymentStatus.CONFIRMED:
+                payment.change_status(PaymentStatus.REJECTED)
+                return redirect(failure_url)
+            return redirect(success_url)
+
+        try:
+            executed_payment = self.execute_payment(payment, payer_id)
+        except PaymentError:
+            return redirect(failure_url)
+        except KeyError:
+            return HttpResponseBadRequest()
+
+        self.set_response_links(payment, executed_payment)
+        payment.attrs.payer_info = executed_payment["payer"]["payer_info"]
+        if self._capture:
+            payment.captured_amount = payment.total
+            type(payment).objects.filter(pk=payment.pk).update(captured_amount=payment.captured_amount)
+            # Leave status as WAITING — webhook (PAYMENT.CAPTURE.COMPLETED) confirms the payment
+        else:
+            payment.change_status(PaymentStatus.PREAUTH)
+
+        payment.save()
+        logger.info("paypal execute complete payment=%s status=%s awaiting webhook", payment.pk, payment.status)
+        return redirect(success_url)
 
 
 def _get_access_token(endpoint, client_id, secret):
