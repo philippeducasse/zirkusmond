@@ -1,15 +1,15 @@
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import EmailMessage
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import Context, Template
+from django.urls import path
+from django.utils import timezone
 from payments import PaymentStatus
 
 from events import services
 from events.forms import EmailTextForm
-from events.models import Event
 from events.services import purge_old_payments
 from reservations.models import ReservationPayment
 
@@ -80,7 +80,6 @@ class PurgeForm(forms.Form):
     dry_run = forms.BooleanField(required=False, initial=True, label="Dry run (no changes)")
 
 
-@staff_member_required
 def purge_old_payments_view(request):
     if request.method == "POST":
         form = PurgeForm(request.POST)
@@ -102,7 +101,7 @@ def purge_old_payments_view(request):
                     f"+{result['visitors_to_add']} visitors accumulated. "
                     f"deleted_visitors now {result['final_deleted_visitors']}.",
                 )
-            return redirect("/mondmin-purge-old-payments")
+            return redirect("/mondmin/reservations/reservationpayment/purge-old-payments/")
     else:
         form = PurgeForm()
 
@@ -114,31 +113,76 @@ def purge_old_payments_view(request):
     return render(request, "admin_purge_old_payments.html", context)
 
 
+class ReservationPaymentStatusFilter(admin.SimpleListFilter):
+    title = "Status"
+    parameter_name = "status"
+
+    def lookups(self, request, model_admin):
+        return [
+            (PaymentStatus.WAITING, "Waiting"),
+            (PaymentStatus.CONFIRMED, "Confirmed"),
+            (PaymentStatus.REJECTED, "Rejected"),
+            (PaymentStatus.REFUNDED, "Refunded"),
+            (PaymentStatus.ERROR, "Error"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(status=self.value())
+        return queryset
+
+
 class ReservationPaymentEventFilter(admin.SimpleListFilter):
     title = "Event"
     parameter_name = "event"
 
     def lookups(self, request, model_admin):
-        return [(event.id, str(event)) for event in Event.objects.all()]
+        return [
+            ("upcoming", "Upcoming"),
+            ("past", "Past"),
+        ]
 
     def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(reservation__event=self.value())
+        now = timezone.now()
+        if self.value() == "upcoming":
+            return queryset.filter(reservation__event__begin__gte=now)
+        elif self.value() == "past":
+            return queryset.filter(reservation__event__begin__lt=now)
         return queryset
 
 
 class ReservationPaymentAdmin(admin.ModelAdmin):
+    change_list_template = "admin/reservations/reservationpayment/change_list.html"
+
+    def get_urls(self):
+        return [
+            path(
+                "purge-old-payments/",
+                self.admin_site.admin_view(purge_old_payments_view),
+                name="reservationpayment_purge_old_payments",
+            ),
+        ] + super().get_urls()
+
     list_display = [
         "reservation",
         "status",
+        "variant",
         "ticket_count",
         "event",
         "ticket_price",
         "confirmed_total",
+        "created",
     ]
-    list_filter = ("status", ReservationPaymentEventFilter)
-    search_fields = ["reservation__first_name", "reservation__last_name"]
+    ordering = ["-created"]
+    date_hierarchy = "created"
+    list_filter = (ReservationPaymentStatusFilter, "variant", ReservationPaymentEventFilter)
+    search_fields = [
+        "reservation__first_name",
+        "reservation__last_name",
+        "billing_email",
+    ]
     readonly_fields = ["reservation"]
+    list_select_related = True
     actions = ["resend_confirmation_mail", "send_to_reservants"]
 
     @admin.display(description="Total")
