@@ -5,10 +5,18 @@ import os
 import requests
 from django.conf import settings
 from payments import PaymentStatus
+from payments.paypal import PaypalProvider as BasePaypalProvider
 
 from reservations.models import ReservationPayment
 
 logger = logging.getLogger(__name__)
+
+
+class PaypalProvider(BasePaypalProvider):
+    def process_data(self, payment, request):
+        result = super().process_data(payment, request)
+        logger.info("paypal process_data payment=%s status=%s", payment.pk, payment.status)
+        return result
 
 
 def _get_access_token(endpoint, client_id, secret):
@@ -43,12 +51,17 @@ def verify_webhook_signature(request, endpoint, client_id, secret, webhook_id):
 
 
 def _handle_capture_completed(event):
-    transaction_id = event.get("resource", {}).get("id")
+    resource = event.get("resource", {})
+    # parent_payment is the PAY-xxx ID stored on the payment; fall back to resource.id for Orders v2
+    transaction_id = resource.get("parent_payment") or resource.get("id")
     if not transaction_id:
         logger.warning("paypal PAYMENT.CAPTURE.COMPLETED missing resource.id")
         return
     payment = ReservationPayment.objects.filter(transaction_id=transaction_id).first()
-    if payment and payment.status != PaymentStatus.CONFIRMED:
+    if not payment:
+        logger.warning("paypal PAYMENT.CAPTURE.COMPLETED no payment found for transaction_id=%s", transaction_id)
+        return
+    if payment.status != PaymentStatus.CONFIRMED:
         payment.change_status(PaymentStatus.CONFIRMED)
         logger.info("paypal webhook confirmed payment transaction_id=%s", transaction_id)
 
