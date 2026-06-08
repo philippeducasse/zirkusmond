@@ -5,28 +5,31 @@ from pathlib import Path
 
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # zirkusmond/ project root
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # zirkusmond/backend
 
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 INSTALLED_APPS = [
-    "events",
-    "shows",
-    "reservations",
-    "stats",
-    "newsletter",
-    "rentals",
-    "payments",
-    "anymail",
-    "easy_thumbnails",
-    "image_cropping",
-    "tinymce",
+    # django core
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # third party apps
+    "payments",
+    "anymail",
+    "easy_thumbnails",
+    "image_cropping",
+    "tinymce",
+    # Zirkusmond apps
+    "events",
+    "shows",
+    "reservations",
+    "stats",
+    "newsletter",
+    "rentals",
 ]
 
 MIDDLEWARE = [
@@ -38,6 +41,18 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME", "monddb"),
+        "USER": os.environ.get("DB_USER", "mond"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "password"),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
+    }
+}
+
 
 ROOT_URLCONF = "config.urls"
 
@@ -71,7 +86,7 @@ EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 ANYMAIL = {
     "BREVO_API_KEY": os.environ.get("BREVO_API_KEY", ""),
 }
-DEFAULT_FROM_EMAIL = "reservation@zirkusmond.de"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "reservation@zirkusmond.de")
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -88,6 +103,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "media")
