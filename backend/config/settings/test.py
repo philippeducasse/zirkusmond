@@ -12,8 +12,6 @@ DATABASES = {
     }
 }
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
