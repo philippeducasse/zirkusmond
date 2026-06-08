@@ -34,7 +34,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
 WORKDIR /usr/src
 
-COPY start-server.sh .
+COPY deploy/start-server.sh .
 RUN chmod +x start-server.sh
 
 COPY --from=python-builder /usr/src/backend/.venv ./backend/.venv
