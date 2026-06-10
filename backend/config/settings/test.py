@@ -1,4 +1,4 @@
-import logging.config
+import os
 
 from .base import *
 
@@ -11,7 +11,7 @@ DATABASES = {
         "NAME": ":memory:",
     }
 }
-
+os.environ["SECRET_KEY"] = "test-secret-key-for-ci"
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
