@@ -11,7 +11,7 @@ services:
 
   django:
     hostname: django
-    image: ${DOCKER_USERNAME}/zirkusmond:latest
+    image: ${DOCKER_USERNAME}/zirkusmond:staging
     env_file:
       - .env
     restart: unless-stopped
