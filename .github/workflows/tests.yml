@@ -3,8 +3,7 @@ name: tests
 on:
   push:
     branches-ignore:
-      - production
-      - main
+      - prod
   pull_request:
 
 jobs:
