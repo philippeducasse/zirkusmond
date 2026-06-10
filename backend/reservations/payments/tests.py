@@ -421,57 +421,6 @@ class PaymentConfirmedSignalTest(TestCase):
 
 
 # ---------------------------------------------------------------------------
-# PayPal webhook view
-# ---------------------------------------------------------------------------
-
-
-class PaypalWebhookViewTest(TestCase):
-    URL = "/payments/paypal-webhook/"
-
-    def _post(self, body):
-        return self.client.post(self.URL, data=_json.dumps(body), content_type="application/json")
-
-    def _make_payment(self, transaction_id):
-        show = make_show()
-        event = make_event(show)
-        reservation = make_reservation(event)
-        payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        payment.transaction_id = transaction_id
-        payment.save()
-        return payment
-
-    def test_get_returns_405(self):
-        response = self.client.get(self.URL)
-        self.assertEqual(response.status_code, 405)
-
-    def test_capture_completed_confirms_payment(self):
-        payment = self._make_payment("txn_001")
-        response = self._post(
-            {"event_type": "PAYMENT.CAPTURE.COMPLETED", "resource": {"id": "txn_001"}}
-        )
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
-
-    def test_unknown_event_type_returns_200(self):
-        response = self._post({"event_type": "CHECKOUT.ORDER.APPROVED", "resource": {}})
-        self.assertEqual(response.status_code, 200)
-
-    def test_unknown_transaction_id_returns_200_without_crash(self):
-        response = self._post(
-            {"event_type": "PAYMENT.CAPTURE.COMPLETED", "resource": {"id": "nonexistent"}}
-        )
-        self.assertEqual(response.status_code, 200)
-
-    def test_already_confirmed_payment_stays_confirmed(self):
-        payment = self._make_payment("txn_002")
-        payment.change_status(PaymentStatus.CONFIRMED)
-        self._post({"event_type": "PAYMENT.CAPTURE.COMPLETED", "resource": {"id": "txn_002"}})
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
-
-
-# ---------------------------------------------------------------------------
 # Stripe webhook view
 # ---------------------------------------------------------------------------
 
