@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
       - prod
+      - staging
   pull_request:
 
 jobs:
