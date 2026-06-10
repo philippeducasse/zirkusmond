@@ -53,6 +53,7 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ROOT_URLCONF = "config.urls"
 
@@ -130,6 +131,11 @@ logging.config.dictConfig(
             "": {
                 "level": LOGLEVEL,
                 "handlers": ["console"],
+            },
+            "django.db.backends": {
+                "level": "WARNING",
+                "handlers": ["console"],
+                "propagate": False,
             },
             "django.utils.autoreload": {
                 "level": "WARNING",
