@@ -61,8 +61,8 @@ jobs:
         uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a # v47.0.4
         with:
           files: |
-            deploy/docker-compose.staging.yml
-            deploy/staging_zirkusmond.conf
+            deploy/staging/docker-compose.yml
+            deploy/staging/staging_zirkusmond.conf
 
       - name: Copy .env file to server
         uses: appleboy/scp-action@v0.1.7
@@ -80,9 +80,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deploy/staging_zirkusmond.conf"
+          source: "deploy/staging/staging_zirkusmond.conf"
           target: "/home/ubuntu/nginx/sites.d/"
-          strip_components: 1
+          strip_components: 2
 
       - name: Copy docker-compose to server
         if: steps.changed-files-deploy.outputs.any_changed == 'true'
@@ -91,9 +91,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deploy/docker-compose.staging.yml"
+          source: "deploy/staging/docker-compose.yml"
           target: "~/staging_zirkusmond/"
-          strip_components: 1
+          strip_components: 2
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
