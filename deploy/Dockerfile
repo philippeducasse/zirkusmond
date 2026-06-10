@@ -41,7 +41,7 @@ COPY --from=python-builder /usr/src/backend/.venv ./backend/.venv
 COPY backend ./backend
 COPY --from=frontend-builder /build/backend/static ./backend/static
 
-COPY ./nginx.default /etc/nginx/sites-available/default
+COPY deploy/nginx.default /etc/nginx/sites-available/default
 RUN mkdir -p /srv/data/static /srv/data/media
 
 ENV PATH="/usr/src/backend/.venv/bin:$PATH"
