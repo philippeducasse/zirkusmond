@@ -7,7 +7,7 @@ from easy_thumbnails.conf import Settings as ThumbnailSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # zirkusmond/backend
 
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY", ""]
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 INSTALLED_APPS = [
     # django core
