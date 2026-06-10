@@ -85,7 +85,7 @@ jobs:
           strip_components: 2
 
       - name: Copy docker-compose to server
-        if: steps.changed-files-deploy.outputs.any_changed == 'true'
+        # if: steps.changed-files-deploy.outputs.any_changed == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
