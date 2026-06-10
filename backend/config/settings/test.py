@@ -1,5 +1,3 @@
-import os
-
 from .base import *
 
 DEBUG = True
@@ -11,7 +9,7 @@ DATABASES = {
         "NAME": ":memory:",
     }
 }
-os.environ["SECRET_KEY"] = "test-secret-key-for-ci"
+SECRET_KEY = "test-secret-key-for-ci"
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False
 PAYMENT_VARIANTS = {
