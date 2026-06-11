@@ -47,6 +47,7 @@ jobs:
       - name: Prepare .env file
         run: |
           cp deploy/.env.basic .env
+          echo "" >> .env  
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env
           echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
