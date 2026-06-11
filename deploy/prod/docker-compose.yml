@@ -28,10 +28,10 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./sites.d:/etc/nginx/sites.d/:ro
-      - ./certs:/certs/:ro
-      - ./acme:/var/www/acme-challenge
+      - /home/ubuntu/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /home/ubuntu/nginx/sites.d:/etc/nginx/sites.d/:ro
+      - /home/ubuntu/nginx/certs:/certs/:ro
+      - /home/ubuntu/nginx/acme:/var/www/acme-challenge
       - zm_media:/var/www/html_zm
       - /var/log/nginx-docker:/var/log/nginx
     restart: always
