@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
   django:
-    hostname: django
+    hostname: testing_zirkusmond_de
     image: ${DOCKER_USERNAME}/zirkusmond:latest
     env_file:
       - .env
