@@ -29,7 +29,6 @@ services:
       - 443:443
     volumes:
       - /home/ubuntu/nginx/sites.d/staging_zirkusmond.conf:/etc/nginx/sites.d/staging_zirkusmond.conf:ro
-      - /home/ubuntu/nginx/sites.d:/etc/nginx/sites.d/:ro
       - /home/ubuntu/nginx/certs:/certs/:ro
       - /home/ubuntu/nginx/acme:/var/www/acme-challenge
       - zm_media:/var/www/html_zm
