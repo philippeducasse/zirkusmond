@@ -19,14 +19,9 @@ services:
       - zm_media:/srv/data
     depends_on:
       - postgres
-    networks:
-      - default
-      - prod
 
 networks:
   default:
-    driver: bridge
-  prod:
     external: true
     name: ubuntu_default
 

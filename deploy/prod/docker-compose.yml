@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
   django:
-    hostname: testing_zirkusmond_de
+    hostname: zirkusmond_de
     image: ${DOCKER_USERNAME}/zirkusmond:latest
     env_file:
       - .env
@@ -22,7 +22,8 @@ services:
 
 networks:
   default:
-    driver: bridge
+    external: true
+    name: ubuntu_default
 
 volumes:
   zm_media:
