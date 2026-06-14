@@ -108,6 +108,14 @@ jobs:
           script: |
             cd ~/staging_zirkusmond
             docker compose pull
-            docker compose up -d --pull always --remove-orphans
+            docker compose up -d postgres
+            until docker compose exec -T postgres pg_isready -U mond; do sleep 2; done
+            docker compose stop django || true
+            docker exec ubuntu-postgres-1 pg_dump -U mond monddb > ~/zirkusmond_latest.sql
+            docker compose exec -T postgres psql -U mond -d postgres -c "DROP DATABASE IF EXISTS monddb;"
+            docker compose exec -T postgres psql -U mond -d postgres -c "CREATE DATABASE monddb;"
+            docker compose exec -T postgres psql -U mond monddb < ~/zirkusmond_latest.sql
+            docker run --rm -v ~/zm_media/media:/src:ro -v staging_zirkusmond_zm_media:/dst alpine sh -c "mkdir -p /dst/media && cp -a /src/. /dst/media/"
+            docker compose up -d --remove-orphans
             docker image prune -f
             docker exec ubuntu-nginx-1 nginx -s reload || true
