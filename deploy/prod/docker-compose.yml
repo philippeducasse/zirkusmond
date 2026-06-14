@@ -35,10 +35,15 @@ services:
       - zm_media:/var/www/html_zm
       - /var/log/nginx-docker:/var/log/nginx
     restart: always
+    networks:
+      - default
+      - nginx_proxy
 
 networks:
   default:
     driver: bridge
+  nginx_proxy:
+    external: true
 
 volumes:
   zm_media:
