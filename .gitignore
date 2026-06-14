@@ -22,6 +22,7 @@ frontend/package-lock.json
 # Environment
 .env
 .env.local
+.env.staging
 .envrc
 
 docker-compose.local.yml
