@@ -84,7 +84,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "deploy/prod/docker-compose.yml"
-          target: "~/zirkusmond/docker-compose.yml"
+          target: "~/zirkusmond/"
           strip_components: 2
 
       - name: Deploy to server
