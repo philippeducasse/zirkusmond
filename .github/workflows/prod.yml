@@ -94,7 +94,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker network create nginx_proxy || true
             cd ~/zirkusmond
             docker compose pull
             docker compose up -d --pull always
