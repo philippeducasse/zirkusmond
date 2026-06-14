@@ -10,7 +10,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
   django:
-    hostname: django
+    hostname: staging_zirkusmond_de
     image: ${DOCKER_USERNAME}/zirkusmond:staging
     env_file:
       - .env
@@ -19,25 +19,15 @@ services:
       - zm_media:/srv/data
     depends_on:
       - postgres
-
-  nginx:
-    image: nginx
-    depends_on:
-      - django
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - /home/ubuntu/nginx/sites.d/staging_zirkusmond.conf:/etc/nginx/sites.d/staging_zirkusmond.conf:ro
-      - /home/ubuntu/nginx/certs:/certs/:ro
-      - /home/ubuntu/nginx/acme:/var/www/acme-challenge
-      - zm_media:/var/www/html_zm
-      - /var/log/nginx-docker:/var/log/nginx
-    restart: always
+    networks:
+      - default
+      - nginx_proxy
 
 networks:
   default:
     driver: bridge
+  nginx_proxy:
+    external: true
 
 volumes:
   zm_media:
