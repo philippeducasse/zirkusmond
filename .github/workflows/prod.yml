@@ -57,7 +57,7 @@ jobs:
           echo "PAYPAL_LIVE_CLIENT_ID=${{ secrets.PAYPAL_LIVE_CLIENT_ID }}" >> .env
           echo "PAYPAL_LIVE_SECRET=${{ secrets.PAYPAL_LIVE_SECRET }}" >> .env
           echo "STRIPE_LIVE_SECRET_KEY=${{ secrets.STRIPE_LIVE_SECRET_KEY }}" >> .env
-          echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> .env
+          echo "STRIPE_LIVE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> .env
 
       - name: Get changed files in deploy folder
         id: changed-files-deploy
