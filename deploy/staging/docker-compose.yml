@@ -14,6 +14,8 @@ services:
     image: ${DOCKER_USERNAME}/zirkusmond:staging
     env_file:
       - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.staging
     restart: unless-stopped
     volumes:
       - zm_media:/srv/data
