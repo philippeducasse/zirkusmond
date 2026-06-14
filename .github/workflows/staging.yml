@@ -109,6 +109,6 @@ jobs:
             docker network create nginx_proxy || true
             cd ~/staging_zirkusmond
             docker compose pull
-            docker compose up -d --pull always
+            docker compose up -d --pull always --remove-orphans
             docker image prune -f
-            cd ~/zirkusmond && docker compose exec nginx nginx -s reload
+            docker exec zirkusmond-nginx-1 nginx -s reload || true
