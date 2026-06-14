@@ -27,4 +27,8 @@ networks:
 
 volumes:
   zm_media:
+    external: true
+    name: ubuntu_zm_media
   zm_db:
+    external: true
+    name: ubuntu_zm_db
