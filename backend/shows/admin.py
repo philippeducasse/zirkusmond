@@ -28,10 +28,10 @@ class EventInlineForm(forms.ModelForm):
     event_date = forms.DateField(
         label="Event date",
         widget=forms.DateInput(
-            attrs={"type": "date", "class": "event-date-input"},
-            format="%Y-%m-%d",
+            attrs={"type": "text", "class": "event-date-input", "placeholder": "dd/mm/yy"},
+            format="%d/%m/%y",
         ),
-        input_formats=["%Y-%m-%d"],
+        input_formats=["%d/%m/%y"],
         required=True,
     )
     show_time = forms.TimeField(
@@ -85,9 +85,7 @@ class EventInlineForm(forms.ModelForm):
             ).time()
 
     def _default_show_time_for_date(self, date_value):
-        if date_value.weekday() in (4, 5):  # Friday or Saturday
-            return dtime(hour=20, minute=0)
-        return dtime(hour=19, minute=0)
+        return dtime(hour=20, minute=0)
 
     def clean(self):
         cleaned_data = super().clean()

@@ -1,17 +1,6 @@
 (function () {
-    function defaultTimeForDate(value) {
-        if (!value) {
-            return '19:00';
-        }
-        var date = new Date(value + 'T00:00:00');
-        if (isNaN(date.getTime())) {
-            return '19:00';
-        }
-        var weekday = date.getUTCDay(); // 5 = Friday, 6 = Saturday
-        if (weekday === 5 || weekday === 6) {
-            return '20:00';
-        }
-        return '19:00';
+    function defaultTimeForDate() {
+        return '20:00';
     }
 
     function subtractHour(timeValue) {
@@ -105,7 +94,7 @@
         }
         adjustAdmissionTime(row);
         if (!admissionInput.value) {
-            var initialAdmission = subtractHour(timeInput.value) || '18:00';
+            var initialAdmission = subtractHour(timeInput.value) || '19:00';
             admissionInput.value = initialAdmission;
             admissionInput.dataset.userModified = 'false';
         }
