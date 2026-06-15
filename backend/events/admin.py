@@ -2,6 +2,7 @@ from io import BytesIO
 
 import xlsxwriter
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from django.db.models import (
     Count,
     DecimalField,
@@ -20,7 +21,7 @@ from reservations.models import Guest, ReservationPayment
 from reservations.payments.admin import reservation_to_dict, send_email_to_reservants
 
 
-class BaseEventAdmin(admin.ModelAdmin):
+class BaseEventAdmin(ModelAdmin):
     list_display = [
         "show",
         "begin",

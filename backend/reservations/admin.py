@@ -1,4 +1,5 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from django.utils import timezone
 
 from events import services
@@ -30,7 +31,7 @@ class ReservationStatusFilter(admin.SimpleListFilter):
         return queryset
 
 
-class ReservationAdmin(admin.ModelAdmin):
+class ReservationAdmin(ModelAdmin):
     list_display = [
         "last_name",
         "first_name",
@@ -88,7 +89,7 @@ class ReservationAdmin(admin.ModelAdmin):
             services.send_confirmation_mail(reservation)
 
 
-class GuestAdmin(admin.ModelAdmin):
+class GuestAdmin(ModelAdmin):
     list_display = [
         "last_name",
         "first_name",

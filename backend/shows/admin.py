@@ -3,6 +3,7 @@ from datetime import time as dtime
 
 from django import forms
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from django.db.models import (
     Count,
     F,
@@ -166,7 +167,7 @@ class EventInline(admin.TabularInline):
         js = ("events/js/event_inline.js",)
 
 
-class ShowAdmin(admin.ModelAdmin):
+class ShowAdmin(ModelAdmin):
     list_display = ["title", "next_event_date", "dates_text", "reservation_open", "show_in_preview"]
     list_filter = ["private", "last_modified"]
     search_fields = ["title", "description", "cast"]

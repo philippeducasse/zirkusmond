@@ -18,6 +18,7 @@ dependencies = [
     "django-tinymce==5.0.0",
     "reportlab==4.5.1",
     "django-anymail==15.0",
+    "django-unfold>=0.97.0",
 ]
 
 [tool.pytest.ini_options]

@@ -2,13 +2,14 @@ from io import BytesIO
 
 import xlsxwriter
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from django.http import HttpResponse
 from django.utils import timezone
 
 from .models import NewsletterRegistration
 
 
-class NewsletterRegistrationAdmin(admin.ModelAdmin):
+class NewsletterRegistrationAdmin(ModelAdmin):
     list_display = ("email",)
     actions = ["export_adresses"]
 
