@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16.1
-    hostname: staging_postgres
+    container_name: staging_postgres
     restart: always
     volumes:
       - zm_db:/var/lib/postgresql/data
