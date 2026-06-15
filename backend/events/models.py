@@ -30,7 +30,7 @@ class Event(models.Model):
 
     @admin.display(ordering="begin")
     def time_and_date(self):
-        return format_datetime(self.begin, "%d.%m.%y at %H:%M")and
+        return format_datetime(self.begin, "%d.%m.%y at %H:%M")
 
     def date_str(self):
         return format_datetime(self.begin, "%d.%m.%y")
