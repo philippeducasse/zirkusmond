@@ -25,11 +25,8 @@ class Event(models.Model):
     def clean(self):
         from django.core.exceptions import ValidationError
 
-        errors = {}
         if self.begin and self.admission and self.begin < self.admission:
-            errors["begin"] = "Event cannot start before admission opens."
-        if errors:
-            raise ValidationError(errors)
+            raise ValidationError("Event cannot start before admission opens.")
 
     @admin.display(ordering="begin")
     def time_and_date(self):
