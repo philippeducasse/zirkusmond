@@ -111,6 +111,9 @@ class EventInlineForm(forms.ModelForm):
         elif admission is None:
             admission = begin_dt - timedelta(hours=1)
 
+        if begin_dt < admission:
+            raise forms.ValidationError({"show_time": "Show cannot start before admission opens."})
+
         cleaned_data["admission"] = admission
         cleaned_data["computed_begin"] = begin_dt
         cleaned_data["computed_admission"] = admission
