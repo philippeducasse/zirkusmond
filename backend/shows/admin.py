@@ -119,6 +119,15 @@ class EventInlineForm(forms.ModelForm):
         cleaned_data["computed_admission"] = admission
         return cleaned_data
 
+    def _post_clean(self):
+        begin = (self.cleaned_data or {}).get("computed_begin")
+        admission = (self.cleaned_data or {}).get("computed_admission")
+        if begin:
+            self.instance.begin = begin
+        if admission:
+            self.instance.admission = admission
+        super()._post_clean()
+
     def has_changed(self):
         if not self.instance.pk and self.data:
             prefix = self.prefix
