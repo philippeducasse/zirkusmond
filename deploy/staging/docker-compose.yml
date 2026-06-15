@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16.1
+    hostname: staging_postgres
     restart: always
     volumes:
       - zm_db:/var/lib/postgresql/data
@@ -14,8 +15,6 @@ services:
     image: ${DOCKER_USERNAME}/zirkusmond:staging
     env_file:
       - .env
-    environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.staging
     restart: unless-stopped
     volumes:
       - zm_media:/srv/data

@@ -59,6 +59,8 @@ jobs:
           echo "PAYPAL_SANDBOX_SECRET=${{ secrets.PAYPAL_SANDBOX_SECRET }}" >> .env
           echo "STRIPE_TEST_SECRET_KEY=${{ secrets.STRIPE_TEST_SECRET_KEY }}" >> .env
           echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> .env
+          echo "DB_HOST=staging_postgres" >> .env
+          echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
 
       - name: Get changed files in deploy folder
         id: changed-files-deploy
