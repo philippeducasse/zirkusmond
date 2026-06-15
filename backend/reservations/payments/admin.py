@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin, messages
+from unfold.admin import ModelAdmin
 from django.core.mail import EmailMessage
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -151,7 +152,7 @@ class ReservationPaymentEventFilter(admin.SimpleListFilter):
         return queryset
 
 
-class ReservationPaymentAdmin(admin.ModelAdmin):
+class ReservationPaymentAdmin(ModelAdmin):
     change_list_template = "admin/reservations/reservationpayment/change_list.html"
 
     def get_urls(self):

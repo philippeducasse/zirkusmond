@@ -139,6 +139,7 @@ dependencies = [
     { name = "django-image-cropping" },
     { name = "django-payments" },
     { name = "django-tinymce" },
+    { name = "django-unfold" },
     { name = "easy-thumbnails" },
     { name = "gunicorn" },
     { name = "imaplib2" },
@@ -165,6 +166,7 @@ requires-dist = [
     { name = "django-image-cropping", specifier = "==1.7" },
     { name = "django-payments", specifier = "==3.1.0" },
     { name = "django-tinymce", specifier = "==5.0.0" },
+    { name = "django-unfold", specifier = ">=0.97.0" },
     { name = "easy-thumbnails", specifier = "==2.10.1" },
     { name = "gunicorn", specifier = "==26.0.0" },
     { name = "imaplib2", specifier = "==3.6" },
@@ -600,6 +602,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0a/71/e9556c8bc1d99c0cb4081af0abc6440d7cf53c87b6c7da7b117f2de24881/django_tinymce-5.0.0.tar.gz", hash = "sha256:6257669ed596accf5fa967ff3061276b2c5352baac1bbc658fcd8252b12ca38a", size = 1161002, upload-time = "2025-10-21T19:25:25.831Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/21/22/b7b9299b40995b524bb2f6d61ae55bd690858630ff5e0ba9a06210313195/django_tinymce-5.0.0-py3-none-any.whl", hash = "sha256:c2e9c5efd2cc6c036f4c57e602b133180433e2bd1513b897089d3c4fb4e20579", size = 1400312, upload-time = "2025-10-21T19:25:24.113Z" },
+]
+
+[[package]]
+name = "django-unfold"
+version = "0.97.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/93/b7/f96aa6b3c060e6361b922607d0f4ec66e8f821a82a495a03ad2ea94e42ae/django_unfold-0.97.0.tar.gz", hash = "sha256:35cc862efde910fe2bb37689c1697a9fc87ca7886b39de0a90d7a037e0fd15ae", size = 1125964, upload-time = "2026-06-06T09:03:20.94Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0d/93/35dc26fa47152779749c53bb3881436d816ea8bcc038a01d5539286a9eab/django_unfold-0.97.0-py3-none-any.whl", hash = "sha256:651abadb26b8b46a590caa3c7d1b902a9ddc5a1b13aca2476a36b54acca42500", size = 1253659, upload-time = "2026-06-06T09:03:22.643Z" },
 ]
 
 [[package]]
