@@ -4,6 +4,7 @@ from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 
 from events.forms import GuestForm, ReservationForm
+from newsletter.services import register_newsletter_email
 from reservations.payments import services
 from shows.models import Show
 
@@ -47,6 +48,8 @@ def reserve(request, show_id):
                             "base_price": base_price,
                         },
                     )
+            if newsletter:
+                register_newsletter_email(reservation_form.cleaned_data["email"])
 
             payment = services.create_reservation_with_payment(
                 reservation_form,
