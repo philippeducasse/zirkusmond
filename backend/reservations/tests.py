@@ -7,6 +7,7 @@ from django.utils import timezone
 from PIL import Image
 
 from events.models import Event
+from newsletter.models import NewsletterRegistration
 from reservations.models import Guest, Reservation, ReservationPayment
 from shows.models import Show
 
@@ -234,3 +235,13 @@ class ReserveViewTest(TestCase):
     def test_get_nonexistent_show_returns_404(self):
         response = self.client.get("/reserve/99999")
         self.assertEqual(response.status_code, 404)
+
+    def test_newsletter_checkbox_creates_registration(self):
+        data = self._post_data(newsletter="on")
+        self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(NewsletterRegistration.objects.count(), 1)
+        self.assertEqual(NewsletterRegistration.objects.first().email, "anna@example.com")
+
+    def test_no_newsletter_checkbox_skips_registration(self):
+        self.client.post(f"/reserve/{self.show.pk}", self._post_data())
+        self.assertEqual(NewsletterRegistration.objects.count(), 0)
