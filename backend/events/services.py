@@ -141,7 +141,7 @@ https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
 Wir freuen uns auf dich im Zirkus Mond – viel Spaß!
 
-
+Bitte beachte, dass Tickets nicht erstattungsfähig sind. Falls du verhindert bist, kannst du dein Ticket gerne an jemand anderen weitergeben – gib einfach den QR-Code weiter.
 —————————————————————————————————————
 
 Dear {reservation.first_name},
@@ -158,8 +158,9 @@ We open our gates at {reservation.event.admission_time()}, the Show will start a
 If you have not been to our tent yet, you should ask OpenStreetMap for directions.
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
-See you at Zirkus Mond and have fun.
+See you at Zirkus Mond and have fun!
 
+Please note that tickets are non-refundable. However, if you can't make it, you're welcome to pass your ticket on to someone else – just forward the QR code.
 """
 
     email = EmailMultiAlternatives(
