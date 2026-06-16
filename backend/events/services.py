@@ -140,7 +140,7 @@ Falls du noch nie in unserem Zelt warst, empfehlen wir dir, dir den Weg über Op
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
 Wir freuen uns auf dich im Zirkus Mond – viel Spaß!
-<3
+
 
 —————————————————————————————————————
 
@@ -159,11 +159,11 @@ If you have not been to our tent yet, you should ask OpenStreetMap for direction
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
 See you at Zirkus Mond and have fun.
-<3
+
 """
 
     email = EmailMultiAlternatives(
-        subject=f"🎪 Thank you for your Reservation for {show.title} 🌙",
+        subject=f"🎪 Zirkusmond 🌙 Thank you for your Reservation for {show.title}",
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[reservation.email],
