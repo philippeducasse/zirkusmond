@@ -3,20 +3,23 @@ import datetime
 from django.shortcuts import redirect, render
 
 from newsletter.forms import NewsletterRegistrationForm
+from newsletter.services import register_newsletter_email
 from rentals.models import RentalObject
 from shows.models import Show
 
 
 def _upcoming_shows():
-    us = Show.objects.prefetch_related("events").all()
-    us = list(filter(lambda x: x.show_in_preview(), us))
-    us = sorted(
-        us,
-        key=lambda x: datetime.date(2020, 1, 1)
-        if not x.future_events()
-        else x.future_events()[0].admission.date(),
+    upcoming_shows = Show.objects.prefetch_related("events").all()
+    upcoming_shows = list(filter(lambda x: x.show_in_preview(), upcoming_shows))
+    upcoming_shows = sorted(
+        upcoming_shows,
+        key=lambda x: (
+            datetime.date(2020, 1, 1)
+            if not x.future_events()
+            else x.future_events()[0].admission.date()
+        ),
     )
-    return us
+    return upcoming_shows
 
 
 def _rental_objects():
@@ -24,14 +27,14 @@ def _rental_objects():
     return rental_objects
 
 
-def plain(request):
-    us = _upcoming_shows()[:6]
+def homepage(request):
+    upcoming_shows = _upcoming_shows()[:6]
     newsletter_form = NewsletterRegistrationForm()
     return render(
         request,
         "index.html",
         {
-            "upcoming_shows": us,
+            "upcoming_shows": upcoming_shows,
             "show_all_events_link": True,
             "show_home_link": False,
             "newsletter_form": newsletter_form,
@@ -69,9 +72,9 @@ def event_list(request):
 
 def newsletter_registration(request):
     if request.method == "POST":
-        n = NewsletterRegistrationForm(request.POST)
-        if n.is_valid():
-            n.save()
+        form = NewsletterRegistrationForm(request.POST)
+        if form.is_valid():
+            register_newsletter_email(form.cleaned_data["email"])
             return render(request, "newsletter_registered.html")
 
     return redirect("/")
