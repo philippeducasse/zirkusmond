@@ -113,7 +113,7 @@ jobs:
             docker compose up -d postgres
             until docker compose exec -T postgres pg_isready -U mond; do sleep 2; done
             docker compose stop django || true
-            docker exec zirkusmond-postgres-1 pg_dump -U mond monddb > ~/zirkusmond_latest.sql
+            docker exec prod_postgres pg_dump -U mond monddb > ~/zirkusmond_latest.sql
             docker compose exec -T postgres psql -U mond -d postgres -c "DROP DATABASE IF EXISTS monddb;"
             docker compose exec -T postgres psql -U mond -d postgres -c "CREATE DATABASE monddb;"
             docker compose exec -T postgres psql -U mond monddb < ~/zirkusmond_latest.sql
