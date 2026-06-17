@@ -3,14 +3,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-import views
+import config.views as views
 
 urlpatterns = [
     # Admin
     path("mondmin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
     # Static pages
-    path("", views.homepage),
+    # path("", views.homepage),
+    path("", views.homepage_api),
     path("events", views.event_list),
     path("about", views.about),
     path("contact", views.contact),
