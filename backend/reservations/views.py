@@ -2,10 +2,15 @@ from decimal import Decimal
 
 from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, redirect, render
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from events.forms import GuestForm, ReservationForm
+from events.models import Event
 from newsletter.services import register_newsletter_email
 from reservations.payments import services
+from reservations.serializers import ReservationSerializer
 from shows.models import Show
 
 
@@ -76,4 +81,50 @@ def reserve(request, show_id):
             "min_price": show.get_effective_min_price(base_price),
             "max_price": show.get_effective_max_price(base_price),
         },
+    )
+
+
+@api_view(["POST"])
+def reserve_api(request, show_id):
+    show = get_object_or_404(Show, pk=show_id)
+    serializer = ReservationSerializer(data=request.data)
+
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    event = get_object_or_404(Event, pk=serializer.validated_data["event_id"], show=show)
+    if not event.reservation_open():
+        return Response(
+            {"error": "Reservations are not open for this event"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    custom_price = None
+    if show.base_ticket_price:
+        try:
+            custom_price = services.parse_custom_price(
+                show, serializer.validated_data.get("custom_price")
+            )
+        except ValueError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    if serializer.validated_data.get("newsletter"):
+        register_newsletter_email(serializer.validated_data["email"])
+
+    payment = services.create_reservation_with_payment_api(
+        event=event,
+        first_name=serializer.validated_data["first_name"],
+        last_name=serializer.validated_data["last_name"],
+        email=serializer.validated_data["email"],
+        guests=serializer.validated_data.get("guests", []),
+        variant=serializer.validated_data["payment_method"],
+        custom_price=custom_price,
+    )
+
+    return Response(
+        {"payment_id": payment.pk, "redirect_url": f"/payments/{payment.pk}"},
+        status=status.HTTP_201_CREATED,
     )
