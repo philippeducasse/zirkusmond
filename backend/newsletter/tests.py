@@ -3,11 +3,11 @@ from rest_framework.test import APIClient
 
 from newsletter.models import NewsletterRegistration
 
-NEWSLETTER_URL = "/newsletter-registration"
+NEWSLETTER_URL = "/newsletter/register"
 
 
 class NewsletterRegistrationAPITest(TestCase):
-    """Tests for the POST /newsletter-registration DRF endpoint."""
+    """Tests for the POST /newsletter/register DRF endpoint."""
 
     def setUp(self):
         self.client = APIClient()

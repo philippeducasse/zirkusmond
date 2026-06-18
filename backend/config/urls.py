@@ -18,7 +18,6 @@ urlpatterns = [
     path("contact", views.contact),
     path("rentals", views.rentals),
     path("international", views.international),
-    path("newsletter-registration", views.newsletter_registration),
     re_path("^impressum.*", views.impressum),
     re_path("^datenschutz.*", views.datenschutz),
     path("robots.txt", views.robots),
@@ -26,6 +25,7 @@ urlpatterns = [
     # Apps
     path("", include("shows.urls")),
     path("", include("reservations.urls")),
+    path("newsletter/", include("newsletter.urls")),
 ]
 
 if settings.DEBUG:
