@@ -5,8 +5,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 from PIL import Image
+from rest_framework.test import APIClient
 
 from events.models import Event
+from newsletter.models import NewsletterRegistration
 from reservations.models import Guest, Reservation, ReservationPayment
 from shows.models import Show
 
@@ -233,4 +235,214 @@ class ReserveViewTest(TestCase):
 
     def test_get_nonexistent_show_returns_404(self):
         response = self.client.get("/reserve/99999")
+        self.assertEqual(response.status_code, 404)
+
+
+# ---------------------------------------------------------------------------
+# Reserve API view
+# ---------------------------------------------------------------------------
+
+
+class ReserveAPIViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.show = make_show()
+        self.event = make_event(self.show)
+
+    def _url(self, show_id=None):
+        pk = show_id if show_id is not None else self.show.pk
+        return f"/reservation/{pk}"
+
+    def _post_data(self, **overrides):
+        data = {
+            "event_id": self.event.pk,
+            "first_name": "Anna",
+            "last_name": "Doe",
+            "email": "anna@example.com",
+            "attendee_count": 1,
+            "payment_method": "paypal",
+        }
+        data.update(overrides)
+        return data
+
+    # -----------------------------------------------------------------------
+    # Successful reservation — no guests, no newsletter
+    # -----------------------------------------------------------------------
+
+    def test_valid_post_returns_201(self):
+        response = self.client.post(self._url(), self._post_data(), format="json")
+        self.assertEqual(response.status_code, 201)
+
+    def test_valid_post_creates_reservation_and_payment(self):
+        self.client.post(self._url(), self._post_data(), format="json")
+        self.assertEqual(Reservation.objects.count(), 1)
+        self.assertEqual(ReservationPayment.objects.count(), 1)
+
+    def test_valid_post_response_contains_payment_id_and_redirect_url(self):
+        response = self.client.post(self._url(), self._post_data(), format="json")
+        payment = ReservationPayment.objects.first()
+        self.assertIn("payment_id", response.data)
+        self.assertIn("redirect_url", response.data)
+        self.assertEqual(str(response.data["payment_id"]), str(payment.pk))
+        self.assertEqual(response.data["redirect_url"], f"/payments/{payment.pk}")
+
+    def test_valid_post_does_not_create_guests(self):
+        self.client.post(self._url(), self._post_data(), format="json")
+        self.assertEqual(Guest.objects.count(), 0)
+
+    # -----------------------------------------------------------------------
+    # Reservation with guests
+    # -----------------------------------------------------------------------
+
+    def test_post_with_guests_creates_guest_records(self):
+        data = self._post_data(
+            attendee_count=3,
+            guests=[
+                {"first_name": "Bob", "last_name": "Smith"},
+                {"first_name": "Carol", "last_name": "Jones"},
+            ],
+        )
+        self.client.post(self._url(), data, format="json")
+        self.assertEqual(Guest.objects.count(), 2)
+
+    def test_post_with_guests_links_guests_to_reservation(self):
+        data = self._post_data(
+            attendee_count=2,
+            guests=[{"first_name": "Bob", "last_name": "Smith"}],
+        )
+        self.client.post(self._url(), data, format="json")
+        reservation = Reservation.objects.first()
+        self.assertEqual(reservation.guests.count(), 1)
+
+    # -----------------------------------------------------------------------
+    # Newsletter opt-in
+    # -----------------------------------------------------------------------
+
+    def test_newsletter_flag_true_registers_email(self):
+        self.client.post(self._url(), self._post_data(newsletter=True), format="json")
+        self.assertTrue(
+            NewsletterRegistration.objects.filter(email="anna@example.com").exists(),
+            "Expected a NewsletterRegistration record for the submitted email.",
+        )
+
+    def test_newsletter_flag_false_does_not_register_email(self):
+        self.client.post(self._url(), self._post_data(newsletter=False), format="json")
+        self.assertEqual(NewsletterRegistration.objects.count(), 0)
+
+    def test_newsletter_flag_absent_does_not_register_email(self):
+        # newsletter defaults to False; omitting it must not create a record.
+        self.client.post(self._url(), self._post_data(), format="json")
+        self.assertEqual(NewsletterRegistration.objects.count(), 0)
+
+    # -----------------------------------------------------------------------
+    # Serializer validation failures — expected 400
+    # -----------------------------------------------------------------------
+
+    def test_missing_required_fields_returns_400(self):
+        response = self.client.post(self._url(), {}, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_missing_first_name_returns_400(self):
+        data = self._post_data()
+        del data["first_name"]
+        response = self.client.post(self._url(), data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_missing_email_returns_400(self):
+        data = self._post_data()
+        del data["email"]
+        response = self.client.post(self._url(), data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_missing_payment_method_returns_400(self):
+        data = self._post_data()
+        del data["payment_method"]
+        response = self.client.post(self._url(), data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_serializer_data_creates_no_db_records(self):
+        self.client.post(self._url(), {}, format="json")
+        self.assertEqual(Reservation.objects.count(), 0)
+        self.assertEqual(ReservationPayment.objects.count(), 0)
+
+    # -----------------------------------------------------------------------
+    # Closed event — expected 400
+    # -----------------------------------------------------------------------
+
+    def test_closed_event_returns_400(self):
+        self.event.open_for_reservation = False
+        self.event.save()
+        response = self.client.post(self._url(), self._post_data(), format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_closed_event_returns_error_key(self):
+        self.event.open_for_reservation = False
+        self.event.save()
+        response = self.client.post(self._url(), self._post_data(), format="json")
+        self.assertIn("error", response.data)
+
+    def test_closed_event_creates_no_db_records(self):
+        self.event.open_for_reservation = False
+        self.event.save()
+        self.client.post(self._url(), self._post_data(), format="json")
+        self.assertEqual(Reservation.objects.count(), 0)
+        self.assertEqual(ReservationPayment.objects.count(), 0)
+
+    # -----------------------------------------------------------------------
+    # Custom price validation
+    # -----------------------------------------------------------------------
+    # make_show() sets base_ticket_price=15; effective range is [5, 25]
+    # (max(5, 15-10) to 15+10).
+
+    def test_invalid_custom_price_below_minimum_returns_400(self):
+        # Price 1 is below the minimum of 5.
+        response = self.client.post(self._url(), self._post_data(custom_price=1), format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_custom_price_above_maximum_returns_400(self):
+        # Price 99 is above the maximum of 25.
+        response = self.client.post(self._url(), self._post_data(custom_price=99), format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_custom_price_returns_error_key(self):
+        response = self.client.post(self._url(), self._post_data(custom_price=1), format="json")
+        self.assertIn("error", response.data)
+
+    def test_invalid_custom_price_creates_no_db_records(self):
+        self.client.post(self._url(), self._post_data(custom_price=1), format="json")
+        self.assertEqual(Reservation.objects.count(), 0)
+        self.assertEqual(ReservationPayment.objects.count(), 0)
+
+    def test_valid_custom_price_creates_payment_with_custom_price(self):
+        # Price 20 is within [5, 25].
+        self.client.post(self._url(), self._post_data(custom_price=20), format="json")
+        payment = ReservationPayment.objects.first()
+        self.assertIsNotNone(payment)
+        self.assertEqual(payment.custom_ticket_price, 20)
+
+    def test_valid_custom_price_returns_201(self):
+        response = self.client.post(self._url(), self._post_data(custom_price=20), format="json")
+        self.assertEqual(response.status_code, 201)
+
+    # -----------------------------------------------------------------------
+    # 404 cases
+    # -----------------------------------------------------------------------
+
+    def test_nonexistent_show_returns_404(self):
+        response = self.client.post(self._url(show_id=99999), self._post_data(), format="json")
+        self.assertEqual(response.status_code, 404)
+
+    def test_nonexistent_event_returns_404(self):
+        # event_id 99999 does not exist in the database.
+        data = self._post_data(event_id=99999)
+        response = self.client.post(self._url(), data, format="json")
+        self.assertEqual(response.status_code, 404)
+
+    def test_event_belonging_to_different_show_returns_404(self):
+        # An event that exists but belongs to a different show must not be
+        # accessible through this show's URL.
+        other_show = make_show()
+        other_event = make_event(other_show)
+        data = self._post_data(event_id=other_event.pk)
+        response = self.client.post(self._url(), data, format="json")
         self.assertEqual(response.status_code, 404)
