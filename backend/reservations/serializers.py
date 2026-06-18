@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 
 
@@ -13,14 +14,21 @@ class ReservationSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=25)
     email = serializers.EmailField()
     attendee_count = serializers.IntegerField(min_value=1, max_value=10)
-    payment_method = serializers.CharField()
+    payment_method = serializers.ChoiceField(choices=[])
     custom_price = serializers.DecimalField(
         max_digits=10, decimal_places=2, required=False, allow_null=True
     )
     newsletter = serializers.BooleanField(required=False, default=False)
     guests = GuestSerializer(many=True, required=False)
 
-    def validate_attendee_count(self, value):
-        if value > 10:
-            raise serializers.ValidationError("Maximum 10 attendees allowed.")
-        return value
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["payment_method"].choices = list(settings.PAYMENT_VARIANTS.keys())
+
+    def validate(self, data):
+        guests = data.get("guests", [])
+        if len(guests) != data["attendee_count"] - 1:
+            raise serializers.ValidationError(
+                {"guests": "guests count must equal attendee_count - 1"}
+            )
+        return data
