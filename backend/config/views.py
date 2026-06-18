@@ -1,11 +1,11 @@
 import datetime
 
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from newsletter.forms import NewsletterRegistrationForm
-from newsletter.services import register_newsletter_email
+from newsletter.models import NewsletterRegistration
 from rentals.models import RentalObject
 from shows.models import Show
 from shows.serializers import ShowCardSerializer
@@ -51,6 +51,25 @@ def homepage_api(request):
     return Response({"upcoming_shows": ShowCardSerializer(shows, many=True).data})
 
 
+# def newsletter_registration(request):
+#     if request.method == "POST":
+#         form = NewsletterRegistrationForm(request.POST)
+#         if form.is_valid():
+#             register_newsletter_email(form.cleaned_data["email"])
+#             return render(request, "newsletter_registered.html")
+
+#     return redirect("/")
+
+
+@api_view(["POST"])
+def newsletter_registration(request):
+    email = request.data.get("email")
+    if not email:
+        return Response({"error": "Email is required"}, status=400)
+    NewsletterRegistration.objects.get_or_create(email=email)
+    return Response({"success": True}, status=201)
+
+
 def about(request):
     return render(request, "about.html")
 
@@ -77,16 +96,6 @@ def event_list(request):
             "show_all_events_link": False,
         },
     )
-
-
-def newsletter_registration(request):
-    if request.method == "POST":
-        form = NewsletterRegistrationForm(request.POST)
-        if form.is_valid():
-            register_newsletter_email(form.cleaned_data["email"])
-            return render(request, "newsletter_registered.html")
-
-    return redirect("/")
 
 
 def handle404(request, exception):
