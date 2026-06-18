@@ -2,7 +2,8 @@ from decimal import Decimal
 
 from django.db import transaction
 
-from reservations.models import ReservationPayment
+from events.models import Event
+from reservations.models import Guest, Reservation, ReservationPayment
 
 
 def parse_custom_price(show, raw_custom_price):
@@ -32,6 +33,30 @@ def create_reservation_with_payment(
             guest = guest_formset[i].save(commit=False)
             guest.reservation = reservation
             guest.save()
+        payment = ReservationPayment.from_reservation(
+            reservation, variant=variant, custom_ticket_price=custom_price
+        )
+        payment.save()
+    return payment
+
+
+def create_reservation_with_payment_api(
+    event, first_name, last_name, email, guests, variant, custom_price
+):
+    """Create a reservation and payment from API data."""
+    with transaction.atomic():
+        reservation = Reservation.objects.create(
+            event=event,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+        )
+        for guest_data in guests:
+            Guest.objects.create(
+                reservation=reservation,
+                first_name=guest_data.get("first_name", ""),
+                last_name=guest_data.get("last_name", ""),
+            )
         payment = ReservationPayment.from_reservation(
             reservation, variant=variant, custom_ticket_price=custom_price
         )
