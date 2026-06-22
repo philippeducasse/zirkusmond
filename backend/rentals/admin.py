@@ -1,5 +1,21 @@
+from django import forms
 from django.contrib import admin
+from unfold.admin import ModelAdmin
+from tinymce.widgets import TinyMCE
 
 from .models import RentalObject
 
-admin.site.register(RentalObject)
+
+class RentalObjectForm(forms.ModelForm):
+    description = forms.CharField(widget=TinyMCE(), required=False)
+
+    class Meta:
+        model = RentalObject
+        fields = "__all__"
+
+
+class RentalObjectAdmin(ModelAdmin):
+    form = RentalObjectForm
+
+
+admin.site.register(RentalObject, RentalObjectAdmin)
