@@ -7,12 +7,6 @@ from payments.stripe.providers import StripeProviderV3 as BaseStripeProviderV3
 
 
 class StripeProviderV3(BaseStripeProviderV3):
-    def return_event_payload(self, request):
-        event = super().return_event_payload(request)
-        if hasattr(event, "to_dict"):
-            return event.to_dict()
-        return event
-
     def get_token_from_request(self, payment, request) -> str:
         event = self.return_event_payload(request)
         event_type = event.get("type", "")
@@ -138,7 +132,6 @@ class TestStripeProvider(BasicProvider):
         super().__init__(**kwargs)
 
     def create_stripe_session(self, payment, *args, **kwargs):
-
         try:
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
