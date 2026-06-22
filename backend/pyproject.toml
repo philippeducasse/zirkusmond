@@ -13,7 +13,7 @@ dependencies = [
     "imaplib2==3.6",
     "xmltodict==1.0.4",
     "psycopg2-binary==2.9.12",
-    "stripe==15.2.0",
+    "stripe==14.4.1",
     "qrcode[pil]==8.2",
     "django-tinymce==5.0.0",
     "reportlab==4.5.1",
