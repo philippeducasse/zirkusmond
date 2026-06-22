@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.core.mail import send_mail
 from django.dispatch import receiver
 from payments import PaymentStatus
@@ -34,7 +35,7 @@ def on_payment_status_changed(sender, instance, **kwargs):
             send_mail(
                 subject="Payment Failed - Please Try Again",
                 message=f"Your payment for {reservation.event.show.title} on {reservation.event.admission.strftime('%Y-%m-%d')} failed.\n\nPlease try again or contact us for assistance.\n\nOrder ID: {payment_id}",
-                from_email="noreply@zirkusmond.de",
+                from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[reservation.email],
                 fail_silently=False,
             )
