@@ -35,6 +35,11 @@ class BaseEventAdmin(ModelAdmin):
     ordering = ["-begin"]
     date_hierarchy = "begin"
 
+    class Media:
+        css = {
+            "all": ("admin/css/mobile-responsive-admin.css",),
+        }
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         queryset = queryset.select_related("show")
