@@ -58,7 +58,7 @@ jobs:
           echo "PAYPAL_SANDBOX_CLIENT_ID=${{ secrets.PAYPAL_SANDBOX_CLIENT_ID }}" >> .env
           echo "PAYPAL_SANDBOX_SECRET=${{ secrets.PAYPAL_SANDBOX_SECRET }}" >> .env
           echo "STRIPE_TEST_TOKEN=${{ secrets.STRIPE_TEST_TOKEN }}" >> .env
-          echo "STRIPE_HOOK_TOKEN=${{ secrets.STRIPE_HOOK_TOKEN }}" >> .env
+          echo "STRIPE_TEST_HOOK_TOKEN=${{ secrets.STRIPE_TEST_HOOK_TOKEN }}" >> .env
           echo "DB_HOST=staging_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
 
