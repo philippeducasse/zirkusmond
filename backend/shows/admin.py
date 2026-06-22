@@ -3,7 +3,6 @@ from datetime import time as dtime
 
 from django import forms
 from django.contrib import admin
-from unfold.admin import ModelAdmin
 from django.db.models import (
     Count,
     F,
@@ -18,6 +17,8 @@ from django.db.models import (
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from payments import PaymentStatus
+from tinymce.widgets import TinyMCE
+from unfold.admin import ModelAdmin
 
 from events.models import Event
 from reservations.models import Guest, ReservationPayment
@@ -150,6 +151,15 @@ class EventInlineForm(forms.ModelForm):
         return instance
 
 
+class ShowForm(forms.ModelForm):
+    description = forms.CharField(widget=TinyMCE(), required=False)
+    cast = forms.CharField(widget=TinyMCE(), required=False)
+
+    class Meta:
+        model = Show
+        fields = "__all__"
+
+
 class EventInline(admin.TabularInline):
     model = Event
     form = EventInlineForm
@@ -168,6 +178,7 @@ class EventInline(admin.TabularInline):
 
 
 class ShowAdmin(ModelAdmin):
+    form = ShowForm
     list_display = ["title", "next_event_date", "dates_text", "reservation_open", "show_in_preview"]
     list_filter = ["private", "last_modified"]
     search_fields = ["title", "description", "cast"]
