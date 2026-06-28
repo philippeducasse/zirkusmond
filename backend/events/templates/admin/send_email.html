@@ -1,59 +1,91 @@
 {% extends "admin/base_site.html" %}
-
+{% block extrahead %}{{ block.super }}{{ form.media }}{% endblock %}
 {% block content %}
-<div style="">
-<div style="width: 50%; margin: auto">
-    <form action="" method="post">
-    {% csrf_token %}
+<div class="max-w-3xl">
 
     {% if sample_text %}
-    <h2>Are you sure you want to send the mail?</h2>
-    <div style="background: var(--darkened-bg); padding: 1em; margin-top: 1em; margin-bottom: 1em;">
-        <h3 style="margin-bottom:.5em;"> {{ sample_subject }} </h3>
-        {{ sample_text|linebreaks }}
+    <div class="border border-base-200 rounded-default shadow-xs mb-6 dark:border-base-800">
+        <div class="p-4 border-b border-base-200 dark:border-base-800">
+            <h2 class="font-semibold text-font-important-light dark:text-font-important-dark">Preview — are you sure you want to send?</h2>
+        </div>
+        <div class="p-4">
+            <p class="font-medium text-sm text-font-default-light dark:text-font-default-dark mb-2">{{ sample_subject }}</p>
+            <div class="text-sm text-font-default-light dark:text-font-default-dark">{{ sample_text|linebreaks }}</div>
+        </div>
     </div>
-    <input type="submit" name="send" value="Yes, Send mail">
-
-    <hl>
-    <div style="margin-top:3em;"></div>
-    <h2>Change Mail</h2>
     {% endif %}
 
-    <p style="width:100%;">
-    <input type="text" name="subject" maxlength="255" required="" id="id_subject"  value="{{form.subject.value}}" style="width:100%;">
-    </input>
-    </p>
-    <p>
-    {{ form.text_field }}
-    </p>
-    {{ form.media }}
-    <p>
-        Use {% verbatim %} {{show_title}} or {{firstname}} {% endverbatim %}
-    </p>
+    <div class="border border-base-200 rounded-default shadow-xs dark:border-base-800">
+        <div class="p-4 border-b border-base-200 dark:border-base-800">
+            <h2 class="font-semibold text-font-important-light dark:text-font-important-dark">
+                {% if sample_text %}Change Mail{% else %}Send Mail{% endif %}
+            </h2>
+        </div>
+        <form action="" method="post" class="p-4 flex flex-col gap-4">
+            {% csrf_token %}
 
-    <input type="hidden" name="action" value="{{action}}" />
-    <input type="hidden" name="select_across" value="{{select_across}}">
-    <input type="hidden" name="index" value="{{index}}">
-    {% for selected  in selected_action %}
-    <input type="hidden" name="_selected_action" value="{{ selected }}">
-    {% endfor %}
+            <div>
+                <label for="id_subject" class="block text-sm font-medium text-font-important-light dark:text-font-important-dark mb-1">Subject</label>
+                <input type="text" name="subject" id="id_subject" maxlength="255" required
+                    value="{{ form.subject.value|default:'' }}"
+                    class="border border-base-200 bg-white font-medium min-w-20 placeholder-base-400 rounded-default shadow-xs text-font-default-light text-sm focus:outline-2 focus:-outline-offset-2 focus:outline-primary-600 dark:bg-base-900 dark:border-base-700 dark:text-font-default-dark px-3 py-2 w-full max-w-2xl">
+            </div>
 
-    {% if sample_text %}
-        <input type="submit" name="change" value="Change Mail"/>
-    {% else %}
-        <input type="submit" name="apply" value="Send Mail"/>
-    {% endif %}
-    </form>
+            <div>
+                <label class="block text-sm font-medium text-font-important-light dark:text-font-important-dark mb-1">Body</label>
+                {{ form.text_field }}
+            </div>
 
-    <h2>Recipients</h2>
-    <table>
-        {% for row in data %}
-            <th></th>
-            {% for k, d in row.items %}
-                <tr><td> {{ k }}</td><td>{{ d }}</td></tr>
+            <p class="text-xs text-font-default-light dark:text-font-default-dark">
+                Use {% verbatim %}{{show_title}}{% endverbatim %} or {% verbatim %}{{firstname}}{% endverbatim %}
+            </p>
+
+            <input type="hidden" name="action" value="{{ action }}" />
+            <input type="hidden" name="select_across" value="{{ select_across }}">
+            <input type="hidden" name="index" value="{{ index }}">
+            {% for selected in selected_action %}
+                <input type="hidden" name="_selected_action" value="{{ selected }}">
             {% endfor %}
-        {% endfor %}
-    </table>
-</div>
+
+            <div class="flex gap-2 flex-wrap">
+                {% if sample_text %}
+                    <button type="submit" name="send"
+                        class="font-medium inline-flex items-center gap-1 rounded-default justify-center whitespace-nowrap cursor-pointer px-3 py-2 border border-base-200 bg-primary-600 border-transparent text-white hover:bg-primary-600/80">
+                        Yes, send mail
+                    </button>
+                    <button type="submit" name="change"
+                        class="font-medium inline-flex items-center gap-1 rounded-default justify-center whitespace-nowrap cursor-pointer px-3 py-2 border border-base-200 bg-white shadow-xs text-font-important-light dark:border-base-700 dark:bg-transparent hover:bg-base-100/80 dark:hover:bg-base-800/80">
+                        Edit mail
+                    </button>
+                {% else %}
+                    <button type="submit" name="apply"
+                        class="font-medium inline-flex items-center gap-1 rounded-default justify-center whitespace-nowrap cursor-pointer px-3 py-2 border border-base-200 bg-primary-600 border-transparent text-white hover:bg-primary-600/80">
+                        Preview &amp; send
+                    </button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="border border-base-200 rounded-default shadow-xs mt-6 dark:border-base-800">
+        <div class="p-4 border-b border-base-200 dark:border-base-800">
+            <h2 class="font-semibold text-font-important-light dark:text-font-important-dark">Recipients</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                {% for row in data %}
+                    <tbody class="border-b border-base-200 dark:border-base-800 last:border-0">
+                        {% for k, d in row.items %}
+                            <tr class="hover:bg-base-50 dark:hover:bg-base-800/50">
+                                <td class="px-4 py-2 font-medium text-font-important-light dark:text-font-important-dark w-32">{{ k }}</td>
+                                <td class="px-4 py-2 text-font-default-light dark:text-font-default-dark">{{ d }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

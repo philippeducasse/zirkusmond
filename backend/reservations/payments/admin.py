@@ -1,13 +1,14 @@
 from django import forms
 from django.contrib import admin, messages
-from unfold.admin import ModelAdmin
 from django.core.mail import EmailMessage
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import Context, Template
+from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils import timezone
 from payments import PaymentStatus
+from unfold.admin import ModelAdmin
 
 from events import services
 from events.forms import EmailTextForm
@@ -58,20 +59,18 @@ def send_email_to_reservants(request, dicts, admin_instance):
 
             return HttpResponseRedirect(request.get_full_path())
 
-    return render(
-        request,
-        "admin/send_email.html",
-        context={
-            "data": dicts,
-            "form": form,
-            "sample_text": sample_text,
-            "sample_subject": sample_subject,
-            "action": request.POST["action"],
-            "select_across": request.POST["select_across"],
-            "index": request.POST["index"],
-            "selected_action": request.POST.getlist("_selected_action"),
-        },
-    )
+    context = {
+        **admin.site.each_context(request),
+        "data": dicts,
+        "form": form,
+        "sample_text": sample_text,
+        "sample_subject": sample_subject,
+        "action": request.POST.get("action", ""),
+        "select_across": request.POST.get("select_across", "0"),
+        "index": request.POST.get("index", "0"),
+        "selected_action": request.POST.getlist("_selected_action"),
+    }
+    return TemplateResponse(request, "admin/send_email.html", context)
 
 
 class PurgeForm(forms.Form):
