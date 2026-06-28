@@ -6,6 +6,7 @@ from django.contrib.admin import AdminSite
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core import mail
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 from payments import PaymentStatus
@@ -445,3 +446,160 @@ class ReservationPaymentAdminConfirmedTotalTest(TestCase):
     def test_confirmed_total_shows_zero_for_refunded_payment(self):
         payment = self._make_payment(Decimal("30.00"), PaymentStatus.REFUNDED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
+
+
+# ---------------------------------------------------------------------------
+# EventAdmin bulk and detail email actions
+# ---------------------------------------------------------------------------
+
+_EVENT_CHANGELIST_URL = "/mondmin/events/event/"
+
+
+class EventAdminEmailActionsTest(TestCase):
+    def setUp(self):
+        self.show = make_show()
+        self.event = make_event(self.show)
+        self.superuser = User.objects.create_superuser("admin", "admin@example.com", "pass")
+        self.client.force_login(self.superuser)
+
+        # confirmed reservation
+        self.confirmed_reservation = make_reservation(
+            self.event, first_name="Anna", last_name="Smith", email="anna@example.com"
+        )
+        confirmed_payment = ReservationPayment.from_reservation(
+            self.confirmed_reservation, variant="paypal"
+        )
+        confirmed_payment.save()
+        confirmed_payment.change_status(PaymentStatus.CONFIRMED)
+
+        # unconfirmed reservation — should never be included
+        waiting_reservation = make_reservation(self.event, email="pending@example.com")
+        waiting_payment = ReservationPayment.from_reservation(waiting_reservation, variant="paypal")
+        waiting_payment.save()
+
+        # clear confirmation email triggered by change_status above
+        mail.outbox.clear()
+
+    def _bulk_post(self, action_name, **extra):
+        return self.client.post(
+            _EVENT_CHANGELIST_URL,
+            {
+                "action": action_name,
+                "index": "0",
+                "select_across": "0",
+                "_selected_action": [str(self.event.pk)],
+                **extra,
+            },
+        )
+
+    def _detail_url(self):
+        return f"/mondmin/events/event/{self.event.pk}/send-mail/"
+
+    # --- print_reservations ---
+
+    def test_print_reservations_returns_xlsx(self):
+        response = self._bulk_post("print_reservations")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        self.assertEqual(response.content[:2], b"PK")
+
+    def test_print_reservations_excludes_unconfirmed(self):
+        # Remove the confirmed payment so only the unconfirmed one exists
+        ReservationPayment.objects.filter(
+            reservation=self.confirmed_reservation
+        ).update(status=PaymentStatus.WAITING)
+        # Action still runs (returns empty sheet) without crashing
+        response = self._bulk_post("print_reservations")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content[:2], b"PK")
+
+    # --- send_to_reservants bulk action ---
+
+    def test_bulk_send_to_reservants_shows_form(self):
+        response = self._bulk_post("send_to_reservants")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Subject")
+
+    def test_bulk_send_to_reservants_only_confirmed_in_recipients(self):
+        response = self._bulk_post("send_to_reservants")
+        self.assertContains(response, "anna@example.com")
+        self.assertNotContains(response, "pending@example.com")
+
+    def test_bulk_send_to_reservants_preview(self):
+        response = self._bulk_post(
+            "send_to_reservants",
+            text_field="Hello {{ firstname }}",
+            subject="Test subject",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hello Anna")
+
+    def test_bulk_send_to_reservants_sends_to_confirmed_only(self):
+        self._bulk_post(
+            "send_to_reservants",
+            text_field="Hello {{ firstname }}",
+            subject="Test subject",
+            send="Yes, Send mail",
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("anna@example.com", mail.outbox[0].to[0])
+
+    def test_bulk_send_to_reservants_redirects_after_send(self):
+        response = self._bulk_post(
+            "send_to_reservants",
+            text_field="Hello",
+            subject="Subject",
+            send="Yes, Send mail",
+        )
+        self.assertEqual(response.status_code, 302)
+
+    # --- send_mail_to_reservants_detail ---
+
+    def test_detail_action_get_shows_form(self):
+        response = self.client.get(self._detail_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Subject")
+
+    def test_detail_action_only_confirmed_in_recipients(self):
+        response = self.client.get(self._detail_url())
+        self.assertContains(response, "anna@example.com")
+        self.assertNotContains(response, "pending@example.com")
+
+    def test_detail_action_preview(self):
+        response = self.client.post(
+            self._detail_url(),
+            {"text_field": "Hello {{ firstname }}", "subject": "Test subject"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hello Anna")
+
+    def test_detail_action_sends_to_confirmed_only(self):
+        self.client.post(
+            self._detail_url(),
+            {
+                "text_field": "Hello {{ firstname }}",
+                "subject": "Test subject",
+                "send": "Yes, Send mail",
+            },
+        )
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("anna@example.com", mail.outbox[0].to[0])
+
+    def test_detail_action_redirects_after_send(self):
+        response = self.client.post(
+            self._detail_url(),
+            {
+                "text_field": "Hello",
+                "subject": "Subject",
+                "send": "Yes, Send mail",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_detail_action_requires_login(self):
+        self.client.logout()
+        response = self.client.get(self._detail_url())
+        self.assertNotEqual(response.status_code, 200)
