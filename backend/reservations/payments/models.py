@@ -1,5 +1,6 @@
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib import admin
@@ -8,12 +9,15 @@ from django.urls import reverse
 from payments import PurchasedItem
 from payments.models import BasePayment
 
-from reservations.models import Reservation
+if TYPE_CHECKING:
+    from reservations.models import Reservation
 
 
 class ReservationPayment(BasePayment):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    reservation = models.ForeignKey(Reservation, null=True, on_delete=models.SET_NULL)
+    reservation = models.ForeignKey(
+        "reservations.Reservation", null=True, on_delete=models.SET_NULL
+    )
     custom_ticket_price = models.PositiveIntegerField(
         null=True, blank=True, help_text="Custom price selected by user (sliding scale)"
     )
@@ -66,7 +70,7 @@ class ReservationPayment(BasePayment):
         return min_price <= self.custom_ticket_price <= max_price
 
     @staticmethod
-    def from_reservation(reservation: Reservation, variant: str, custom_ticket_price=None):
+    def from_reservation(reservation: "Reservation", variant: str, custom_ticket_price=None):
         payment = ReservationPayment(
             reservation=reservation,
             variant=variant,
@@ -85,3 +89,41 @@ class ReservationPayment(BasePayment):
     @admin.display
     def event(self):
         return f"{self.reservation.event}"
+
+
+class Payment(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        COMPLETED = "completed"
+        FAILED = "failed"
+        REFUNDED = "refunded"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reservation = models.ForeignKey(
+        "reservations.Reservation", null=True, on_delete=models.SET_NULL
+    )
+    stripe_payment_intent_id = models.CharField(max_length=200, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    custom_ticket_price = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def create_for_reservation(cls, reservation, custom_ticket_price):
+        if custom_ticket_price is None:
+            raise ValueError("Custom ticket price must be provided")
+
+        from reservations.models import Reservation
+        reservation = Reservation.objects.select_related("event__show").get(pk=reservation.pk)
+        show = reservation.event.show
+        base = show.base_ticket_price
+        min_price = show.get_effective_min_price(base)
+        max_price = show.get_effective_max_price(base)
+        if not (min_price <= custom_ticket_price <= max_price):
+            raise ValueError(f"Custom price must be between {min_price} and {max_price}")
+
+        ticket_price = Decimal(str(custom_ticket_price))
+        total = reservation.ticket_count() * ticket_price
+        return cls.objects.create(
+            reservation=reservation, custom_ticket_price=custom_ticket_price, total=total
+        )
