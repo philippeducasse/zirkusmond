@@ -14,6 +14,7 @@ from PIL import Image
 from events import services
 from events.models import Event
 from reservations.models import Guest, Reservation, ReservationPayment
+from reservations.payments.models import Payment
 from shows.models import Show
 
 # ---------------------------------------------------------------------------
@@ -159,6 +160,57 @@ class ReservationPaymentModelTest(TestCase):
         payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
         payment.save()
         self.assertEqual(payment.ticket_count(), 1)
+
+
+# ---------------------------------------------------------------------------
+# Payment model
+# ---------------------------------------------------------------------------
+
+
+class PaymentCreateForReservationTest(TestCase):
+    def setUp(self):
+        self.show = make_show(base_ticket_price=20, min_ticket_price=10, max_ticket_price=30)
+        self.event = make_event(self.show)
+        self.reservation = make_reservation(self.event)
+
+    def test_creates_payment_with_valid_price(self):
+        payment = Payment.create_for_reservation(self.reservation, custom_ticket_price=20)
+        self.assertIsNotNone(payment.pk)
+        self.assertEqual(payment.custom_ticket_price, 20)
+        self.assertEqual(payment.reservation, self.reservation)
+
+    def test_total_is_ticket_count_times_price(self):
+        payment = Payment.create_for_reservation(self.reservation, custom_ticket_price=20)
+        self.assertEqual(payment.total, Decimal("20"))
+
+    def test_total_includes_guests(self):
+        Guest.objects.create(reservation=self.reservation, first_name="G", last_name="H")
+        payment = Payment.create_for_reservation(self.reservation, custom_ticket_price=15)
+        self.assertEqual(payment.total, Decimal("30"))
+
+    def test_price_at_minimum_boundary_is_accepted(self):
+        payment = Payment.create_for_reservation(self.reservation, custom_ticket_price=10)
+        self.assertEqual(payment.custom_ticket_price, 10)
+
+    def test_price_at_maximum_boundary_is_accepted(self):
+        payment = Payment.create_for_reservation(self.reservation, custom_ticket_price=30)
+        self.assertEqual(payment.custom_ticket_price, 30)
+
+    def test_none_price_raises(self):
+        with self.assertRaises(ValueError):
+            Payment.create_for_reservation(self.reservation, custom_ticket_price=None)
+
+    def test_price_below_minimum_raises(self):
+        with self.assertRaises(ValueError):
+            Payment.create_for_reservation(self.reservation, custom_ticket_price=9)
+
+    def test_price_above_maximum_raises(self):
+        with self.assertRaises(ValueError):
+            Payment.create_for_reservation(self.reservation, custom_ticket_price=31)
+
+    def test_status_defaults_to_pending(self):
+        payment = Payment.create_for_reservation(self.reservation, custom_ticket_price=20)
+        self.assertEqual(payment.status, Payment.Status.PENDING)
 
 
 # ---------------------------------------------------------------------------
