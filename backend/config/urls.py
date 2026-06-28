@@ -7,7 +7,6 @@ import views
 
 urlpatterns = [
     # Admin
-    path("mondmin/events/", include("events.urls", namespace="events_admin")),
     path("mondmin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
     # Static pages
