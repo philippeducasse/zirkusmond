@@ -3,6 +3,7 @@ from io import BytesIO
 import xlsxwriter
 from django.contrib import admin
 from unfold.admin import ModelAdmin
+from unfold.decorators import action
 from django.db.models import (
     Count,
     DecimalField,
@@ -32,6 +33,7 @@ class BaseEventAdmin(ModelAdmin):
     ]
     search_fields = ["show__title"]
     actions = ["print_reservations", "send_to_reservants"]
+    actions_detail = ["send_mail_to_reservants_detail"]
     ordering = ["-begin"]
     date_hierarchy = "begin"
 
@@ -159,6 +161,14 @@ class BaseEventAdmin(ModelAdmin):
                 ReservationPayment.objects.filter(status="confirmed", reservation__event=event)
             )
         dicts = [reservation_to_dict(payment.reservation) for payment in all_payments]
+        return send_email_to_reservants(request, dicts, self)
+
+    @action(description="Send mail to Reservants", url_path="send-mail", icon="mail")
+    def send_mail_to_reservants_detail(self, request, object_id):
+        payments = ReservationPayment.objects.filter(
+            status="confirmed", reservation__event_id=object_id
+        )
+        dicts = [reservation_to_dict(p.reservation) for p in payments]
         return send_email_to_reservants(request, dicts, self)
 
 
