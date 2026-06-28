@@ -220,13 +220,13 @@ class SiteViewsTest(TestCase):
         self.assertEqual(self.client.get("/sitemap.xml").status_code, 200)
 
     def test_newsletter_get_redirects(self):
-        response = self.client.get("/newsletter_registration")
+        response = self.client.get("/newsletter/newsletter-registration")
         self.assertEqual(response.status_code, 302)
 
     def test_newsletter_post_valid_email_shows_confirmation(self):
-        response = self.client.post("/newsletter_registration", {"email": "user@example.com"})
+        response = self.client.post("/newsletter/newsletter-registration", {"email": "user@example.com"})
         self.assertEqual(response.status_code, 200)
 
     def test_newsletter_post_invalid_email_redirects(self):
-        response = self.client.post("/newsletter_registration", {"email": "not-an-email"})
+        response = self.client.post("/newsletter/newsletter-registration", {"email": "not-an-email"})
         self.assertEqual(response.status_code, 302)
