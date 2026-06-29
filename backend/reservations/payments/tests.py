@@ -473,6 +473,54 @@ class PaymentConfirmedSignalTest(TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Payment URL methods
+# ---------------------------------------------------------------------------
+
+
+class PaymentURLTest(TestCase):
+    def setUp(self):
+        show = make_show(base_ticket_price=20, min_ticket_price=10, max_ticket_price=30)
+        event = make_event(show)
+        reservation = make_reservation(event)
+        self.payment = Payment.objects.create(
+            payment_method=Payment.PaymentMethod.CARD,
+            reservation=reservation,
+            custom_ticket_price=20,
+            total=Decimal("20"),
+        )
+
+    @override_settings(PAYMENT_USES_SSL=True, PAYMENT_HOST="example.com")
+    def test_failure_url_uses_https_when_ssl_enabled(self):
+        url = self.payment.get_failure_url()
+        self.assertTrue(url.startswith("https://"))
+        self.assertIn(str(self.payment.pk), url)
+        self.assertIn("failure", url)
+
+    @override_settings(PAYMENT_USES_SSL=False, PAYMENT_HOST="example.com")
+    def test_failure_url_uses_http_when_ssl_disabled(self):
+        url = self.payment.get_failure_url()
+        self.assertTrue(url.startswith("http://"))
+
+    @override_settings(PAYMENT_USES_SSL=True, PAYMENT_HOST="example.com")
+    def test_success_url_uses_https_when_ssl_enabled(self):
+        url = self.payment.get_success_url()
+        self.assertTrue(url.startswith("https://"))
+        self.assertIn(str(self.payment.pk), url)
+        self.assertIn("success", url)
+
+    @override_settings(PAYMENT_USES_SSL=False, PAYMENT_HOST="example.com")
+    def test_success_url_uses_http_when_ssl_disabled(self):
+        url = self.payment.get_success_url()
+        self.assertTrue(url.startswith("http://"))
+
+    def test_payment_method_card_value(self):
+        self.assertEqual(Payment.PaymentMethod.CARD, "card")
+
+    def test_payment_method_paypal_value(self):
+        self.assertEqual(Payment.PaymentMethod.PAYPAL, "paypal")
+
+
+# ---------------------------------------------------------------------------
 # Stripe webhook view
 # ---------------------------------------------------------------------------
 
