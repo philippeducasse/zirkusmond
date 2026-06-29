@@ -1,32 +1,5 @@
 
 
-- html_base
-  - index includes containers.html
-  - html_design (block content)
-    - show
-      - event (replace block show_details)
-
-
-- container_basic 
-    - container_gallery
-    - container_team
-    - container_stream
-    - container_last
-- container_base extended by
-
-## Tailwind watcher
-
-run it in frontend/
-
-npm run tailwind 
-
-
-## TODO
-
-- Change logos in zm- ->> border radius on lisboa
-- change images
-- add Merch in navbar -> redirect to payment site
-
 
 - translations: en, de, es, pt
 
