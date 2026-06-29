@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from reservations.models import Reservation
 
 
+# old payment model using Django Payments.
 class ReservationPayment(BasePayment):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     reservation = models.ForeignKey(
@@ -92,6 +93,10 @@ class ReservationPayment(BasePayment):
 
 
 class Payment(models.Model):
+    class PaymentMethod(models.TextChoices):
+        CARD = "card"
+        PAYPAL = "paypal"
+
     class Status(models.TextChoices):
         PENDING = "pending"
         COMPLETED = "completed"
@@ -99,10 +104,11 @@ class Payment(models.Model):
         REFUNDED = "refunded"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices)
     reservation = models.ForeignKey(
         "reservations.Reservation", null=True, on_delete=models.SET_NULL
     )
-    stripe_payment_intent_id = models.CharField(max_length=200, null=True, blank=True)
+    stripe_session_id = models.CharField(max_length=200, null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     custom_ticket_price = models.PositiveIntegerField()
@@ -114,6 +120,7 @@ class Payment(models.Model):
             raise ValueError("Custom ticket price must be provided")
 
         from reservations.models import Reservation
+
         reservation = Reservation.objects.select_related("event__show").get(pk=reservation.pk)
         show = reservation.event.show
         base = show.base_ticket_price
@@ -127,3 +134,11 @@ class Payment(models.Model):
         return cls.objects.create(
             reservation=reservation, custom_ticket_price=custom_ticket_price, total=total
         )
+
+    def get_failure_url(self):
+        protocol = "https" if settings.PAYMENT_USES_SSL else "http"
+        return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/failure"
+
+    def get_success_url(self):
+        protocol = "https" if settings.PAYMENT_USES_SSL else "http"
+        return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/success"
