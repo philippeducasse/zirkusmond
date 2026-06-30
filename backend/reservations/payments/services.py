@@ -40,10 +40,8 @@ def create_reservation_with_payment(
     return payment
 
 
-def create_reservation_with_payment_api(
-    event, first_name, last_name, email, guests, variant, custom_price
-):
-    """Create a reservation and payment from API data."""
+def create_reservation(event, first_name, last_name, email, guests):
+    """Create reservation for Stripe PaymentIntent flow."""
     with transaction.atomic():
         reservation = Reservation.objects.create(
             event=event,
@@ -57,8 +55,4 @@ def create_reservation_with_payment_api(
                 first_name=guest_data.get("first_name", ""),
                 last_name=guest_data.get("last_name", ""),
             )
-        payment = ReservationPayment.from_reservation(
-            reservation, variant=variant, custom_ticket_price=custom_price
-        )
-        payment.save()
-    return payment
+    return reservation
