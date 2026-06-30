@@ -230,6 +230,14 @@ class PaymentCreateForReservationTest(TestCase):
         )
         self.assertEqual(payment.status, Payment.Status.PENDING)
 
+    def test_creates_payment_with_paypal(self):
+        payment = Payment.create_for_reservation(
+            self.reservation, custom_ticket_price=20, payment_method="paypal"
+        )
+        self.assertIsNotNone(payment.pk)
+        self.assertEqual(payment.payment_method, "paypal")
+        self.assertEqual(payment.custom_ticket_price, 20)
+
 
 # ---------------------------------------------------------------------------
 # Send confirmation mail
