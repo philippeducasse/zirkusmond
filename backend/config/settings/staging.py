@@ -22,7 +22,7 @@ PAYMENT_VARIANTS = {
         },
     ),
     "stripe": (
-        "payments.stripe.StripeProvider",
+        "payments.stripe.StripeProvideV3",
         {
             "api_key": os.environ.get("STRIPE_TEST_SECRET_KEY"),
         },
