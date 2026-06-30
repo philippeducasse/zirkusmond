@@ -17,17 +17,17 @@
         </li>
         {% for i in "0123456789" %}
             <li class="glide__slide {% if forloop.first %}active{%endif%} my-auto">
-                <img src="{% get_static_prefix %}media/images/gallery/img-{{i}}.jpg" class="gallery-img w-full h-full" alt="Gallery Picture {{i}}">
+                <img src="{% get_static_prefix %}media/images/gallery/img-{{i}}.webp" class="gallery-img w-full h-full" alt="Gallery Picture {{i}}">
             </li>
         {% endfor %}
       </ul>
     </div>
     <div class="absolute top-0 h-full w-full flex justify-between items-center" data-glide-el="controls">
-      <button class="w-3 ml-4 lg:w-6 lg:ml-8" data-glide-dir="<"><img src="/static/media/images/gallery/prev.png" alt="Previous"></button>
-      <button class="w-3 mr-4  lg:w-6 lg:mr-8" data-glide-dir=">"><img src="/static/media/images/gallery/next.png" alt="Next"></button>
+      <button class="w-3 ml-4 lg:w-6 lg:ml-8" data-glide-dir="<"><img src="/static/media/images/gallery/prev.webp" alt="Previous"></button>
+      <button class="w-3 mr-4  lg:w-6 lg:mr-8" data-glide-dir=">"><img src="/static/media/images/gallery/next.webp" alt="Next"></button>
     </div>
   </div>
-  <div class="deko"> <img class="mx-auto" src="{% static "media/images/gallery/deko-1.png" %}" alt="********"/> </div>
+  <div class="deko"> <img class="mx-auto" src="{% static "media/images/gallery/deko-1.webp" %}" alt="********"/> </div>
 
 </div>
 

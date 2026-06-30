@@ -176,13 +176,13 @@ UNFOLD = {
     "SITE_TITLE": "Zirkusmond admin panel",
     "SITE_HEADER": "Zirkusmond",
     "SITE_SUBHEADER": "Admin Panel",
-    "SITE_ICON": lambda request: static("media/images/gallery/logo.png"),
+    "SITE_ICON": lambda request: static("media/images/gallery/logo.webp"),
     "SITE_FAVICONS": [
         {
             "rel": "icon",
             "sizes": "32x32",
             "type": "image/png",
-            "href": lambda request: static("media/images/gallery/logo.png"),
+            "href": lambda request: static("media/images/gallery/logo.webp"),
         },
     ],
 }
