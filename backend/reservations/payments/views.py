@@ -1,11 +1,14 @@
 import logging
 
 import stripe
+from django.conf import settings
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from payments import RedirectNeeded
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from reservations.models import Payment, Reservation, ReservationPayment
 from reservations.payments.serializers import (
@@ -69,3 +72,37 @@ def payment_success(request, payment_id):
 def payment_fail(request, payment_id):
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
     return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
+
+
+class StripeWebhookView(APIView):
+    """Handle Stripe webhook events for PaymentIntent confirmations."""
+
+    def post(self, request):
+        payload = request.body
+        sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            )
+        except ValueError:
+            return Response({"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
+        except stripe.error.SignatureVerificationError:
+            return Response({"error": "Invalid signature"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if event["type"] == "payment_intent.succeeded":
+            intent = event["data"]["object"]
+            payment_intent_id = intent["id"]
+
+            try:
+                payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+                payment.status = Payment.Status.COMPLETED
+                payment.save()
+                logger.info(
+                    "payment_completed: payment=%s intent=%s", payment.id, payment_intent_id
+                )
+            except Payment.DoesNotExist:
+                logger.warning("payment_intent.succeeded: payment not found for %s", payment_intent_id)
+                return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        return JsonResponse({"status": "ok"})
