@@ -22,11 +22,9 @@ PAYMENT_VARIANTS = {
         },
     ),
     "stripe": (
-        "reservations.payments.stripe_provider.StripeProviderV3",
+        "payments.stripe.StripeProvider",
         {
             "api_key": os.environ.get("STRIPE_TEST_TOKEN"),
-            "endpoint_secret": os.environ.get("STRIPE_TEST_HOOK_TOKEN"),
-            "secure_endpoint": False,
         },
     ),
 }
