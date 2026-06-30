@@ -10,8 +10,8 @@ from events.forms import GuestForm, ReservationForm
 from events.models import Event
 from newsletter.services import register_newsletter_email
 from reservations.payments.services import (
+    create_reservation,
     create_reservation_with_payment,
-    create_reservation_with_payment_api,
     parse_custom_price,
 )
 from reservations.serializers import ReservationSerializer
@@ -101,30 +101,27 @@ def reserve_api(request, show_id):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    custom_price = None
     if show.base_ticket_price:
         try:
-            custom_price = parse_custom_price(show, serializer.validated_data.get("custom_price"))
+            parse_custom_price(show, serializer.validated_data.get("custom_price"))
         except ValueError as e:
             return Response(
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    payment = create_reservation_with_payment_api(
+    reservation = create_reservation(
         event=event,
         first_name=serializer.validated_data["first_name"],
         last_name=serializer.validated_data["last_name"],
         email=serializer.validated_data["email"],
         guests=serializer.validated_data.get("guests", []),
-        variant=serializer.validated_data["payment_method"],
-        custom_price=custom_price,
     )
 
     if serializer.validated_data.get("newsletter"):
         register_newsletter_email(serializer.validated_data["email"])
 
     return Response(
-        {"payment_id": payment.pk, "redirect_url": f"/payments/{payment.pk}"},
+        {"reservation_id": str(reservation.id)},
         status=status.HTTP_201_CREATED,
     )
