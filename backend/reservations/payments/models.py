@@ -109,13 +109,14 @@ class Payment(models.Model):
         "reservations.Reservation", null=True, on_delete=models.SET_NULL
     )
     stripe_session_id = models.CharField(max_length=200, null=True, blank=True)
+    stripe_payment_intent_id = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     custom_ticket_price = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     @classmethod
-    def create_for_reservation(cls, reservation, custom_ticket_price):
+    def create_for_reservation(cls, reservation, custom_ticket_price, payment_method):
         if custom_ticket_price is None:
             raise ValueError("Custom ticket price must be provided")
 
@@ -132,7 +133,10 @@ class Payment(models.Model):
         ticket_price = Decimal(str(custom_ticket_price))
         total = reservation.ticket_count() * ticket_price
         return cls.objects.create(
-            reservation=reservation, custom_ticket_price=custom_ticket_price, total=total
+            reservation=reservation,
+            payment_method=payment_method,
+            custom_ticket_price=custom_ticket_price,
+            total=total,
         )
 
     def get_failure_url(self):
