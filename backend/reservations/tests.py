@@ -276,15 +276,12 @@ class ReserveAPIViewTest(TestCase):
     def test_valid_post_creates_reservation_and_payment(self):
         self.client.post(self._url(), self._post_data(), format="json")
         self.assertEqual(Reservation.objects.count(), 1)
-        self.assertEqual(ReservationPayment.objects.count(), 1)
 
-    def test_valid_post_response_contains_payment_id_and_redirect_url(self):
+    def test_valid_post_response_contains_reservation_id(self):
         response = self.client.post(self._url(), self._post_data(), format="json")
-        payment = ReservationPayment.objects.first()
-        self.assertIn("payment_id", response.data)
-        self.assertIn("redirect_url", response.data)
-        self.assertEqual(str(response.data["payment_id"]), str(payment.pk))
-        self.assertEqual(response.data["redirect_url"], f"/payments/{payment.pk}")
+        reservation = Reservation.objects.first()
+        self.assertIn("reservation_id", response.data)
+        self.assertEqual(str(response.data["reservation_id"]), str(reservation.id))
 
     def test_valid_post_does_not_create_guests(self):
         self.client.post(self._url(), self._post_data(), format="json")
@@ -363,7 +360,6 @@ class ReserveAPIViewTest(TestCase):
     def test_invalid_serializer_data_creates_no_db_records(self):
         self.client.post(self._url(), {}, format="json")
         self.assertEqual(Reservation.objects.count(), 0)
-        self.assertEqual(ReservationPayment.objects.count(), 0)
 
     # -----------------------------------------------------------------------
     # Closed event — expected 400
@@ -386,7 +382,6 @@ class ReserveAPIViewTest(TestCase):
         self.event.save()
         self.client.post(self._url(), self._post_data(), format="json")
         self.assertEqual(Reservation.objects.count(), 0)
-        self.assertEqual(ReservationPayment.objects.count(), 0)
 
     # -----------------------------------------------------------------------
     # Custom price validation
@@ -411,14 +406,6 @@ class ReserveAPIViewTest(TestCase):
     def test_invalid_custom_price_creates_no_db_records(self):
         self.client.post(self._url(), self._post_data(custom_price=1), format="json")
         self.assertEqual(Reservation.objects.count(), 0)
-        self.assertEqual(ReservationPayment.objects.count(), 0)
-
-    def test_valid_custom_price_creates_payment_with_custom_price(self):
-        # Price 20 is within [5, 25].
-        self.client.post(self._url(), self._post_data(custom_price=20), format="json")
-        payment = ReservationPayment.objects.first()
-        self.assertIsNotNone(payment)
-        self.assertEqual(payment.custom_ticket_price, 20)
 
     def test_valid_custom_price_returns_201(self):
         response = self.client.post(self._url(), self._post_data(custom_price=20), format="json")
