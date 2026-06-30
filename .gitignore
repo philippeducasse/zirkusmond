@@ -28,3 +28,4 @@ frontend/package-lock.json
 docker-compose.local.yml
 .claude
 .coverage
+.vscode
