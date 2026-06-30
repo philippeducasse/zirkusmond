@@ -58,7 +58,7 @@ class NewsletterRegistrationAPITest(TestCase):
         # The endpoint should be idempotent: re-submitting an already-registered
         # email must still return 201 rather than a conflict error.
         NewsletterRegistration.objects.create(email="existing@example.com")
-        response = self.client.secreate_reservation_with_paymentlfpost(
+        response = self.client.post(
             NEWSLETTER_URL, {"email": "existing@example.com"}, format="json"
         )
         self.assertEqual(response.status_code, 201)
