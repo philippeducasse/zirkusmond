@@ -30,8 +30,8 @@
 }
 
 body {
-  
-  background: url("/static/media/images/gallery/bg_pattern.png") repeat;
+
+  background: url("/static/media/images/gallery/bg_pattern.webp") repeat;
   color:  #f6ae42;
   box-sizing:border-box;
 
@@ -347,7 +347,7 @@ a.card-link  {
 
 .navbar.sticky{
   opacity: 1;
-  background-image: url("/static/media/images/gallery/bg_pattern.png");
+  background-image: url("/static/media/images/gallery/bg_pattern.webp");
   backface-visibility: hidden;
   visibility: visible;
 }
@@ -426,7 +426,7 @@ a.card-link  {
 
 .mobile-menu{
   z-index:100;
-  background-image: url("/static/media/images/gallery/bg_pattern.png");
+  background-image: url("/static/media/images/gallery/bg_pattern.webp");
   border: 2px solid #E7B548;
   top:77.7px;
   right:0;
@@ -437,7 +437,7 @@ a.card-link  {
 .banner-image-container {
     width: 100%;
     height: 80vh;
-    background-image: url('/static/media/images/gallery/zm_banner.jpg');
+    background-image: url('/static/media/images/gallery/zm_banner.webp');
     background-size: cover;
     background-position: center;
 
