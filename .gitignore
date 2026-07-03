@@ -18,6 +18,24 @@ frontend/dist
 frontend/.DS_Store
 frontend/*.local
 frontend/package-lock.json
+frontend/dist-ssr
+frontend/.nitro
+frontend/.tanstack
+frontend/.wrangler
+frontend/.output
+frontend/.vinxi
+frontend/__unconfig*
+todos.json
+
+
+
+frontend-1/node_modules/
+frontend-1/dist
+frontend-1/.DS_Store
+frontend-1/*.local
+frontend-1/package-lock.json
+
+
 
 # Environment
 .env
