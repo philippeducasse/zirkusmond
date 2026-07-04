@@ -43,7 +43,16 @@ npm run dev
 ## Migration to Next.js
 
 When migrating to Next.js:
+
 1. Replace this `frontend/` folder with the Next.js project
 2. Update template references if build output paths change
 3. Convert Vue components to React components
 4. Merge Tailwind config with Next.js setup
+
+## Contributing
+
+1. Create a branch off `main` for your change.
+2. Run `npm install` and `npm run dev` to work locally.
+3. Keep commits focused and use clear, descriptive messages.
+4. Open a pull request against `main` and wait for CI to pass.
+5. Request a review before merging.
