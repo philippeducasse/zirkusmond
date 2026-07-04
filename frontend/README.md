@@ -1,4 +1,4 @@
-Welcome to your new TanStack Start app! 
+Welcome to your new TanStack Start app!
 
 # Getting Started
 
@@ -40,7 +40,6 @@ If you prefer not to use Tailwind CSS:
 
 ## Linting & Formatting
 
-
 This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
 
 ```bash
@@ -48,7 +47,6 @@ npm run lint
 npm run format
 npm run check
 ```
-
 
 ## Shadcn
 
@@ -58,7 +56,6 @@ Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 pnpm dlx shadcn@latest add button
 ```
 
-
 # Paraglide i18n
 
 This add-on wires up ParaglideJS for localized routing and message formatting.
@@ -66,8 +63,6 @@ This add-on wires up ParaglideJS for localized routing and message formatting.
 - Messages live in `project.inlang/messages`.
 - URLs are localized through the Paraglide Vite plugin and router `rewrite` hooks.
 - Run the dev server or build to regenerate the `src/paraglide` outputs.
-
-
 
 ## Routing
 
@@ -86,7 +81,7 @@ Now that you have two routes you can use a `Link` component to navigate between 
 To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
 
 ```tsx
-import { Link } from "@tanstack/react-router";
+import { Link } from '@tanstack/react-router'
 ```
 
 Then anywhere in your JSX you can use it like so:
@@ -154,11 +149,11 @@ const getServerTime = createServerFn({
 // Use in a component
 function MyComponent() {
   const [time, setTime] = useState('')
-  
+
   useEffect(() => {
     getServerTime().then(setTime)
   }, [])
-  
+
   return <div>Server time: {time}</div>
 }
 ```
@@ -220,3 +215,17 @@ Files prefixed with `demo` can be safely deleted. They are there to provide a st
 You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
 
 For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+When migrating to Next.js:
+
+1. Replace this `frontend/` folder with the Next.js project
+2. Update template references if build output paths change
+3. Convert Vue components to React components
+4. Merge Tailwind config with Next.js setup
+
+## Contributing
+
+1. Create a branch off `main` for your change.
+2. Run `npm install` and `npm run dev` to work locally.
+3. Keep commits focused and use clear, descriptive messages.
+4. Open a pull request against `main` and wait for CI to pass.
+5. Request a review before merging.
