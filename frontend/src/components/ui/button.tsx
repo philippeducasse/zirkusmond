@@ -16,17 +16,16 @@ const buttonVariants = cva(
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
         ghost:
-          'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50',
+          'text-primary duration-300 hover:text-primary/80 aria-expanded:text-primary/80',
         destructive:
           'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         default:
-          'h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
-        xs: "h-6 gap-1 rounded-none px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-none px-2.5 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-auto gap-1.5 text-2xl border-4 px-12 py-4 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
+          'h-auto gap-1.5 text-2xl border-4 px-12 py-4 has-data-[icon=inline-end]:pr-8 has-data-[icon=inline-start]:pl-8',
+        sm: "h-auto gap-1 text-base border-2 px-6 py-2.5 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4 [&_svg:not([class*='size-'])]:size-4",
+        xs: "h-auto gap-1 text-sm border-2 px-3 py-1.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
         icon: 'size-8',
         'icon-xs': "size-6 rounded-none [&_svg:not([class*='size-'])]:size-3",
         'icon-sm': 'size-7 rounded-none',
@@ -35,7 +34,7 @@ const buttonVariants = cva(
     },
     defaultVariants: {
       variant: 'primary',
-      size: 'lg',
+      size: 'default',
     },
   },
 )
@@ -43,7 +42,7 @@ const buttonVariants = cva(
 function Button({
   className,
   variant = 'primary',
-  size = 'lg',
+  size = 'default',
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
