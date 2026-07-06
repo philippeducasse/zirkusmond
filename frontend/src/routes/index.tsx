@@ -20,8 +20,11 @@ function App() {
         eventTitle="Open Stage - 2026 - Vol. III"
         eventDates={[
           'Sunday 05.07.26 at 20:00',
-          'Sunday 05.07.26 at 20:00',
-          'Sunday 05.07.26 at 20:00',
+          'Sunday 05.12.26 at 20:00',
+          'Sunday 05.11.26 at 20:00',
+          'Sunday 05.10.26 at 20:00',
+          'Sunday 05.07.27 at 20:00',
+          'Sunday 05.07.28 at 20:00',
         ]}
         eventImageUrl="/images/team/maria.webp"
       />
