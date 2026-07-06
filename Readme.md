@@ -49,18 +49,14 @@ Tests run automatically on every push/PR via the `tests` GitHub Actions workflow
 - Install the pre-commit hooks before making changes: `pre-commit install`. They run `ruff` (lint + format) on the backend and basic whitespace/YAML/JSON/merge-conflict checks on every commit.
 - Backend code is linted/formatted with `ruff` (`uv run ruff check --fix` / `uv run ruff format`); keep to the project's `line-length = 100` (see `backend/pyproject.toml`).
 - Add or update tests for any backend logic change and make sure `uv run pytest` passes before opening a PR.
-- Keep PRs focused and small where possible; describe *why* a change is needed, not just what changed.
+- Keep PRs focused and small where possible; describe _why_ a change is needed, not just what changed.
 - Open a PR against `main`; CI (tests workflow) must pass before merging.
 
 # qr code duplication
 
 # cookie popover
 
-# remove talent && venue && remove all other emails from website
-
 # add way for juan to change videos && images
-
-# handle case for shows that zm doesnt handle bookings
 
 # early bird tickets
 
