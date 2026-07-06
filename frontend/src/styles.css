@@ -130,17 +130,6 @@ body {
   overflow-x: hidden;
 }
 
-a {
-  color: var(--lagoon-deep);
-  text-decoration-color: rgba(50, 143, 151, 0.4);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-a:hover {
-  color: #246f76;
-}
-
 .page-wrap {
   width: min(1080px, calc(100% - 2rem));
   margin-inline: auto;
