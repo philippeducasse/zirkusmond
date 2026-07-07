@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import PageContainer from '#/components/common/PageContainer.tsx'
+
 export const Route = createFileRoute('/about')({
   head: () => ({
     meta: [
@@ -29,7 +31,7 @@ const team = [
 
 function About() {
   return (
-    <main className="page-wrap px-4 py-12">
+    <PageContainer className="px-4">
       <h1 className="display-title mb-8 text-center text-5xl font-bold text-[var(--sea-ink)] sm:text-6xl">
         Welcome to the Moon
       </h1>
@@ -95,6 +97,6 @@ function About() {
         src="/images/gallery/deko-2.webp"
         alt=""
       />
-    </main>
+    </PageContainer>
   )
 }
