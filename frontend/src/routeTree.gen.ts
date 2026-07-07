@@ -9,14 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RentalsRouteImport } from './routes/rentals'
+import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShowShowIdRouteImport } from './routes/show.$showId'
+import { Route as ReserveShowIdRouteImport } from './routes/reserve.$showId'
 
+const RentalsRoute = RentalsRouteImport.update({
+  id: '/rentals',
+  path: '/rentals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpressumRoute = ImpressumRouteImport.update({
+  id: '/impressum',
+  path: '/impressum',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DatenschutzRoute = DatenschutzRouteImport.update({
+  id: '/datenschutz',
+  path: '/datenschutz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -34,48 +54,127 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShowShowIdRoute = ShowShowIdRouteImport.update({
+  id: '/show/$showId',
+  path: '/show/$showId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReserveShowIdRoute = ReserveShowIdRouteImport.update({
+  id: '/reserve/$showId',
+  path: '/reserve/$showId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/datenschutz': typeof DatenschutzRoute
   '/events': typeof EventsRoute
+  '/impressum': typeof ImpressumRoute
+  '/rentals': typeof RentalsRoute
+  '/reserve/$showId': typeof ReserveShowIdRoute
+  '/show/$showId': typeof ShowShowIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/datenschutz': typeof DatenschutzRoute
   '/events': typeof EventsRoute
+  '/impressum': typeof ImpressumRoute
+  '/rentals': typeof RentalsRoute
+  '/reserve/$showId': typeof ReserveShowIdRoute
+  '/show/$showId': typeof ShowShowIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/datenschutz': typeof DatenschutzRoute
   '/events': typeof EventsRoute
+  '/impressum': typeof ImpressumRoute
+  '/rentals': typeof RentalsRoute
+  '/reserve/$showId': typeof ReserveShowIdRoute
+  '/show/$showId': typeof ShowShowIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/events'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/datenschutz'
+    | '/events'
+    | '/impressum'
+    | '/rentals'
+    | '/reserve/$showId'
+    | '/show/$showId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/events'
-  id: '__root__' | '/' | '/about' | '/contact' | '/events'
+  to:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/datenschutz'
+    | '/events'
+    | '/impressum'
+    | '/rentals'
+    | '/reserve/$showId'
+    | '/show/$showId'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/datenschutz'
+    | '/events'
+    | '/impressum'
+    | '/rentals'
+    | '/reserve/$showId'
+    | '/show/$showId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  DatenschutzRoute: typeof DatenschutzRoute
   EventsRoute: typeof EventsRoute
+  ImpressumRoute: typeof ImpressumRoute
+  RentalsRoute: typeof RentalsRoute
+  ReserveShowIdRoute: typeof ReserveShowIdRoute
+  ShowShowIdRoute: typeof ShowShowIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/rentals': {
+      id: '/rentals'
+      path: '/rentals'
+      fullPath: '/rentals'
+      preLoaderRoute: typeof RentalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impressum': {
+      id: '/impressum'
+      path: '/impressum'
+      fullPath: '/impressum'
+      preLoaderRoute: typeof ImpressumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events': {
       id: '/events'
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/datenschutz': {
+      id: '/datenschutz'
+      path: '/datenschutz'
+      fullPath: '/datenschutz'
+      preLoaderRoute: typeof DatenschutzRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -99,6 +198,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/show/$showId': {
+      id: '/show/$showId'
+      path: '/show/$showId'
+      fullPath: '/show/$showId'
+      preLoaderRoute: typeof ShowShowIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reserve/$showId': {
+      id: '/reserve/$showId'
+      path: '/reserve/$showId'
+      fullPath: '/reserve/$showId'
+      preLoaderRoute: typeof ReserveShowIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -106,7 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  DatenschutzRoute: DatenschutzRoute,
   EventsRoute: EventsRoute,
+  ImpressumRoute: ImpressumRoute,
+  RentalsRoute: RentalsRoute,
+  ReserveShowIdRoute: ReserveShowIdRoute,
+  ShowShowIdRoute: ShowShowIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
