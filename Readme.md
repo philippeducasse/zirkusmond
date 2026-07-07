@@ -52,8 +52,6 @@ Tests run automatically on every push/PR via the `tests` GitHub Actions workflow
 - Keep PRs focused and small where possible; describe _why_ a change is needed, not just what changed.
 - Open a PR against `main`; CI (tests workflow) must pass before merging.
 
-# qr code duplication
-
 # cookie popover
 
 # add way for juan to change videos && images
