@@ -1,5 +1,5 @@
 import { cn } from '#/lib/utils.ts'
-import { useStickyNavbar } from '#/hooks/use-sticky-navbar.ts'
+import { useNavbar } from '#/hooks/useNavbar.ts'
 
 import Logo from './navbar/Logo.tsx'
 import DesktopNav from './navbar/DesktopNav.tsx'
@@ -11,7 +11,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ isStaff = false }: NavbarProps) {
-  const { sticky, sentinelRef, scrollThreshold } = useStickyNavbar()
+  const { fixed, sentinelRef, scrollThreshold } = useNavbar()
   const items = isStaff ? [...NAV_ITEMS, QR_SCANNER_ITEM] : NAV_ITEMS
 
   return (
@@ -25,7 +25,7 @@ export default function Navbar({ isStaff = false }: NavbarProps) {
       <header
         className={cn(
           'fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-between border-b-[3px] border-primary px-6 backface-hidden transition-all delay-200 duration-[600ms] md:px-12 lg:px-24',
-          sticky
+          fixed
             ? 'visible bg-[url(/images/general/bg_pattern.webp)] opacity-100'
             : 'invisible opacity-0',
         )}
