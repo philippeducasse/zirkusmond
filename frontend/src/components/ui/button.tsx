@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
+import type { VariantProps } from 'class-variance-authority'
 import { Slot } from 'radix-ui'
 
 import { cn } from '#/lib/utils.ts'
@@ -14,7 +15,7 @@ const buttonVariants = cva(
         outline:
           'font-bold text-primary bg-white/5 tracking-wide duration-300 hover:bg-black/10 aria-expanded:bg-muted aria-expanded:text-foreground disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
         secondary:
-          'font-bold text-secondary-foreground bg-secondary border-secondary-foreground/20 border-double tracking-wide duration-300 shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_color-mix(in_oklch,var(--secondary-foreground)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] hover:border-secondary-foreground/40 hover:-translate-y-1 hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_color-mix(in_oklch,var(--secondary-foreground)_45%,transparent)] active:shadow-[0_4px_10px_-4px_rgba(0,0,0,0.4),0_0_10px_-4px_color-mix(in_oklch,var(--secondary-foreground)_30%,transparent)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
+          'font-bold text-white bg-transparent border-primary border-double tracking-wide duration-300 shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_color-mix(in_oklch,var(--secondary-foreground)_35%,transparent)] hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] hover:border-secondary-foreground/40 hover:-translate-y-1 hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_color-mix(in_oklch,var(--secondary-foreground)_45%,transparent)] active:shadow-[0_4px_10px_-4px_rgba(0,0,0,0.4),0_0_10px_-4px_color-mix(in_oklch,var(--secondary-foreground)_30%,transparent)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
         ghost:
           'font-bold text-primary tracking-wide duration-300 hover:text-primary/80 hover:-translate-y-1 active:translate-y-0 aria-expanded:text-primary/80 disabled:opacity-80 disabled:cursor-not-allowed disabled:translate-y-0',
         destructive:
