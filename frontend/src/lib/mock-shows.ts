@@ -1,6 +1,6 @@
 export interface MockShowEvent {
   id: string
-  /** Full display date, e.g. "Sonntag 05.07.26 um 20:00" (used on cards and the reservation event picker). */
+  /** Full display date, e.g. "Sonntag 05.07.26" (used on cards and the reservation event picker). */
   label: string
   beginTime: string
   admissionTime: string
@@ -44,25 +44,25 @@ export const MOCK_SHOWS: MockShow[] = [
     events: [
       {
         id: 'e1',
-        label: 'Sonntag 05.07.26 um 20:00',
+        label: 'Sonntag 05.07.26',
         beginTime: '20:00',
         admissionTime: '19:30',
       },
       {
         id: 'e2',
-        label: 'Sonntag 12.07.26 um 20:00',
+        label: 'Sonntag 12.07.26',
         beginTime: '20:00',
         admissionTime: '19:30',
       },
       {
         id: 'e3',
-        label: 'Sonntag 19.07.26 um 20:00',
+        label: 'Sonntag 19.07.26',
         beginTime: '20:00',
         admissionTime: '19:30',
       },
       {
         id: 'e4',
-        label: 'Sonntag 26.07.26 um 20:00',
+        label: 'Sonntag 26.07.26',
         beginTime: '20:00',
         admissionTime: '19:30',
       },
@@ -119,7 +119,7 @@ export const MOCK_SHOWS: MockShow[] = [
     events: [
       {
         id: 'e8',
-        label: 'Freitag 04.09.26 um 20:00',
+        label: 'Freitag 04.09.26',
         beginTime: '20:00',
         admissionTime: '19:30',
       },
@@ -140,7 +140,7 @@ export const MOCK_SHOWS: MockShow[] = [
     events: [
       {
         id: 'e9',
-        label: 'Samstag 19.09.26 um 20:00',
+        label: 'Samstag 19.09.26',
         beginTime: '20:00',
         admissionTime: '19:30',
       },
