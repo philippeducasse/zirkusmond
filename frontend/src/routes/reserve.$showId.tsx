@@ -1,7 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import PageContainer from '#/components/common/PageContainer.tsx'
-import ReservationForm from '#/components/common/reserve/ReservationForm.tsx'
+import ReservationPage from '#/components/common/reserve/reservationPage.tsx'
 import { getMockShowById } from '#/lib/mock-shows.ts'
 
 export const Route = createFileRoute('/reserve/$showId')({
@@ -26,7 +26,7 @@ function RouteComponent() {
       <h1 className="mb-4 text-center text-3xl text-primary lg:text-5xl">
         {show.title}
       </h1>
-      <ReservationForm show={show} />
+      <ReservationPage show={show} />
     </PageContainer>
   )
 }
