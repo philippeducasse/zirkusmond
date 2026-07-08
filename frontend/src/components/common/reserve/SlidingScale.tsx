@@ -14,11 +14,11 @@ export default function SlidingScale({
 }: SlidingScaleProps) {
   if (!show.baseTicketPrice) return null
 
-  const minPrice = show.minTicketPrice ?? (show.baseTicketPrice ?? 0) - 10
-  const maxPrice = show.maxTicketPrice ?? (show.baseTicketPrice ?? 0) + 10
+  const minPrice = show.minTicketPrice ?? show.baseTicketPrice - 10
+  const maxPrice = show.maxTicketPrice ?? show.baseTicketPrice + 10
 
   return (
-    <div className="my-6 border-2 border-primary">
+    <div className="my-6">
       <h4 className="mb-3 text-2xl text-primary">Choose Your Price</h4>
       <p className="my-6 text-lg">
         We offer sliding scale pricing to make our shows accessible. Pay what
