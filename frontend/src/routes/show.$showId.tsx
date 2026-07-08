@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 
 import PageContainer from '#/components/common/PageContainer.tsx'
 import SectionDivider from '#/components/common/home/SectionDivider.tsx'
+import TimeDetails from '#/components/common/TimeDetails.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import type { MockShow } from '#/lib/mock-shows.ts'
 import { getMockShowById } from '#/lib/mock-shows.ts'
@@ -48,13 +49,14 @@ function RouteComponent() {
         className="mx-auto w-full object-cover"
       />
 
-      <div className="flex flex-wrap justify-center gap-6 py-8 text-center">
+      <div className="flex flex-wrap justify-center gap-6 py-8">
         {show.events.map((event) => (
-          <div key={event.id} className="text-lg">
-            <p className="text-center">{event.label}</p>
-            <p>Show begin: {event.beginTime}</p>
-            <p>Admission: {event.admissionTime}</p>
-          </div>
+          <TimeDetails
+            key={event.id}
+            date={event.label}
+            beginTime={event.beginTime}
+            admissionTime={event.admissionTime}
+          />
         ))}
       </div>
 
