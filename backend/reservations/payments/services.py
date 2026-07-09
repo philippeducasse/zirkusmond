@@ -1,12 +1,16 @@
 from decimal import Decimal
+from typing import Any
 
 from django.db import transaction
+from django.forms import BaseFormSet
 
+from events.forms import ReservationForm
 from events.models import Event
 from reservations.models import Guest, Reservation, ReservationPayment
+from shows.models import Show
 
 
-def parse_custom_price(show, raw_custom_price):
+def parse_custom_price(show: Show, raw_custom_price: str | None) -> Decimal | None:
     """Returns a validated Decimal price or None. Raises ValueError if out of the allowed range."""
     if not raw_custom_price:
         return None
@@ -25,8 +29,12 @@ def parse_custom_price(show, raw_custom_price):
 
 
 def create_reservation_with_payment(
-    reservation_form, guest_formset, guest_count, variant, custom_price
-):
+    reservation_form: ReservationForm,
+    guest_formset: BaseFormSet,
+    guest_count: int,
+    variant: str,
+    custom_price: Decimal | None,
+) -> ReservationPayment:
     with transaction.atomic():
         reservation = reservation_form.save()
         for i in range(guest_count):
@@ -40,7 +48,13 @@ def create_reservation_with_payment(
     return payment
 
 
-def create_reservation(event, first_name, last_name, email, guests):
+def create_reservation(
+    event: Event,
+    first_name: str,
+    last_name: str,
+    email: str,
+    guests: list[dict[str, Any]],
+) -> Reservation:
     """Create reservation for Stripe PaymentIntent flow."""
     with transaction.atomic():
         reservation = Reservation.objects.create(

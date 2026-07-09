@@ -2,9 +2,10 @@ from io import BytesIO
 
 import xlsxwriter
 from django.contrib import admin
-from unfold.admin import ModelAdmin
-from django.http import HttpResponse
+from django.db.models import QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.utils import timezone
+from unfold.admin import ModelAdmin
 
 from .models import NewsletterRegistration
 
@@ -14,7 +15,9 @@ class NewsletterRegistrationAdmin(ModelAdmin):
     actions = ["export_adresses"]
 
     @admin.action(description="Export EMail Adresses")
-    def export_adresses(self, request, queryset):
+    def export_adresses(
+        self, request: HttpRequest, queryset: QuerySet[NewsletterRegistration]
+    ) -> HttpResponse:
         output = BytesIO()
         workbook = xlsxwriter.Workbook(output)
         worksheet = workbook.add_worksheet()

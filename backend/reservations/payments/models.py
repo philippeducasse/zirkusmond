@@ -1,6 +1,7 @@
 import uuid
+from collections.abc import Iterator
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
 from django.contrib import admin
@@ -23,17 +24,17 @@ class ReservationPayment(BasePayment):
         null=True, blank=True, help_text="Custom price selected by user (sliding scale)"
     )
 
-    def get_metadata(self):
+    def get_metadata(self) -> dict[str, str]:
         return {
             "event": str(self.reservation),
             "reservation_id": str(self.id),
         }
 
-    def get_failure_url(self):
+    def get_failure_url(self) -> str:
         protocol = "https" if settings.PAYMENT_USES_SSL else "http"
         return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/failure"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         protocol = "https" if settings.PAYMENT_USES_SSL else "http"
         return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/success"
 
@@ -43,7 +44,7 @@ class ReservationPayment(BasePayment):
             "process_payment", kwargs={"token": self.token}
         )
 
-    def get_purchased_items(self):
+    def get_purchased_items(self) -> Iterator[PurchasedItem]:
         yield PurchasedItem(
             name=f"{self.reservation.event.show.title} {self.reservation.event}",
             sku=self.reservation.event.pk,
@@ -53,7 +54,7 @@ class ReservationPayment(BasePayment):
         )
 
     @property
-    def ticket_price(self):
+    def ticket_price(self) -> Decimal:
         if self.custom_ticket_price is not None:
             return Decimal(self.custom_ticket_price)
         show = self.reservation.event.show
@@ -62,7 +63,7 @@ class ReservationPayment(BasePayment):
             price = Decimal(15.0)
         return price
 
-    def validate_custom_price(self, base_price):
+    def validate_custom_price(self, base_price: int | None) -> bool:
         if self.custom_ticket_price is None:
             return True
         show = self.reservation.event.show
@@ -71,7 +72,9 @@ class ReservationPayment(BasePayment):
         return min_price <= self.custom_ticket_price <= max_price
 
     @staticmethod
-    def from_reservation(reservation: "Reservation", variant: str, custom_ticket_price=None):
+    def from_reservation(
+        reservation: "Reservation", variant: str, custom_ticket_price: Decimal | None = None
+    ) -> "ReservationPayment":
         payment = ReservationPayment(
             reservation=reservation,
             variant=variant,
@@ -84,11 +87,11 @@ class ReservationPayment(BasePayment):
         return payment
 
     @admin.display
-    def ticket_count(self):
+    def ticket_count(self) -> int:
         return self.reservation.ticket_count()
 
     @admin.display
-    def event(self):
+    def event(self) -> str:
         return f"{self.reservation.event}"
 
 
@@ -116,7 +119,12 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     @classmethod
-    def create_for_reservation(cls, reservation, custom_ticket_price, payment_method):
+    def create_for_reservation(
+        cls,
+        reservation: "Reservation",
+        custom_ticket_price: int | None,
+        payment_method: str,
+    ) -> Self:
         if custom_ticket_price is None:
             raise ValueError("Custom ticket price must be provided")
 
@@ -139,10 +147,10 @@ class Payment(models.Model):
             total=total,
         )
 
-    def get_failure_url(self):
+    def get_failure_url(self) -> str:
         protocol = "https" if settings.PAYMENT_USES_SSL else "http"
         return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/failure"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         protocol = "https" if settings.PAYMENT_USES_SSL else "http"
         return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/success"

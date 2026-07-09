@@ -1,7 +1,10 @@
 import datetime
 
+from django.db.models import QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from newsletter.forms import NewsletterRegistrationForm
@@ -10,7 +13,7 @@ from shows.models import Show
 from shows.serializers import ShowCardSerializer
 
 
-def _upcoming_shows():
+def _upcoming_shows() -> list[Show]:
     upcoming_shows = Show.objects.prefetch_related("events").all()
     upcoming_shows = list(filter(lambda x: x.show_in_preview(), upcoming_shows))
     upcoming_shows = sorted(
@@ -24,12 +27,12 @@ def _upcoming_shows():
     return upcoming_shows
 
 
-def _rental_objects():
+def _rental_objects() -> QuerySet[RentalObject]:
     rental_objects = RentalObject.objects.all()
     return rental_objects
 
 
-def homepage(request):
+def homepage(request: HttpRequest) -> HttpResponse:
     upcoming_shows = _upcoming_shows()[:6]
     newsletter_form = NewsletterRegistrationForm()
     return render(
@@ -45,28 +48,28 @@ def homepage(request):
 
 
 @api_view(["GET"])
-def homepage_api(request):
+def homepage_api(request: Request) -> Response:
     shows = _upcoming_shows()[:6]
     return Response({"upcoming_shows": ShowCardSerializer(shows, many=True).data})
 
 
-def about(request):
+def about(request: HttpRequest) -> HttpResponse:
     return render(request, "about.html")
 
 
-def contact(request):
+def contact(request: HttpRequest) -> HttpResponse:
     return render(request, "contact.html")
 
 
-def rentals(request):
+def rentals(request: HttpRequest) -> HttpResponse:
     return render(request, "rentals.html", {"rental_objects": _rental_objects()})
 
 
-def international(request):
+def international(request: HttpRequest) -> HttpResponse:
     return render(request, "international.html")
 
 
-def event_list(request):
+def event_list(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "events.html",
@@ -78,11 +81,11 @@ def event_list(request):
     )
 
 
-def handle404(request, exception):
+def handle404(request: HttpRequest, exception: Exception) -> HttpResponse:
     return render(request, "404.html", status=404)
 
 
-def server_error(request):
+def server_error(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "error_message.html",
@@ -91,7 +94,7 @@ def server_error(request):
     )
 
 
-def permission_denied(request, exception):
+def permission_denied(request: HttpRequest, exception: Exception) -> HttpResponse:
     return render(
         request,
         "error_message.html",
@@ -100,7 +103,7 @@ def permission_denied(request, exception):
     )
 
 
-def bad_request(request, exception):
+def bad_request(request: HttpRequest, exception: Exception) -> HttpResponse:
     return render(
         request,
         "error_message.html",
@@ -109,24 +112,24 @@ def bad_request(request, exception):
     )
 
 
-def impressum(request):
+def impressum(request: HttpRequest) -> HttpResponse:
     """display impressum"""
     return render(request, "impressum.html")
 
 
-def datenschutz(request):
+def datenschutz(request: HttpRequest) -> HttpResponse:
     """display datenschutz"""
     return render(request, "datenschutz.html")
 
 
-def robots(request):
+def robots(request: HttpRequest) -> HttpResponse:
     """display impressum"""
     private_shows = Show.objects.filter(private=True)
     shows = Show.objects.filter(private=False)
     return render(request, "robots.txt", {"private_shows": private_shows, "shows": shows})
 
 
-def sitemap(request):
+def sitemap(request: HttpRequest) -> HttpResponse:
     """sitemap.xml"""
     shows = Show.objects.filter(private=False)
     return render(request, "sitemap.xml", {"shows": shows})

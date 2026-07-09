@@ -2,23 +2,25 @@ from io import BytesIO
 
 import xlsxwriter
 from django.contrib import admin
-from unfold.admin import ModelAdmin
-from unfold.decorators import action
 from django.db.models import (
     Count,
     DecimalField,
     IntegerField,
     OuterRef,
+    QuerySet,
     Subquery,
     Sum,
     Value,
 )
 from django.db.models.functions import Coalesce, Lower
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from payments import PaymentStatus
+from unfold.admin import ModelAdmin
+from unfold.decorators import action
+from xlsxwriter.worksheet import Worksheet
 
 from events.models import Event, PastEvent, UpcomingEvent
-from reservations.models import Guest, ReservationPayment
+from reservations.models import Guest, Reservation, ReservationPayment
 from reservations.payments.admin import reservation_to_dict, send_email_to_reservants
 
 
@@ -42,7 +44,7 @@ class BaseEventAdmin(ModelAdmin):
             "all": ("admin/css/mobile-responsive-admin.css",),
         }
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Event]:
         queryset = super().get_queryset(request)
         queryset = queryset.select_related("show")
 
@@ -92,13 +94,15 @@ class BaseEventAdmin(ModelAdmin):
         return queryset
 
     @admin.display(description="Revenue", ordering="total_revenue")
-    def revenue(self, obj):
+    def revenue(self, obj: Event) -> str:
         if obj.total_revenue is None:
             return "—"
         return f"€ {obj.total_revenue:.2f}"
 
     @admin.action(description="Print Reservation List")
-    def print_reservations(self, request, queryset):
+    def print_reservations(
+        self, request: HttpRequest, queryset: QuerySet[Event]
+    ) -> HttpResponse | None:
         for event in queryset:
             payments = ReservationPayment.objects.filter(
                 reservation__event=event, status=PaymentStatus.CONFIRMED
@@ -117,7 +121,9 @@ class BaseEventAdmin(ModelAdmin):
 
             columns = ["first_name", "last_name", "email", f"{event.date_str()}"]
 
-            def add_row(worksheet, row, person, count):
+            def add_row(
+                worksheet: Worksheet, row: int, person: Reservation | Guest, count: int
+            ) -> None:
                 worksheet.write_row(
                     row,
                     0,
@@ -154,8 +160,8 @@ class BaseEventAdmin(ModelAdmin):
             return response
 
     @admin.action(description="Send mail to Reservants")
-    def send_to_reservants(self, request, queryset):
-        all_payments = []
+    def send_to_reservants(self, request: HttpRequest, queryset: QuerySet[Event]) -> HttpResponse:
+        all_payments: list[ReservationPayment] = []
         for event in queryset:
             all_payments += list(
                 ReservationPayment.objects.filter(status="confirmed", reservation__event=event)
@@ -164,7 +170,7 @@ class BaseEventAdmin(ModelAdmin):
         return send_email_to_reservants(request, dicts, self)
 
     @action(description="Send mail to Reservants", url_path="send-mail", icon="mail")
-    def send_mail_to_reservants_detail(self, request, object_id):
+    def send_mail_to_reservants_detail(self, request: HttpRequest, object_id: str) -> HttpResponse:
         payments = ReservationPayment.objects.filter(
             status="confirmed", reservation__event_id=object_id
         )

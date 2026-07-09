@@ -1,9 +1,11 @@
 from decimal import Decimal
 
 from django.forms import formset_factory
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from events.forms import GuestForm, ReservationForm
@@ -18,7 +20,7 @@ from reservations.serializers import ReservationSerializer
 from shows.models import Show
 
 
-def reserve(request, show_id):
+def reserve(request: HttpRequest, show_id: int) -> HttpResponse | HttpResponseRedirect:
     show = get_object_or_404(Show, pk=show_id)
     guest_form_set = formset_factory(GuestForm, max_num=9, extra=9)
     newsletter = False
@@ -87,7 +89,7 @@ def reserve(request, show_id):
 
 
 @api_view(["POST"])
-def reserve_api(request, show_id):
+def reserve_api(request: Request, show_id: int) -> Response:
     show = get_object_or_404(Show, pk=show_id)
     serializer = ReservationSerializer(data=request.data)
 

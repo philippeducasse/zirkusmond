@@ -1,14 +1,17 @@
+from typing import Any, NoReturn
+
 import stripe
-from django.http import JsonResponse
+from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_base_url
+from payments.models import BasePayment
 from payments.stripe.providers import StripeProviderV3 as BaseStripeProviderV3
 
 
 class StripeProviderV3(BaseStripeProviderV3):
-    def get_token_from_request(self, payment, request) -> str:
-        event = self.return_event_payload(request)
+    def get_token_from_request(self, payment: BasePayment, request: HttpRequest) -> str:
+        event: dict[str, Any] | stripe.Event = self.return_event_payload(request)
         event_type = event.get("type", "")
 
         if event_type == "charge.failed":
@@ -21,7 +24,7 @@ class StripeProviderV3(BaseStripeProviderV3):
 
         return super().get_token_from_request(payment, request)
 
-    def _token_from_payment_intent(self, pi_id, event_type):
+    def _token_from_payment_intent(self, pi_id: str | None, event_type: str) -> str:
         from payments import get_payment_model
 
         if not pi_id:
@@ -37,13 +40,13 @@ class StripeProviderV3(BaseStripeProviderV3):
                 code=400, message=f"multiple payments found for payment_intent {pi_id}"
             )
 
-    def get_form(self, payment, data=None):
+    def get_form(self, payment: BasePayment, data: Any = None) -> NoReturn:
         """Override to avoid storing the Session object."""
         import stripe
 
         stripe.api_key = self.api_key
 
-        items = []
+        items: list[dict[str, Any]] = []
         for item in payment.get_purchased_items():
             items.append(
                 {
@@ -67,9 +70,9 @@ class StripeProviderV3(BaseStripeProviderV3):
 
         raise RedirectNeeded(session.url)
 
-    def process_data(self, payment, request):
+    def process_data(self, payment: BasePayment, request: HttpRequest) -> JsonResponse:
         """Override to handle explicit payment failures (not session expiration)."""
-        event = self.return_event_payload(request)
+        event: dict[str, Any] | stripe.Event = self.return_event_payload(request)
         event_type = event.get("type")
 
         if event_type in [
@@ -125,13 +128,13 @@ class StripeProviderV3(BaseStripeProviderV3):
 class TestStripeProvider(BasicProvider):
     """Redirect-based provider for local development. No webhooks or external services."""
 
-    def __init__(self, secret_key, **kwargs):
+    def __init__(self, secret_key: str, **kwargs: Any) -> None:
         self.secret_key = secret_key
         stripe.api_key = self.secret_key
         self.callback_host = get_base_url()
         super().__init__(**kwargs)
 
-    def create_stripe_session(self, payment, *args, **kwargs):
+    def create_stripe_session(self, payment: BasePayment, *args: Any, **kwargs: Any) -> str | None:
         try:
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
@@ -157,10 +160,10 @@ class TestStripeProvider(BasicProvider):
             payment.change_status(PaymentStatus.REJECTED)
             raise RedirectNeeded(payment.get_failure_url())
 
-    def get_form(self, payment, data=None):
+    def get_form(self, payment: BasePayment, data: Any = None) -> NoReturn:
         session_url = self.create_stripe_session(payment)
         raise RedirectNeeded(session_url)
 
-    def process_data(self, payment, request):
+    def process_data(self, payment: BasePayment, request: HttpRequest) -> HttpResponseRedirect:
         payment.change_status(PaymentStatus.CONFIRMED)
         return redirect(payment.get_success_url())

@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -7,12 +8,15 @@ from payments import PaymentStatus
 from payments.signals import status_changed
 
 from events import services
+from reservations.models import ReservationPayment
 
 logger = logging.getLogger(__name__)
 
 
 @receiver(status_changed)
-def on_payment_status_changed(sender, instance, **kwargs):
+def on_payment_status_changed(
+    sender: type[ReservationPayment], instance: ReservationPayment, **kwargs: Any
+) -> None:
     reservation = getattr(instance, "reservation", None)
     if not reservation:
         logger.error("failed to send retrieve reservation %s", instance)
