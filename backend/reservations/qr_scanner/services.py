@@ -1,15 +1,25 @@
+import uuid
+from typing import Any
+
+from django.db.models import QuerySet
 from django.utils import timezone
 from payments import PaymentStatus
 
 from reservations.models import Guest, Reservation
 
 
-def _payment_rejected(reservation):
+def _payment_rejected(reservation: Reservation) -> bool:
     payment = reservation.reservationpayment_set.order_by("-created").first()
     return payment is not None and payment.status == PaymentStatus.REJECTED
 
 
-def _do_check_in(entity, reservation, ticket_id, names, **extra):
+def _do_check_in(
+    entity: Reservation | Guest,
+    reservation: Reservation,
+    ticket_id: uuid.UUID | None,
+    names: list[str],
+    **extra: Any,
+) -> tuple[dict[str, Any], int]:
     if _payment_rejected(reservation):
         return {
             "error": "Payment rejected",
@@ -27,7 +37,7 @@ def _do_check_in(entity, reservation, ticket_id, names, **extra):
     return {"success": True, "reservation_number": str(ticket_id), "guests": names, **extra}, 200
 
 
-def check_in_ticket(ticket_id):
+def check_in_ticket(ticket_id: uuid.UUID) -> tuple[dict[str, Any], int]:
     """Returns (response_dict, http_status_code)."""
     try:
         reservation = Reservation.objects.get(id=ticket_id)
@@ -44,7 +54,7 @@ def check_in_ticket(ticket_id):
         return {"error": "Ticket not found"}, 404
 
 
-def get_upcoming_events():
+def get_upcoming_events() -> QuerySet[dict[str, Any]]:
     from events.models import Event
 
     today = timezone.now().date()

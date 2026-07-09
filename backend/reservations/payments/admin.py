@@ -1,11 +1,14 @@
+from typing import Any
+
 from django import forms
 from django.contrib import admin, messages
 from django.core.mail import EmailMessage
-from django.http import HttpResponseRedirect
+from django.db.models import QuerySet
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import Context, Template
 from django.template.response import TemplateResponse
-from django.urls import path
+from django.urls import URLPattern, URLResolver, path
 from django.utils import timezone
 from payments import PaymentStatus
 from unfold.admin import ModelAdmin
@@ -13,10 +16,10 @@ from unfold.admin import ModelAdmin
 from events import services
 from events.forms import EmailTextForm
 from events.services import purge_old_payments
-from reservations.models import ReservationPayment
+from reservations.models import Reservation, ReservationPayment
 
 
-def reservation_to_dict(reservation):
+def reservation_to_dict(reservation: Reservation) -> dict[str, Any]:
     return {
         "show_title": reservation.event.show.title,
         "event_time": reservation.event.time_and_date(),
@@ -26,14 +29,16 @@ def reservation_to_dict(reservation):
     }
 
 
-def render_mail(subject, body, context):
+def render_mail(subject: str, body: str, context: dict[str, Any]) -> tuple[str, str]:
     context = Context(context)
     rendered_subject = Template(subject).render(context)
     rendered_body = Template(body).render(context)
     return rendered_subject, rendered_body
 
 
-def send_email_to_reservants(request, dicts, admin_instance):
+def send_email_to_reservants(
+    request: HttpRequest, dicts: list[dict[str, Any]], admin_instance: ModelAdmin
+) -> HttpResponseRedirect | TemplateResponse:
     if "text_field" in request.POST.keys():
         form = EmailTextForm(request.POST)
     else:
@@ -80,7 +85,7 @@ class PurgeForm(forms.Form):
     dry_run = forms.BooleanField(required=False, initial=True, label="Dry run (no changes)")
 
 
-def purge_old_payments_view(request):
+def purge_old_payments_view(request: HttpRequest) -> HttpResponseRedirect | HttpResponse:
     if request.method == "POST":
         form = PurgeForm(request.POST)
         if form.is_valid():
@@ -117,7 +122,9 @@ class ReservationPaymentStatusFilter(admin.SimpleListFilter):
     title = "Status"
     parameter_name = "status"
 
-    def lookups(self, request, model_admin):
+    def lookups(
+        self, request: HttpRequest, model_admin: admin.ModelAdmin
+    ) -> list[tuple[str, str]]:
         return [
             (PaymentStatus.WAITING, "Waiting"),
             (PaymentStatus.CONFIRMED, "Confirmed"),
@@ -126,7 +133,9 @@ class ReservationPaymentStatusFilter(admin.SimpleListFilter):
             (PaymentStatus.ERROR, "Error"),
         ]
 
-    def queryset(self, request, queryset):
+    def queryset(
+        self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
+    ) -> QuerySet[ReservationPayment]:
         if self.value():
             return queryset.filter(status=self.value())
         return queryset
@@ -136,13 +145,17 @@ class ReservationPaymentEventFilter(admin.SimpleListFilter):
     title = "Event"
     parameter_name = "event"
 
-    def lookups(self, request, model_admin):
+    def lookups(
+        self, request: HttpRequest, model_admin: admin.ModelAdmin
+    ) -> list[tuple[str, str]]:
         return [
             ("upcoming", "Upcoming"),
             ("past", "Past"),
         ]
 
-    def queryset(self, request, queryset):
+    def queryset(
+        self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
+    ) -> QuerySet[ReservationPayment]:
         now = timezone.now()
         if self.value() == "upcoming":
             return queryset.filter(reservation__event__begin__gte=now)
@@ -154,7 +167,7 @@ class ReservationPaymentEventFilter(admin.SimpleListFilter):
 class ReservationPaymentAdmin(ModelAdmin):
     change_list_template = "admin/reservations/reservationpayment/change_list.html"
 
-    def get_urls(self):
+    def get_urls(self) -> list[URLPattern | URLResolver]:
         return [
             path(
                 "purge-old-payments/",
@@ -186,18 +199,22 @@ class ReservationPaymentAdmin(ModelAdmin):
     actions = ["resend_confirmation_mail", "send_to_reservants"]
 
     @admin.display(description="Total")
-    def confirmed_total(self, obj):
+    def confirmed_total(self, obj: ReservationPayment) -> str:
         if obj.status != PaymentStatus.CONFIRMED:
             return "€ 0.00"
         return f"€ {obj.total:.2f}"
 
     @admin.action(description="Resend confirmation E-Mail")
-    def resend_confirmation_mail(self, request, queryset):
+    def resend_confirmation_mail(
+        self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
+    ) -> None:
         for payment in queryset:
             services.send_confirmation_mail(payment.reservation)
 
     @admin.action(description="Send mail to Reservants")
-    def send_to_reservants(self, request, queryset):
+    def send_to_reservants(
+        self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
+    ) -> HttpResponseRedirect | TemplateResponse:
         dicts = [reservation_to_dict(payment.reservation) for payment in queryset]
         return send_email_to_reservants(request, dicts, self)
 

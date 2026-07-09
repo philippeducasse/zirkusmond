@@ -9,8 +9,8 @@ class RentalObject(models.Model):
     link = models.CharField(max_length=255, blank=True)
     last_modified = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def lastmod(self):
+    def lastmod(self) -> str:
         return self.last_modified.strftime("%Y-%m-%d")

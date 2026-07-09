@@ -1,8 +1,9 @@
 from datetime import UTC, datetime, timedelta
 from io import BytesIO
+from typing import Any
 
 from django.core.files.base import ContentFile
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from payments import PaymentStatus
 from PIL import Image
 
@@ -14,14 +15,14 @@ from shows.models import Show
 class Command(BaseCommand):
     help = "Populate database with fixture shows and events"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
             "--clear",
             action="store_true",
             help="Delete all existing shows and events before creating fixtures",
         )
 
-    def create_placeholder_image(self):
+    def create_placeholder_image(self) -> ContentFile:
         """Create a simple placeholder image."""
         image = Image.new("RGB", (400, 300), color="lightblue")
         image_io = BytesIO()
@@ -29,14 +30,14 @@ class Command(BaseCommand):
         image_io.seek(0)
         return ContentFile(image_io.getvalue(), name="placeholder.png")
 
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         if options["clear"]:
             Show.objects.all().delete()
             Event.objects.all().delete()
             self.stdout.write(self.style.WARNING("Deleted all existing shows and events"))
 
         # Create 50 shows: 5 with future events (2036), 45 with past events
-        shows_to_create = []
+        shows_to_create: list[tuple[Show, bool]] = []
         for i in range(1, 51):
             is_future = i <= 5
             show = Show(
@@ -49,14 +50,14 @@ class Command(BaseCommand):
             shows_to_create.append((show, is_future))
 
         # Save shows first
-        shows = []
+        shows: list[tuple[Show, bool]] = []
         for show, is_future in shows_to_create:
             show.save()
             shows.append((show, is_future))
             self.stdout.write(f"Created show: {show.title}")
 
         # Create events for each show with different dates
-        events_to_create = []
+        events_to_create: list[Event] = []
         for idx, (show, is_future) in enumerate(shows):
             if is_future:
                 # Events in 2036, spread across multiple months
@@ -83,9 +84,9 @@ class Command(BaseCommand):
         Event.objects.bulk_create(events_to_create)
 
         # Create reservations and payments for all events
-        reservations_to_create = []
-        payments_to_create = []
-        guests_to_create = []
+        reservations_to_create: list[Reservation] = []
+        payments_to_create: list[ReservationPayment] = []
+        guests_to_create: list[Guest] = []
 
         for event in Event.objects.all():
             # Create 2-8 reservations per event

@@ -1,5 +1,8 @@
+from typing import Any
+
 from django.core.exceptions import ValidationError
 from django.forms import CharField, Form, IntegerField, ModelChoiceField, ModelForm
+from django.forms.boundfield import BoundField
 from tinymce.widgets import TinyMCE
 
 from events.models import Event
@@ -8,7 +11,7 @@ from shows.models import Show
 
 
 class EventModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
+    def label_from_instance(self, obj: Event) -> str:
         return f"{obj}" if obj.reservation_open() else f"RESERVATION CLOSED - {obj}"
 
 
@@ -19,7 +22,7 @@ class ReservationForm(ModelForm):
         model = Reservation
         fields = ["event", "first_name", "last_name", "email"]
 
-    def __init__(self, show: Show, *args, **kwargs):
+    def __init__(self, show: Show, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         all_events = Event.objects.filter(show=show.pk)
         open_ids = [e.pk for e in all_events if e.reservation_open()]
@@ -27,7 +30,7 @@ class ReservationForm(ModelForm):
             Event.objects.filter(pk__in=open_ids).order_by("begin")
         )
 
-    def clean(self):
+    def clean(self) -> None:
         cleaned_data = super().clean()
         event = cleaned_data.get("event")
         if event and not event.reservation_open():
@@ -41,10 +44,10 @@ class GuestForm(ModelForm):
         name_fields = ["first_name", "last_name"]
         fields = name_fields
 
-    def line_tuples(self):
+    def line_tuples(self) -> tuple[tuple[BoundField, BoundField]]:
         return ((self["first_name"], self["last_name"]),)
 
-    def clean(self):
+    def clean(self) -> None:
         cleaned_data = super().clean()
         for field in self.Meta.name_fields:
             if not cleaned_data.get(field):

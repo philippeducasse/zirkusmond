@@ -19,33 +19,33 @@ class Event(models.Model):
         ordering = ["admission"]
         verbose_name_plural = "all events"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return format_datetime(self.begin, "%A %d.%m.%y at %H:%M")
 
-    def clean(self):
+    def clean(self) -> None:
         from django.core.exceptions import ValidationError
 
         if self.begin and self.admission and self.begin < self.admission:
             raise ValidationError("Event cannot start before admission opens.")
 
     @admin.display(ordering="begin")
-    def time_and_date(self):
+    def time_and_date(self) -> str:
         return format_datetime(self.begin, "%d.%m.%y at %H:%M")
 
-    def date_str(self):
+    def date_str(self) -> str:
         return format_datetime(self.begin, "%d.%m.%y")
 
-    def elaborate_date_str(self):
+    def elaborate_date_str(self) -> str:
         return format_datetime(self.begin, "%A %d.%m.%y")
 
-    def admission_time(self):
+    def admission_time(self) -> str:
         return format_datetime(self.admission, "%H:%M")
 
-    def begin_time(self):
+    def begin_time(self) -> str:
         return format_datetime(self.begin, "%H:%M")
 
     @admin.display(ordering="annotated_reservation_count")
-    def reserved_tickets(self):
+    def reserved_tickets(self) -> str:
         if hasattr(self, "annotated_reservation_count"):
             return f"{self.annotated_reservation_count}/{self.reservation_capacity}"
         return f"{self.reservation_count()}/{self.reservation_capacity}"
@@ -61,7 +61,7 @@ class Event(models.Model):
         return True
 
     @admin.display
-    def reservation_count(self):
+    def reservation_count(self) -> int:
         if hasattr(self, "annotated_reservation_count"):
             return self.annotated_reservation_count
 
