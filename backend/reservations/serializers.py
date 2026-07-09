@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from rest_framework import serializers
 
@@ -21,11 +23,11 @@ class ReservationSerializer(serializers.Serializer):
     newsletter = serializers.BooleanField(required=False, default=False)
     guests = GuestSerializer(many=True, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["payment_method"].choices = list(settings.PAYMENT_VARIANTS.keys())
 
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         guests = data.get("guests", [])
         if len(guests) != data["attendee_count"] - 1:
             raise serializers.ValidationError(

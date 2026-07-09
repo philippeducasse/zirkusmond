@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 from io import BytesIO
+from typing import Any
 
 import qrcode
 from django.conf import settings
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 HALF_YEAR_DAYS = 220  # ≈6 months
 
 
-def _make_qr_buffer(data: dict) -> BytesIO:
+def _make_qr_buffer(data: dict[str, Any]) -> BytesIO:
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(json.dumps(data))
     qr.make(fit=True)
@@ -32,7 +33,7 @@ def _make_qr_buffer(data: dict) -> BytesIO:
     return buffer
 
 
-def _build_tickets_pdf(reservation: Reservation, tickets: list) -> BytesIO:
+def _build_tickets_pdf(reservation: Reservation, tickets: list[tuple[str, BytesIO]]) -> BytesIO:
     pdf_buffer = BytesIO()
     width, height = A4
     canvas = rl_canvas.Canvas(pdf_buffer, pagesize=A4)
@@ -80,7 +81,7 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list) -> BytesIO:
     return pdf_buffer
 
 
-def send_confirmation_mail(reservation: Reservation):
+def send_confirmation_mail(reservation: Reservation) -> None:
     logger.info(
         "send_confirmation_mail: reservation=%s event=%s email=%s tickets=%s",
         reservation.id,
@@ -174,7 +175,7 @@ Please note that tickets are non-refundable. However, if you can't make it, you'
     logger.info("confirmation email delivered for reservation=%s", reservation.id)
 
 
-def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):
+def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False) -> dict[str, Any]:
     cutoff = timezone.now() - datetime.timedelta(days=HALF_YEAR_DAYS)
 
     payments_qs = ReservationPayment.objects.filter(created__lt=cutoff)
@@ -222,7 +223,7 @@ def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False):
     }
 
 
-def purge_orphan_reservations(*, dry_run: bool = True):
+def purge_orphan_reservations(*, dry_run: bool = True) -> dict[str, Any]:
     orphan_reservations_qs = Reservation.objects.filter(
         ~Exists(ReservationPayment.objects.filter(reservation=OuterRef("pk")))
     )

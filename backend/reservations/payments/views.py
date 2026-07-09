@@ -1,12 +1,14 @@
 import logging
+import uuid
 
 import stripe
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from payments import RedirectNeeded
 from rest_framework import generics, status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,7 +21,7 @@ from reservations.payments.serializers import (
 logger = logging.getLogger(__name__)
 
 
-def payment(request, payment_id):
+def payment(request: HttpRequest, payment_id: uuid.UUID) -> HttpResponseRedirect | None:
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
     try:
         reservation_payment.get_form(data=request.POST or None)
@@ -30,7 +32,7 @@ def payment(request, payment_id):
 class CreatePaymentIntentView(generics.GenericAPIView):
     serializer_class = CreatePaymentIntentSerializer
 
-    def post(self, request, reservation_id):
+    def post(self, request: Request, reservation_id: uuid.UUID) -> Response:
         reservation = get_object_or_404(Reservation, id=reservation_id)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -43,7 +45,7 @@ class CreatePaymentIntentView(generics.GenericAPIView):
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        intent = stripe.PaymentIntent.create(
+        intent: stripe.PaymentIntent = stripe.PaymentIntent.create(
             amount=int(payment.total * 100),
             currency="eur",
             metadata={"reservation_id": str(reservation.id)},
@@ -56,7 +58,7 @@ class CreatePaymentIntentView(generics.GenericAPIView):
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
 
-def payment_success(request, payment_id):
+def payment_success(request: HttpRequest, payment_id: uuid.UUID) -> TemplateResponse:
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
     logger.info("payment_success: payment=%s status=%s", payment_id, reservation_payment.status)
     return TemplateResponse(
@@ -69,7 +71,7 @@ def payment_success(request, payment_id):
     )
 
 
-def payment_fail(request, payment_id):
+def payment_fail(request: HttpRequest, payment_id: uuid.UUID) -> TemplateResponse:
     reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
     return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
 
@@ -77,12 +79,12 @@ def payment_fail(request, payment_id):
 class StripeWebhookView(APIView):
     """Handle Stripe webhook events for PaymentIntent confirmations."""
 
-    def post(self, request):
+    def post(self, request: Request) -> Response | JsonResponse:
         payload = request.body
         sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
 
         try:
-            event = stripe.Webhook.construct_event(
+            event: stripe.Event = stripe.Webhook.construct_event(
                 payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
             )
         except ValueError:

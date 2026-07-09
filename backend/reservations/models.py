@@ -17,10 +17,10 @@ class Reservation(models.Model):
     checked_in = models.BooleanField(default=False)
 
     @admin.display
-    def ticket_count(self):
+    def ticket_count(self) -> int:
         return self.guests.count() + 1
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Reservation for {self.event} - tickets: {self.ticket_count()} — bought by {self.last_name} {self.first_name}"
 
 
@@ -33,7 +33,7 @@ class Guest(models.Model):
     )
     checked_in = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Guest: {self.first_name}, {self.last_name}"
 
 
