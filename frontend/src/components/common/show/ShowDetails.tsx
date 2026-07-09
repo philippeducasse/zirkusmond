@@ -1,7 +1,7 @@
-import type { Show } from "~/types/show";
+import type { MockShow } from '#/lib/mock-shows.ts'
 
 interface ShowDetailsProps {
-  show: Show;
+  show: MockShow
 }
 
 export function ShowDetails({ show }: ShowDetailsProps) {
@@ -15,7 +15,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
         <img
           src={show.cardImage}
           alt={show.title}
-          className="aspect-square w-full max-w-sm object-cover"
+          className="w-full max-w-sm object-cover"
         />
         <div className="flex flex-col lg:mt-12">
           <p className="mt-4 mb-4 text-3xl text-primary">Cast:</p>
@@ -45,5 +45,5 @@ export function ShowDetails({ show }: ShowDetailsProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -12,13 +12,13 @@ export default function TimeDetails({
   admissionTime,
 }: TimeDetailsProps) {
   return (
-    <Card className="max-w-[250px] border-2 border-primary bg-transparent text-left">
+    <Card className="max-w-62.5 border-2 border-primary bg-transparent text-left">
       <CardContent className="px-8 py-4">
         <CardDescription className="mb-2 font-bold text-center text-lg text-white">
           {date}
         </CardDescription>
-        <p className="text-primary">Show begin: {beginTime}</p>
-        <p className="text-primary">Admission: {admissionTime}</p>
+        <p className="text-primary font-semibold">Show begin: {beginTime}</p>
+        <p className="text-primary font-semibold">Admission: {admissionTime}</p>
       </CardContent>
     </Card>
   )

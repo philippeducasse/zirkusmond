@@ -1,9 +1,9 @@
 import { Button } from '#/components/ui/button.tsx'
-import { Checkbox } from '#/components/ui/checkbox.tsx'
-import { Field, FieldLabel } from '#/components/ui/field.tsx'
 import type { MockShow } from '#/lib/mock-shows.ts'
 import SectionDivider from '../home/SectionDivider.tsx'
 
+import DynamicField from './DynamicField.tsx'
+import { buildNewsletterField, buildPaymentMethodField } from './helper.ts'
 import SlidingScale from './SlidingScale.tsx'
 
 interface PaymentSectionProps {
@@ -30,19 +30,15 @@ export default function PaymentSection({
     : (show.reservationPrice ?? 5)
   const total = attendeeCount * pricePerTicket
 
+  const newsletterFields = buildNewsletterField({ newsletter, setNewsletter })
+  const paymentMethodFields = buildPaymentMethodField()
+
   return (
     <>
       <div className="bg-white/[0.19]">
-        <Field orientation="horizontal" className="my-6 flex p-4 items-center">
-          <Checkbox
-            id="newsletter"
-            checked={newsletter}
-            onCheckedChange={(checked) => setNewsletter(checked === true)}
-          />
-          <FieldLabel htmlFor="newsletter" className="font-normal">
-            I would like to receive the Zirkus Mond newsletter.
-          </FieldLabel>
-        </Field>
+        {newsletterFields.map((field) => (
+          <DynamicField key={field.id} field={field} />
+        ))}
       </div>
 
       <div className="my-6">
@@ -63,28 +59,9 @@ export default function PaymentSection({
       <h4 className="my-12 text-center text-2xl text-primary">
         Choose Your Payment Method
       </h4>
-      <div className="flex flex-col justify-evenly gap-4 md:flex-row">
-        <div className="my-2 mx-auto md:w-auto w-4/5">
-          <Button
-            type="submit"
-            name="payment-method"
-            value="paypal"
-            className="w-full"
-          >
-            PayPal
-          </Button>
-        </div>
-        <div className="my-2 mx-auto md:w-auto w-4/5">
-          <Button
-            type="submit"
-            name="payment-method"
-            value="stripe"
-            className="w-full"
-          >
-            Bank Card
-          </Button>
-        </div>
-      </div>
+      {paymentMethodFields.map((field) => (
+        <DynamicField key={field.id} field={field} />
+      ))}
       <SectionDivider type="moon" />
       <div className="mt-8 text-center">
         <Button type="button" size={'sm'} variant="secondary" onClick={onBack}>
