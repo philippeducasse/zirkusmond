@@ -84,19 +84,19 @@ export const MOCK_SHOWS: MockShow[] = [
     events: [
       {
         id: 'e5',
-        label: 'Freitag 14.08.26 um 19:30',
+        label: 'Freitag 14.08.26',
         beginTime: '19:30',
         admissionTime: '19:00',
       },
       {
         id: 'e6',
-        label: 'Samstag 15.08.26 um 19:30',
+        label: 'Samstag 15.08.26',
         beginTime: '19:30',
         admissionTime: '19:00',
       },
       {
         id: 'e7',
-        label: 'Sonntag 16.08.26 um 18:00',
+        label: 'Sonntag 16.08.26',
         beginTime: '18:00',
         admissionTime: '17:30',
       },
