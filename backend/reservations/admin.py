@@ -1,6 +1,11 @@
+from typing import Any
+
+from django import forms
 from django.contrib import admin
-from unfold.admin import ModelAdmin
+from django.db.models import Field, QuerySet
+from django.http import HttpRequest
 from django.utils import timezone
+from unfold.admin import ModelAdmin
 
 from events import services
 from events.models import Event
@@ -16,13 +21,17 @@ class ReservationStatusFilter(admin.SimpleListFilter):
     title = "event status"
     parameter_name = "event_status"
 
-    def lookups(self, request, model_admin):
+    def lookups(
+        self, request: HttpRequest, model_admin: admin.ModelAdmin
+    ) -> list[tuple[str, str]]:
         return [
             ("upcoming", "Upcoming"),
             ("past", "Past"),
         ]
 
-    def queryset(self, request, queryset):
+    def queryset(
+        self, request: HttpRequest, queryset: QuerySet[Reservation]
+    ) -> QuerySet[Reservation]:
         now = timezone.now()
         if self.value() == "upcoming":
             return queryset.filter(event__begin__gte=now)
@@ -49,14 +58,16 @@ class ReservationAdmin(ModelAdmin):
     list_select_related = ["event"]
     date_hierarchy = "event__begin"
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Reservation]:
         queryset = super().get_queryset(request)
         is_detail_view = request.resolver_match.url_name.endswith("_change")
         if not request.GET.get("event_status") and not is_detail_view:
             queryset = queryset.filter(event__begin__gte=timezone.now())
         return queryset
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    def formfield_for_foreignkey(
+        self, db_field: Field, request: HttpRequest, **kwargs: Any
+    ) -> forms.ModelChoiceField | None:
         if db_field.name == "event":
             is_upcoming = (
                 not request.GET.get("event_status") or request.GET.get("event_status") == "upcoming"
@@ -66,25 +77,25 @@ class ReservationAdmin(ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     @admin.display(ordering="last_name")
-    def last_name(self, obj):
+    def last_name(self, obj: Reservation) -> str:
         return obj.last_name
 
     @admin.display(ordering="first_name")
-    def first_name(self, obj):
+    def first_name(self, obj: Reservation) -> str:
         return obj.first_name
 
     @admin.display(ordering="email")
-    def email(self, obj):
+    def email(self, obj: Reservation) -> str:
         return obj.email
 
     @admin.display(ordering="checked_in")
-    def checked_in(self, obj):
+    def checked_in(self, obj: Reservation) -> bool:
         return obj.checked_in
 
     checked_in.boolean = True
 
     @admin.action(description="Resend Reservation confirmation mail")
-    def resend_confirmation_mail(self, request, queryset):
+    def resend_confirmation_mail(self, request: HttpRequest, queryset: QuerySet[Reservation]) -> None:
         for reservation in queryset:
             services.send_confirmation_mail(reservation)
 
@@ -103,15 +114,15 @@ class GuestAdmin(ModelAdmin):
     list_select_related = ["reservation__event"]
 
     @admin.display(ordering="last_name")
-    def last_name(self, obj):
+    def last_name(self, obj: Guest) -> str:
         return obj.last_name
 
     @admin.display(ordering="first_name")
-    def first_name(self, obj):
+    def first_name(self, obj: Guest) -> str:
         return obj.first_name
 
     @admin.display(ordering="checked_in")
-    def checked_in(self, obj):
+    def checked_in(self, obj: Guest) -> bool:
         return obj.checked_in
 
     checked_in.boolean = True

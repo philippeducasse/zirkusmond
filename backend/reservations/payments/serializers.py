@@ -17,6 +17,6 @@ class PaymentIntentResponseSerializer(serializers.ModelSerializer):
 
     client_secret = serializers.SerializerMethodField()
 
-    def get_client_secret(self, obj):
+    def get_client_secret(self, obj: Payment) -> str | None:
         # This will be set on the object after Stripe intent creation
         return getattr(obj, "_client_secret", None)

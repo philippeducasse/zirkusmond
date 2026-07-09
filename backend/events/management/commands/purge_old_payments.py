@@ -1,4 +1,6 @@
-from django.core.management.base import BaseCommand
+from typing import Any
+
+from django.core.management.base import BaseCommand, CommandParser
 
 from events.services import purge_old_payments
 
@@ -6,11 +8,11 @@ from events.services import purge_old_payments
 class Command(BaseCommand):
     help = "Delete ReservationPayments older than ~6 months and bump SiteStats.deleted_visitors."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--confirmed-only", action="store_true")
         parser.add_argument("--dry-run", action="store_true")
 
-    def handle(self, *args, **opts):
+    def handle(self, *args: Any, **opts: Any) -> None:
         result = purge_old_payments(
             confirmed_only=opts["confirmed_only"],
             dry_run=opts["dry_run"],

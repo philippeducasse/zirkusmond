@@ -1,12 +1,14 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from io import BytesIO
+from typing import Any
 
 from django.contrib.admin import AdminSite
 from django.contrib.auth.models import User
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core import mail
+from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 from payments import PaymentStatus
@@ -22,14 +24,14 @@ from shows.models import Show
 # ---------------------------------------------------------------------------
 
 
-def make_image():
+def make_image() -> SimpleUploadedFile:
     buf = BytesIO()
     Image.new("RGB", (10, 10), color="red").save(buf, format="JPEG")
     buf.seek(0)
     return SimpleUploadedFile("test.jpg", buf.read(), content_type="image/jpeg")
 
 
-def make_show(**kwargs):
+def make_show(**kwargs: Any) -> Show:
     defaults = dict(
         title="Test Show",
         description="",
@@ -42,7 +44,12 @@ def make_show(**kwargs):
     return Show.objects.create(**defaults)
 
 
-def make_event(show, offset_days=7, capacity=150, open_for_reservation=True):
+def make_event(
+    show: Show,
+    offset_days: int = 7,
+    capacity: int = 150,
+    open_for_reservation: bool = True,
+) -> Event:
     base = timezone.now() + timedelta(days=offset_days)
     return Event.objects.create(
         show=show,
@@ -53,7 +60,7 @@ def make_event(show, offset_days=7, capacity=150, open_for_reservation=True):
     )
 
 
-def make_reservation(event, **kwargs):
+def make_reservation(event: Event, **kwargs: Any) -> Reservation:
     defaults = dict(first_name="Test", last_name="User", email="test@example.com")
     defaults.update(kwargs)
     return Reservation.objects.create(event=event, **defaults)
@@ -65,41 +72,41 @@ def make_reservation(event, **kwargs):
 
 
 class EventModelTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.show = make_show()
         self.event = make_event(self.show)
 
-    def test_str_contains_date(self):
+    def test_str_contains_date(self) -> None:
         self.assertIn(".", str(self.event))
 
-    def test_time_and_date(self):
+    def test_time_and_date(self) -> None:
         self.assertRegex(self.event.time_and_date(), r"\d{2}\.\d{2}\.\d{2} at \d{2}:\d{2}")
 
-    def test_date_str(self):
+    def test_date_str(self) -> None:
         self.assertRegex(self.event.date_str(), r"\d{2}\.\d{2}\.\d{2}")
 
-    def test_admission_time(self):
+    def test_admission_time(self) -> None:
         self.assertRegex(self.event.admission_time(), r"\d{2}:\d{2}")
 
-    def test_begin_time(self):
+    def test_begin_time(self) -> None:
         self.assertRegex(self.event.begin_time(), r"\d{2}:\d{2}")
 
-    def test_elaborate_date_str(self):
+    def test_elaborate_date_str(self) -> None:
         result = self.event.elaborate_date_str()
         self.assertIn(".", result)
 
-    def test_reservation_open_for_future_event(self):
+    def test_reservation_open_for_future_event(self) -> None:
         self.assertTrue(self.event.reservation_open())
 
-    def test_reservation_closed_for_past_event(self):
+    def test_reservation_closed_for_past_event(self) -> None:
         past = make_event(self.show, offset_days=-1)
         self.assertFalse(past.reservation_open())
 
-    def test_reservation_closed_when_manually_closed(self):
+    def test_reservation_closed_when_manually_closed(self) -> None:
         closed = make_event(self.show, open_for_reservation=False)
         self.assertFalse(closed.reservation_open())
 
-    def test_reservation_closed_when_over_capacity(self):
+    def test_reservation_closed_when_over_capacity(self) -> None:
         event = make_event(self.show, capacity=1)
         p1 = ReservationPayment.from_reservation(make_reservation(event), variant="paypal")
         p1.save()
@@ -111,22 +118,22 @@ class EventModelTest(TestCase):
         p2.change_status(PaymentStatus.CONFIRMED)
         self.assertFalse(event.reservation_open())
 
-    def test_reservation_count_empty(self):
+    def test_reservation_count_empty(self) -> None:
         self.assertEqual(self.event.reservation_count(), 0)
 
-    def test_reservation_count_with_payment(self):
+    def test_reservation_count_with_payment(self) -> None:
         reservation = make_reservation(self.event)
         payment = ReservationPayment.from_reservation(reservation, variant="paypal")
         payment.save()
         payment.change_status(PaymentStatus.CONFIRMED)
         self.assertEqual(self.event.reservation_count(), 1)
 
-    def test_reservation_count_unconfirmed_not_counted(self):
+    def test_reservation_count_unconfirmed_not_counted(self) -> None:
         reservation = make_reservation(self.event)
         ReservationPayment.from_reservation(reservation, variant="paypal").save()
         self.assertEqual(self.event.reservation_count(), 0)
 
-    def test_reservation_count_includes_guests(self):
+    def test_reservation_count_includes_guests(self) -> None:
         from reservations.models import Guest
 
         reservation = make_reservation(self.event)
@@ -136,14 +143,14 @@ class EventModelTest(TestCase):
         Guest.objects.create(reservation=reservation, first_name="G", last_name="H")
         self.assertEqual(self.event.reservation_count(), 2)
 
-    def test_reserved_tickets_display_format(self):
+    def test_reserved_tickets_display_format(self) -> None:
         reservation = make_reservation(self.event)
         payment = ReservationPayment.from_reservation(reservation, variant="paypal")
         payment.save()
         payment.change_status(PaymentStatus.CONFIRMED)
         self.assertEqual(self.event.reserved_tickets(), "1/150")
 
-    def test_clean_raises_if_begin_before_admission(self):
+    def test_clean_raises_if_begin_before_admission(self) -> None:
         base = timezone.now() + timedelta(days=3)
         event = Event(
             show=self.show,
@@ -161,7 +168,7 @@ class EventModelTest(TestCase):
 
 
 class ShowPriceValidationTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.show_data = dict(
             title="Test Show",
             description="A description",
@@ -170,73 +177,73 @@ class ShowPriceValidationTest(TestCase):
             private=False,
         )
 
-    def test_valid_price_config_passes(self):
+    def test_valid_price_config_passes(self) -> None:
         show = Show(
             **self.show_data, base_ticket_price=20, min_ticket_price=10, max_ticket_price=30
         )
         show.full_clean()
 
-    def test_negative_ticket_price_raises(self):
+    def test_negative_ticket_price_raises(self) -> None:
         show = Show(**self.show_data, base_ticket_price=-10)
         with self.assertRaises(ValidationError) as ctx:
             show.full_clean()
         self.assertIn("base_ticket_price", ctx.exception.message_dict)
 
-    def test_negative_min_ticket_price_raises(self):
+    def test_negative_min_ticket_price_raises(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, min_ticket_price=-5)
         with self.assertRaises(ValidationError) as ctx:
             show.full_clean()
         self.assertIn("min_ticket_price", ctx.exception.message_dict)
 
-    def test_negative_max_ticket_price_raises(self):
+    def test_negative_max_ticket_price_raises(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, max_ticket_price=-5)
         with self.assertRaises(ValidationError) as ctx:
             show.full_clean()
         self.assertIn("max_ticket_price", ctx.exception.message_dict)
 
-    def test_negative_reservation_price_raises(self):
+    def test_negative_reservation_price_raises(self) -> None:
         show = Show(**self.show_data, reservation_price=-5)
         with self.assertRaises(ValidationError) as ctx:
             show.full_clean()
         self.assertIn("reservation_price", ctx.exception.message_dict)
 
-    def test_min_above_ticket_price_raises(self):
+    def test_min_above_ticket_price_raises(self) -> None:
         show = Show(**self.show_data, base_ticket_price=15, min_ticket_price=20)
         with self.assertRaises(ValidationError) as ctx:
             show.full_clean()
         self.assertIn("min_ticket_price", ctx.exception.message_dict)
 
-    def test_max_below_ticket_price_raises(self):
+    def test_max_below_ticket_price_raises(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, max_ticket_price=15)
         with self.assertRaises(ValidationError) as ctx:
             show.full_clean()
         self.assertIn("max_ticket_price", ctx.exception.message_dict)
 
-    def test_min_equals_ticket_price_is_valid(self):
+    def test_min_equals_ticket_price_is_valid(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, min_ticket_price=20)
         show.full_clean()
 
-    def test_max_equals_ticket_price_is_valid(self):
+    def test_max_equals_ticket_price_is_valid(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, max_ticket_price=20)
         show.full_clean()
 
-    def test_effective_min_price_uses_custom_value(self):
+    def test_effective_min_price_uses_custom_value(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, min_ticket_price=12)
         self.assertEqual(show.get_effective_min_price(20), 12)
 
-    def test_effective_min_price_defaults_to_base_minus_10(self):
+    def test_effective_min_price_defaults_to_base_minus_10(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20)
         self.assertEqual(show.get_effective_min_price(20), 10)
 
-    def test_effective_min_price_floors_at_5(self):
+    def test_effective_min_price_floors_at_5(self) -> None:
         show = Show(**self.show_data, base_ticket_price=8)
         self.assertEqual(show.get_effective_min_price(8), 5)
 
-    def test_effective_max_price_uses_custom_value(self):
+    def test_effective_max_price_uses_custom_value(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20, max_ticket_price=35)
         self.assertEqual(show.get_effective_max_price(20), 35)
 
-    def test_effective_max_price_defaults_to_base_plus_10(self):
+    def test_effective_max_price_defaults_to_base_plus_10(self) -> None:
         show = Show(**self.show_data, base_ticket_price=20)
         self.assertEqual(show.get_effective_max_price(20), 30)
 
@@ -247,12 +254,14 @@ class ShowPriceValidationTest(TestCase):
 
 
 class ReservationFormTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.show = make_show()
         self.future = timezone.now() + timedelta(days=7)
         self.past = timezone.now() - timedelta(days=1)
 
-    def _make_event(self, begin, open_for_reservation=True, capacity=150):
+    def _make_event(
+        self, begin: datetime, open_for_reservation: bool = True, capacity: int = 150
+    ) -> Event:
         return Event.objects.create(
             show=self.show,
             admission=begin - timedelta(hours=1),
@@ -261,22 +270,22 @@ class ReservationFormTest(TestCase):
             open_for_reservation=open_for_reservation,
         )
 
-    def test_future_open_event_included(self):
+    def test_future_open_event_included(self) -> None:
         event = self._make_event(self.future)
         form = ReservationForm(self.show)
         self.assertIn(event, form.fields["event"].queryset)
 
-    def test_past_event_excluded(self):
+    def test_past_event_excluded(self) -> None:
         event = self._make_event(self.past)
         form = ReservationForm(self.show)
         self.assertNotIn(event, form.fields["event"].queryset)
 
-    def test_manually_closed_event_excluded(self):
+    def test_manually_closed_event_excluded(self) -> None:
         event = self._make_event(self.future, open_for_reservation=False)
         form = ReservationForm(self.show)
         self.assertNotIn(event, form.fields["event"].queryset)
 
-    def test_over_capacity_event_excluded(self):
+    def test_over_capacity_event_excluded(self) -> None:
         event = self._make_event(self.future, capacity=1)
         for r in [make_reservation(event), make_reservation(event, email="other@example.com")]:
             p = ReservationPayment.from_reservation(r, variant="paypal")
@@ -285,7 +294,7 @@ class ReservationFormTest(TestCase):
         form = ReservationForm(self.show)
         self.assertNotIn(event, form.fields["event"].queryset)
 
-    def test_open_and_closed_events_filtered_correctly(self):
+    def test_open_and_closed_events_filtered_correctly(self) -> None:
         open_event = self._make_event(self.future)
         past_event = self._make_event(self.past)
         closed_event = self._make_event(self.future, open_for_reservation=False)
@@ -294,7 +303,7 @@ class ReservationFormTest(TestCase):
         self.assertNotIn(past_event, qs)
         self.assertNotIn(closed_event, qs)
 
-    def test_valid_form_with_all_fields(self):
+    def test_valid_form_with_all_fields(self) -> None:
         event = self._make_event(self.future)
         form = ReservationForm(
             self.show,
@@ -308,7 +317,7 @@ class ReservationFormTest(TestCase):
         )
         self.assertTrue(form.is_valid(), form.errors)
 
-    def test_missing_required_fields_invalid(self):
+    def test_missing_required_fields_invalid(self) -> None:
         form = ReservationForm(self.show, data={})
         self.assertFalse(form.is_valid())
 
@@ -319,26 +328,26 @@ class ReservationFormTest(TestCase):
 
 
 class PurgeOldPaymentsViewTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
 
-    def test_get_requires_staff(self):
+    def test_get_requires_staff(self) -> None:
         response = self.client.get("/mondmin/reservations/reservationpayment/purge-old-payments/")
         self.assertNotEqual(response.status_code, 200)
 
-    def test_get_returns_200_for_staff(self):
+    def test_get_returns_200_for_staff(self) -> None:
         self.client.force_login(self.staff)
         response = self.client.get("/mondmin/reservations/reservationpayment/purge-old-payments/")
         self.assertEqual(response.status_code, 200)
 
-    def test_post_dry_run_redirects(self):
+    def test_post_dry_run_redirects(self) -> None:
         self.client.force_login(self.staff)
         response = self.client.post(
             "/mondmin/reservations/reservationpayment/purge-old-payments/", {"dry_run": True, "confirmed_only": False}
         )
         self.assertEqual(response.status_code, 302)
 
-    def test_post_live_run_redirects(self):
+    def test_post_live_run_redirects(self) -> None:
         self.client.force_login(self.staff)
         response = self.client.post(
             "/mondmin/reservations/reservationpayment/purge-old-payments/", {"dry_run": False, "confirmed_only": False}
@@ -352,7 +361,7 @@ class PurgeOldPaymentsViewTest(TestCase):
 
 
 class EventAdminRevenueTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         from events.admin import EventAdmin
 
         self.show = make_show(base_ticket_price=15)
@@ -362,30 +371,32 @@ class EventAdminRevenueTest(TestCase):
         self.admin = EventAdmin(Event, self.site)
         self.factory = RequestFactory()
 
-    def _get_annotated_event(self):
+    def _get_annotated_event(self) -> Event:
         request = self.factory.get("/")
         request.user = self.user
         return self.admin.get_queryset(request).get(pk=self.event.pk)
 
-    def _make_payment(self, reservation, total, status=PaymentStatus.CONFIRMED):
+    def _make_payment(
+        self, reservation: Reservation, total: Decimal, status: str = PaymentStatus.CONFIRMED
+    ) -> ReservationPayment:
         payment = ReservationPayment.from_reservation(reservation, variant="paypal")
         payment.total = total
         payment.status = status
         payment.save()
         return payment
 
-    def test_revenue_display_returns_dash_when_no_payments(self):
+    def test_revenue_display_returns_dash_when_no_payments(self) -> None:
         event = self._get_annotated_event()
         self.assertIsNone(event.total_revenue)
         self.assertEqual(self.admin.revenue(event), "—")
 
-    def test_revenue_display_returns_formatted_euro_amount(self):
+    def test_revenue_display_returns_formatted_euro_amount(self) -> None:
         reservation = make_reservation(self.event)
         self._make_payment(reservation, Decimal("30.00"))
         event = self._get_annotated_event()
         self.assertEqual(self.admin.revenue(event), "€ 30.00")
 
-    def test_total_revenue_sums_multiple_confirmed_payments(self):
+    def test_total_revenue_sums_multiple_confirmed_payments(self) -> None:
         for i, amount in enumerate([Decimal("15.00"), Decimal("30.00"), Decimal("45.00")]):
             reservation = make_reservation(self.event, email=f"p{i}@example.com")
             self._make_payment(reservation, amount)
@@ -393,14 +404,14 @@ class EventAdminRevenueTest(TestCase):
         self.assertEqual(event.total_revenue, Decimal("90.00"))
         self.assertEqual(self.admin.revenue(event), "€ 90.00")
 
-    def test_total_revenue_excludes_non_confirmed_payments(self):
+    def test_total_revenue_excludes_non_confirmed_payments(self) -> None:
         reservation = make_reservation(self.event)
         self._make_payment(reservation, Decimal("50.00"), status=PaymentStatus.WAITING)
         event = self._get_annotated_event()
         self.assertIsNone(event.total_revenue)
         self.assertEqual(self.admin.revenue(event), "—")
 
-    def test_total_revenue_only_counts_confirmed_among_mixed_statuses(self):
+    def test_total_revenue_only_counts_confirmed_among_mixed_statuses(self) -> None:
         reservation = make_reservation(self.event)
         self._make_payment(reservation, Decimal("20.00"), status=PaymentStatus.CONFIRMED)
         reservation2 = make_reservation(self.event, email="b@example.com")
@@ -415,7 +426,7 @@ class EventAdminRevenueTest(TestCase):
 
 
 class ReservationPaymentAdminConfirmedTotalTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         from reservations.payments.admin import ReservationPaymentAdmin
 
         self.show = make_show(base_ticket_price=15)
@@ -424,26 +435,26 @@ class ReservationPaymentAdminConfirmedTotalTest(TestCase):
         self.site = AdminSite()
         self.admin = ReservationPaymentAdmin(ReservationPayment, self.site)
 
-    def _make_payment(self, total, status):
+    def _make_payment(self, total: Decimal, status: str) -> ReservationPayment:
         payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
         payment.total = total
         payment.status = status
         payment.save()
         return payment
 
-    def test_confirmed_total_shows_amount_for_confirmed_payment(self):
+    def test_confirmed_total_shows_amount_for_confirmed_payment(self) -> None:
         payment = self._make_payment(Decimal("30.00"), PaymentStatus.CONFIRMED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 30.00")
 
-    def test_confirmed_total_shows_zero_for_waiting_payment(self):
+    def test_confirmed_total_shows_zero_for_waiting_payment(self) -> None:
         payment = self._make_payment(Decimal("30.00"), PaymentStatus.WAITING)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
 
-    def test_confirmed_total_shows_zero_for_rejected_payment(self):
+    def test_confirmed_total_shows_zero_for_rejected_payment(self) -> None:
         payment = self._make_payment(Decimal("30.00"), PaymentStatus.REJECTED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
 
-    def test_confirmed_total_shows_zero_for_refunded_payment(self):
+    def test_confirmed_total_shows_zero_for_refunded_payment(self) -> None:
         payment = self._make_payment(Decimal("30.00"), PaymentStatus.REFUNDED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
 
@@ -456,7 +467,7 @@ _EVENT_CHANGELIST_URL = "/mondmin/events/event/"
 
 
 class EventAdminEmailActionsTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.show = make_show()
         self.event = make_event(self.show)
         self.superuser = User.objects.create_superuser("admin", "admin@example.com", "pass")
@@ -480,7 +491,7 @@ class EventAdminEmailActionsTest(TestCase):
         # clear confirmation email triggered by change_status above
         mail.outbox.clear()
 
-    def _bulk_post(self, action_name, **extra):
+    def _bulk_post(self, action_name: str, **extra: Any) -> HttpResponse:
         return self.client.post(
             _EVENT_CHANGELIST_URL,
             {
@@ -492,12 +503,12 @@ class EventAdminEmailActionsTest(TestCase):
             },
         )
 
-    def _detail_url(self):
+    def _detail_url(self) -> str:
         return f"/mondmin/events/event/{self.event.pk}/send-mail/"
 
     # --- print_reservations ---
 
-    def test_print_reservations_returns_xlsx(self):
+    def test_print_reservations_returns_xlsx(self) -> None:
         response = self._bulk_post("print_reservations")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -506,7 +517,7 @@ class EventAdminEmailActionsTest(TestCase):
         )
         self.assertEqual(response.content[:2], b"PK")
 
-    def test_print_reservations_excludes_unconfirmed(self):
+    def test_print_reservations_excludes_unconfirmed(self) -> None:
         # Remove the confirmed payment so only the unconfirmed one exists
         ReservationPayment.objects.filter(
             reservation=self.confirmed_reservation
@@ -518,17 +529,17 @@ class EventAdminEmailActionsTest(TestCase):
 
     # --- send_to_reservants bulk action ---
 
-    def test_bulk_send_to_reservants_shows_form(self):
+    def test_bulk_send_to_reservants_shows_form(self) -> None:
         response = self._bulk_post("send_to_reservants")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Subject")
 
-    def test_bulk_send_to_reservants_only_confirmed_in_recipients(self):
+    def test_bulk_send_to_reservants_only_confirmed_in_recipients(self) -> None:
         response = self._bulk_post("send_to_reservants")
         self.assertContains(response, "anna@example.com")
         self.assertNotContains(response, "pending@example.com")
 
-    def test_bulk_send_to_reservants_preview(self):
+    def test_bulk_send_to_reservants_preview(self) -> None:
         response = self._bulk_post(
             "send_to_reservants",
             text_field="Hello {{ firstname }}",
@@ -537,7 +548,7 @@ class EventAdminEmailActionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Hello Anna")
 
-    def test_bulk_send_to_reservants_sends_to_confirmed_only(self):
+    def test_bulk_send_to_reservants_sends_to_confirmed_only(self) -> None:
         self._bulk_post(
             "send_to_reservants",
             text_field="Hello {{ firstname }}",
@@ -547,7 +558,7 @@ class EventAdminEmailActionsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("anna@example.com", mail.outbox[0].to[0])
 
-    def test_bulk_send_to_reservants_redirects_after_send(self):
+    def test_bulk_send_to_reservants_redirects_after_send(self) -> None:
         response = self._bulk_post(
             "send_to_reservants",
             text_field="Hello",
@@ -558,17 +569,17 @@ class EventAdminEmailActionsTest(TestCase):
 
     # --- send_mail_to_reservants_detail ---
 
-    def test_detail_action_get_shows_form(self):
+    def test_detail_action_get_shows_form(self) -> None:
         response = self.client.get(self._detail_url())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Subject")
 
-    def test_detail_action_only_confirmed_in_recipients(self):
+    def test_detail_action_only_confirmed_in_recipients(self) -> None:
         response = self.client.get(self._detail_url())
         self.assertContains(response, "anna@example.com")
         self.assertNotContains(response, "pending@example.com")
 
-    def test_detail_action_preview(self):
+    def test_detail_action_preview(self) -> None:
         response = self.client.post(
             self._detail_url(),
             {"text_field": "Hello {{ firstname }}", "subject": "Test subject"},
@@ -576,7 +587,7 @@ class EventAdminEmailActionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Hello Anna")
 
-    def test_detail_action_sends_to_confirmed_only(self):
+    def test_detail_action_sends_to_confirmed_only(self) -> None:
         self.client.post(
             self._detail_url(),
             {
@@ -588,7 +599,7 @@ class EventAdminEmailActionsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("anna@example.com", mail.outbox[0].to[0])
 
-    def test_detail_action_redirects_after_send(self):
+    def test_detail_action_redirects_after_send(self) -> None:
         response = self.client.post(
             self._detail_url(),
             {
@@ -599,7 +610,7 @@ class EventAdminEmailActionsTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
 
-    def test_detail_action_requires_login(self):
+    def test_detail_action_requires_login(self) -> None:
         self.client.logout()
         response = self.client.get(self._detail_url())
         self.assertNotEqual(response.status_code, 200)

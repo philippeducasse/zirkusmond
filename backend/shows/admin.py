@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from datetime import time as dtime
+from typing import Any
 
 from django import forms
 from django.contrib import admin
@@ -10,11 +11,13 @@ from django.db.models import (
     Min,
     OuterRef,
     Prefetch,
+    QuerySet,
     Subquery,
     Sum,
     Value,
 )
 from django.db.models.functions import Coalesce
+from django.http import HttpRequest
 from django.utils import timezone
 from payments import PaymentStatus
 from tinymce.widgets import TinyMCE
@@ -66,7 +69,7 @@ class EventInlineForm(forms.ModelForm):
             "open_for_reservation",
         )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if self.instance.pk and self.instance.begin:
             local_begin = timezone.localtime(self.instance.begin)
@@ -86,10 +89,10 @@ class EventInlineForm(forms.ModelForm):
                 datetime.combine(today, default_time) - timedelta(hours=1)
             ).time()
 
-    def _default_show_time_for_date(self, date_value):
+    def _default_show_time_for_date(self, date_value: date) -> dtime:
         return dtime(hour=20, minute=0)
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         event_date = cleaned_data.get("event_date")
         show_time = cleaned_data.get("show_time")
@@ -116,7 +119,7 @@ class EventInlineForm(forms.ModelForm):
         cleaned_data["computed_admission"] = admission
         return cleaned_data
 
-    def _post_clean(self):
+    def _post_clean(self) -> None:
         begin = (self.cleaned_data or {}).get("computed_begin")
         admission = (self.cleaned_data or {}).get("computed_admission")
         if begin:
@@ -125,7 +128,7 @@ class EventInlineForm(forms.ModelForm):
             self.instance.admission = admission
         super()._post_clean()
 
-    def has_changed(self):
+    def has_changed(self) -> bool:
         if not self.instance.pk and self.data:
             prefix = self.prefix
             event_date_key = f"{prefix}-event_date" if prefix else "event_date"
@@ -133,7 +136,7 @@ class EventInlineForm(forms.ModelForm):
                 return True
         return super().has_changed()
 
-    def save(self, commit=True):
+    def save(self, commit: bool = True) -> Event:
         instance = super().save(commit=False)
         begin_dt = self.cleaned_data.get("computed_begin") or self.cleaned_data.get("begin")
         admission_dt = self.cleaned_data.get("computed_admission") or self.cleaned_data.get(
@@ -187,7 +190,7 @@ class ShowAdmin(ModelAdmin):
     inlines = [EventInline]
     exclude = ["seo_image_crop"]
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Show]:
         queryset = super().get_queryset(request)
         events_for_show = Event.objects.filter(show=OuterRef("pk"))
         capacity_subquery = events_for_show.annotate(
@@ -270,7 +273,7 @@ class ShowAdmin(ModelAdmin):
         return queryset
 
     @admin.display(ordering="next_event_begin", description="Next event")
-    def next_event_date(self, obj):
+    def next_event_date(self, obj: Show) -> str:
         next_begin = getattr(obj, "next_event_begin", None)
         if not next_begin:
             return "-"
