@@ -24,7 +24,11 @@ function ReserveButton({ show }: { show: MockShow }) {
   if (show.thirdPartyReservation && show.thirdPartyReservationLink) {
     return (
       <Button asChild>
-        <a href={show.thirdPartyReservationLink} target="_blank" rel="noreferrer">
+        <a
+          href={show.thirdPartyReservationLink}
+          target="_blank"
+          rel="noreferrer"
+        >
           Zur Reservierung
         </a>
       </Button>
@@ -70,7 +74,7 @@ function RouteComponent() {
       <ShowDetails show={show} />
 
       <div className="my-12 flex justify-evenly">
-        <Button asChild>
+        <Button variant={'secondary'}>
           <Link to="/">Home</Link>
         </Button>
         <ReserveButton show={show} />
