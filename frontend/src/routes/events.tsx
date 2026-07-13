@@ -1,9 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import EventsSection from '#/components/common/home/EventsSection.tsx'
 import PageContainer from '#/components/common/PageContainer.tsx'
+import { homepageQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/events')({
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(homepageQueryOptions),
   head: () => ({
     meta: [
       { title: 'Zirkus Mond – Shows & Events' },
@@ -23,9 +27,11 @@ export const Route = createFileRoute('/events')({
 })
 
 function RouteComponent() {
+  const { data } = useSuspenseQuery(homepageQueryOptions)
+
   return (
     <PageContainer>
-      <EventsSection showHomeLink />
+      <EventsSection shows={data.upcoming_shows} showHomeLink />
     </PageContainer>
   )
 }

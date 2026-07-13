@@ -3,16 +3,17 @@ import { Link } from '@tanstack/react-router'
 import EventCard from '#/components/common/EventCard.tsx'
 import SectionDivider from '#/components/common/home/SectionDivider.tsx'
 import { Button } from '#/components/ui/button.tsx'
-import { MOCK_SHOWS } from '#/lib/mock-shows.ts'
+
+import type { ShowCard } from '#/interfaces/show.ts'
 
 interface EventsSectionProps {
-  /** Renders a CTA linking to the full events page (used on the homepage). */
+  shows: ShowCard[]
   showAllEventsLink?: boolean
-  /** Renders a CTA linking back to the homepage (used on the events page). */
   showHomeLink?: boolean
 }
 
 export default function EventsSection({
+  shows,
   showAllEventsLink = false,
   showHomeLink = false,
 }: EventsSectionProps) {
@@ -22,12 +23,16 @@ export default function EventsSection({
         Upcoming Shows
       </h2>
       <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 px-6">
-        {MOCK_SHOWS.map((show) => (
-          <Link key={show.id} to="/show/$showId" params={{ showId: show.id }}>
+        {shows.map((show) => (
+          <Link
+            key={show.id}
+            to="/show/$showId"
+            params={{ showId: String(show.id) }}
+          >
             <EventCard
               eventTitle={show.title}
-              eventDates={show.events.map((event) => event.label)}
-              eventImageUrl={show.cardImage}
+              eventDates={show.event_dates}
+              eventImageUrl={show.card_image}
             />
           </Link>
         ))}
