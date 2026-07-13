@@ -10,8 +10,7 @@ urlpatterns = [
     path("mondmin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
     # Static pages
-    path("", views.homepage),
-    # path("", views.homepage_api),
+    path("", views.homepage_api),
     path("events", views.event_list),
     path("about", views.about),
     path("contact", views.contact),
