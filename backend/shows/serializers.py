@@ -1,15 +1,18 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
-from events.serializers import BasicEventSerializer, EventSerializer
+from events.serializers import EventSerializer
 from shows.models import Show
 
 
 class ShowCardSerializer(ModelSerializer):
-    upcoming_events = BasicEventSerializer(read_only=True, many=True, source="future_events")
+    event_dates = SerializerMethodField()
 
     class Meta:
         model = Show
-        fields = ["id", "title", "card_image", "upcoming_events"]
+        fields = ["id", "title", "card_image", "event_dates"]
+
+    def get_event_dates(self, show):
+        return [event.time_and_date() for event in show.future_events()]
 
 
 class ShowDetailSerializer(ModelSerializer):
