@@ -1,5 +1,5 @@
-import DynamicField from '#/components/common/reserve/DynamicField.tsx'
-import FieldsLayout from '#/components/common/reserve/FieldsLayout.tsx'
+import DynamicField from '#/components/common/form/DynamicField'
+import FieldsLayout from '#/components/common/form/FieldsLayout'
 import type { DynamicFieldConfig } from '#/components/common/reserve/helper.ts'
 
 interface DynamicFormProps {
