@@ -6,7 +6,7 @@ import SectionDivider from '#/components/common/home/SectionDivider.tsx'
 import { ShowDetails } from '#/components/common/show/ShowDetails.tsx'
 import TimeDetails from '#/components/common/TimeDetails.tsx'
 import { Button } from '#/components/ui/button.tsx'
-import type { Show } from '#/lib/interfaces/shows'
+import type { Show } from '#/interfaces/show.ts'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/show/$showId')({
@@ -65,7 +65,7 @@ function RouteComponent() {
       />
 
       <div className="flex flex-wrap justify-center gap-6 py-8">
-        {show.events.map((event) => (
+        {show.upcomingEvents.map((event) => (
           <TimeDetails
             key={event.id}
             date={event.label}
