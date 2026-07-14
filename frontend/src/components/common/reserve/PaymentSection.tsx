@@ -1,5 +1,5 @@
 import { Button } from '#/components/ui/button.tsx'
-import type { MockShow } from '#/lib/mock-shows.ts'
+import type { MockShow } from '#/lib/interfaces/shows.ts'
 import SectionDivider from '../home/SectionDivider.tsx'
 
 import DynamicField from './DynamicField.tsx'

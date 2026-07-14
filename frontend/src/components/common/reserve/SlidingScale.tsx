@@ -1,5 +1,5 @@
 import { Slider } from '#/components/ui/slider.tsx'
-import type { MockShow } from '#/lib/mock-shows.ts'
+import type { MockShow } from '#/lib/interfaces/shows'
 
 interface SlidingScaleProps {
   show: MockShow

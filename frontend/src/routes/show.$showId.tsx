@@ -5,8 +5,8 @@ import SectionDivider from '#/components/common/home/SectionDivider.tsx'
 import { ShowDetails } from '#/components/common/show/ShowDetails.tsx'
 import TimeDetails from '#/components/common/TimeDetails.tsx'
 import { Button } from '#/components/ui/button.tsx'
-import type { MockShow } from '#/lib/mock-shows.ts'
-import { getMockShowById } from '#/lib/mock-shows.ts'
+import type { MockShow } from '#/lib/interfaces/shows'
+import { getMockShowById } from '#/lib/interfaces/shows'
 
 export const Route = createFileRoute('/show/$showId')({
   loader: ({ params }) => {
