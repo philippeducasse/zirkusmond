@@ -31,8 +31,8 @@ export default function EventsSection({
           >
             <EventCard
               eventTitle={show.title}
-              eventDates={show.event_dates}
-              eventImageUrl={show.card_image}
+              eventDates={show.eventDates}
+              eventImageUrl={show.cardImage}
             />
           </Link>
         ))}

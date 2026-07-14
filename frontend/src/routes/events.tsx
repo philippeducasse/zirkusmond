@@ -31,7 +31,7 @@ function RouteComponent() {
 
   return (
     <PageContainer>
-      <EventsSection shows={data.upcoming_shows} showHomeLink />
+      <EventsSection shows={data.upcomingShows} showHomeLink />
     </PageContainer>
   )
 }
