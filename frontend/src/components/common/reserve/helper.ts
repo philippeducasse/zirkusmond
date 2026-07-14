@@ -1,58 +1,19 @@
-import type { MockShow } from '#/lib/mock-shows.ts'
-
-export interface SelectFieldConfig {
-  kind: 'select'
-  id: string
-  label: string
-  placeholder: string
-  value: string
-  onChange: (value: string) => void
-  options: { value: string; label: string }[]
-}
-
-export interface NumberFieldConfig {
-  kind: 'number'
-  id: string
-  label: string
-  value: number
-  onChange: (value: number) => void
-  min: number
-  max: number
-}
-
-export interface CheckboxFieldConfig {
-  kind: 'checkbox'
-  id: string
-  label: string
-  checked: boolean
-  onChange: (checked: boolean) => void
-}
-
-export interface ButtonGroupFieldConfig {
-  kind: 'button-group'
-  id: string
-  name: string
-  options: { value: string; label: string }[]
-}
-
-export interface TextFieldConfig {
-  kind: 'text'
-  id: string
-  label: string
-  name?: string
-  type?: string
-  required?: boolean
-}
+import type { Show } from '#/lib/interfaces/shows'
+import type { ButtonGroupFieldProps } from '#/components/common/form/ButtonGroupField.tsx'
+import type { CheckboxFieldProps } from '#/components/common/form/CheckboxField.tsx'
+import type { NumberFieldProps } from '#/components/common/form/NumberField.tsx'
+import type { SelectFieldProps } from '#/components/common/form/SelectField.tsx'
+import type { TextFieldProps } from '#/components/common/form/TextField.tsx'
 
 export type DynamicFieldConfig =
-  | SelectFieldConfig
-  | NumberFieldConfig
-  | CheckboxFieldConfig
-  | ButtonGroupFieldConfig
-  | TextFieldConfig
+  | ({ kind: 'select' } & SelectFieldProps)
+  | ({ kind: 'number' } & NumberFieldProps)
+  | ({ kind: 'checkbox' } & CheckboxFieldProps)
+  | ({ kind: 'button-group'; id: string } & ButtonGroupFieldProps)
+  | ({ kind: 'text' } & TextFieldProps)
 
 interface BuildTicketFieldsParams {
-  show: MockShow
+  show: Show
   selectedEventId: string
   setSelectedEventId: (id: string) => void
   attendeeCount: number
@@ -86,7 +47,7 @@ export function buildTicketFields({
       value: attendeeCount,
       onChange: (count) => setAttendeeCount(Math.min(10, Math.max(1, count))),
       min: 1,
-      max: 10,
+      max: 100,
     },
   ]
 }
@@ -117,14 +78,14 @@ export function buildPersonalInfoFields(): DynamicFieldConfig[] {
       kind: 'text',
       id: 'first-name',
       label: 'First name',
-      name: 'first_name',
+      name: 'firstName',
       required: true,
     },
     {
       kind: 'text',
       id: 'last-name',
       label: 'Last name',
-      name: 'last_name',
+      name: 'lastName',
       required: true,
     },
     {
