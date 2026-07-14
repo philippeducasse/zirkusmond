@@ -1,9 +1,9 @@
-import DynamicForm from '#/components/common/reserve/DynamicForm.tsx'
+import DynamicForm from '#/components/common/form/DynamicForm'
 import {
   buildPersonalInfoFields,
   buildTicketFields,
 } from '#/components/common/reserve/helper.ts'
-import type { Show } from '#/lib/interfaces/shows'
+import type { Show } from '#/interfaces/show'
 
 interface ReservationFormProps {
   show: Show
