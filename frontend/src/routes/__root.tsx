@@ -13,6 +13,8 @@ import Navbar from '#/components/common/Navbar.tsx'
 
 import appCss from '../styles.css?url'
 
+// Types the router context created in router.tsx, so every route loader gets
+// a typed `context.queryClient` for prefetching TanStack Query data.
 interface RouterContext {
   queryClient: QueryClient
 }
@@ -56,9 +58,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <ClientOnly>
-          <Navbar />
-        </ClientOnly>
+        {/* <ClientOnly> */}
+        <Navbar />
+        {/* </ClientOnly> */}
         {children}
         <TanStackDevtools
           config={{

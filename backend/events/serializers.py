@@ -12,4 +12,11 @@ class BasicEventSerializer(ModelSerializer):
 class EventSerializer(ModelSerializer):
     class Meta:
         model = Event
-        fields = ["admission_time", "begin_time", "reservation_capacity", "reservation_open"]
+        fields = [
+            "id",
+            "elaborate_date_str",
+            "admission_time",
+            "begin_time",
+            "reservation_capacity",
+            "reservation_open",
+        ]

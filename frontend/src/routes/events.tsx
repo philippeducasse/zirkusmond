@@ -6,6 +6,8 @@ import PageContainer from '#/components/common/PageContainer.tsx'
 import { homepageQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/events')({
+  // TanStack Query: prefetch into the cache during SSR / navigation. Reuses
+  // the homepage query, so navigating from / renders without a refetch.
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(homepageQueryOptions),
   head: () => ({
@@ -27,6 +29,7 @@ export const Route = createFileRoute('/events')({
 })
 
 function RouteComponent() {
+  // TanStack Query: reads the cache entry the loader ensured; no loading state.
   const { data } = useSuspenseQuery(homepageQueryOptions)
 
   return (

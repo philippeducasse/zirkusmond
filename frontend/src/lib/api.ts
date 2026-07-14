@@ -1,6 +1,11 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import type { HomepageResponse } from '#/interfaces/show.ts'
+import type {
+  HomepageResponse,
+  ShowDetail,
+  ShowDetailResponse,
+} from '#/interfaces/show.ts'
+import type { Show } from '#/lib/interfaces/shows.ts'
 import { keysToCamelCase } from '#/lib/utils.ts'
 
 /**
@@ -16,16 +21,70 @@ function apiUrl(path: string) {
     : `/api${path}`
 }
 
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    path: string,
+  ) {
+    super(`API request to ${path} failed with status ${status}`)
+  }
+}
+
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(apiUrl(path))
   if (!res.ok) {
-    throw new Error(`API request to ${path} failed with status ${res.status}`)
+    throw new ApiError(res.status, path)
   }
   const data = await res.json()
   return keysToCamelCase<T>(data)
 }
 
+/**
+ * TanStack Query: `queryOptions` bundles a cache key with its fetch function
+ * so the same definition can be used by route loaders (ensureQueryData) and
+ * components (useSuspenseQuery). Sharing one definition guarantees both sides
+ * hit the same cache entry.
+ */
 export const homepageQueryOptions = queryOptions({
+  // Cache key: all consumers of ['homepage'] share one cached response.
   queryKey: ['homepage'],
   queryFn: () => fetchJson<HomepageResponse>('/'),
 })
+
+function toShow(detail: ShowDetail): Show {
+  return {
+    id: String(detail.id),
+    title: detail.title,
+    cardImage: detail.cardImage,
+    bannerImage: detail.bannerImage ?? '',
+    description: detail.description,
+    cast: detail.cast,
+    videoLink: detail.videoLink || undefined,
+    websiteLink: detail.websiteLink || undefined,
+    thirdPartyReservation: detail.thirdPartyReservation,
+    thirdPartyReservationLink: detail.thirdPartyReservationLink || undefined,
+    reservationPrice: detail.reservationPrice ?? null,
+    baseTicketPrice: detail.baseTicketPrice ?? null,
+    minTicketPrice: detail.minTicketPrice ?? null,
+    maxTicketPrice: detail.maxTicketPrice ?? null,
+    events: (detail.upcomingEvents ?? []).map((event) => ({
+      id: String(event.id),
+      label: event.elaborateDateStr,
+      beginTime: event.beginTime,
+      admissionTime: event.admissionTime,
+    })),
+  }
+}
+
+/**
+ * TanStack Query: parameterised query — a factory because the cache key must
+ * include the showId, giving each show its own cache entry.
+ */
+export const showQueryOptions = (showId: string) =>
+  queryOptions({
+    queryKey: ['show', showId],
+    queryFn: async () => {
+      const data = await fetchJson<ShowDetailResponse>(`/shows/${showId}`)
+      return toShow(data.show)
+    },
+  })

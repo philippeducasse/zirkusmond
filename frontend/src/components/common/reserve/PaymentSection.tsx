@@ -1,5 +1,5 @@
 import { Button } from '#/components/ui/button.tsx'
-import type { MockShow } from '#/lib/interfaces/shows.ts'
+import type { Show } from '#/lib/interfaces/shows.ts'
 import SectionDivider from '../home/SectionDivider.tsx'
 
 import DynamicField from './DynamicField.tsx'
@@ -7,7 +7,7 @@ import { buildNewsletterField, buildPaymentMethodField } from './helper.ts'
 import SlidingScale from './SlidingScale.tsx'
 
 interface PaymentSectionProps {
-  show: MockShow
+  show: Show
   attendeeCount: number
   customPrice: number
   setCustomPrice: (price: number) => void
