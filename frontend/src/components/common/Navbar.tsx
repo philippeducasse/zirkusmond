@@ -13,7 +13,7 @@ interface NavbarProps {
 export default function Navbar({ isStaff = false }: NavbarProps) {
   const { fixed, sentinelRef, scrollThreshold } = useNavbar()
   const items = isStaff ? [...NAV_ITEMS, QR_SCANNER_ITEM] : NAV_ITEMS
-
+  console.log({ fixed })
   return (
     <>
       <div
