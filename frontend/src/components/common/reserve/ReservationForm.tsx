@@ -3,10 +3,10 @@ import {
   buildPersonalInfoFields,
   buildTicketFields,
 } from '#/components/common/reserve/helper.ts'
-import type { MockShow } from '#/lib/interfaces/shows'
+import type { Show } from '#/lib/interfaces/shows'
 
 interface ReservationFormProps {
-  show: MockShow
+  show: Show
   selectedEventId: string
   setSelectedEventId: (id: string) => void
   attendeeCount: number

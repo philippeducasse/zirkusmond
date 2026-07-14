@@ -8,6 +8,9 @@ import Hero from '#/components/common/home/Hero.tsx'
 import { homepageQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/')({
+  // TanStack Query: `ensureQueryData` fetches into the cache unless the data
+  // is already there. On the server this runs during SSR and the result is
+  // dehydrated into the HTML; useSuspenseQuery below then reads it from cache.
   loader: ({ context: { queryClient } }) =>
     queryClient.ensureQueryData(homepageQueryOptions),
   head: () => ({
@@ -29,6 +32,8 @@ export const Route = createFileRoute('/')({
 })
 
 function App() {
+  // TanStack Query: resolves instantly from the cache filled by the loader
+  // (no loading state needed); would suspend only on a cache miss.
   const { data } = useSuspenseQuery(homepageQueryOptions)
 
   return (

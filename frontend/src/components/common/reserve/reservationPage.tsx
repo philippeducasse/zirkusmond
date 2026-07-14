@@ -2,14 +2,14 @@ import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
-import type { MockShow } from '#/lib/interfaces/shows.ts'
+import type { Show } from '#/lib/interfaces/shows.ts'
 
 import GuestForm from './GuestForm.tsx'
 import PaymentSection from './PaymentSection.tsx'
 import ReservationForm from './ReservationForm.tsx'
 
 interface ReservationPageProps {
-  show: MockShow
+  show: Show
 }
 
 export default function ReservationPage({ show }: ReservationPageProps) {
