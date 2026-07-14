@@ -1,5 +1,5 @@
 import { Slider } from '#/components/ui/slider.tsx'
-import type { Show } from '#/lib/interfaces/shows'
+import type { Show } from '#/interfaces/show'
 
 interface SlidingScaleProps {
   show: Show
