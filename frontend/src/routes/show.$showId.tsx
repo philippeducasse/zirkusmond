@@ -1,18 +1,25 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 import PageContainer from '#/components/common/PageContainer.tsx'
 import SectionDivider from '#/components/common/home/SectionDivider.tsx'
 import { ShowDetails } from '#/components/common/show/ShowDetails.tsx'
 import TimeDetails from '#/components/common/TimeDetails.tsx'
 import { Button } from '#/components/ui/button.tsx'
-import type { MockShow } from '#/lib/interfaces/shows'
-import { getMockShowById } from '#/lib/interfaces/shows'
+import type { Show } from '#/lib/interfaces/shows'
+import { ApiError, showQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/show/$showId')({
-  loader: ({ params }) => {
-    const show = getMockShowById(params.showId)
-    if (!show) throw notFound()
-    return show
+  // TanStack Query: prefetch the show into the cache during SSR / navigation.
+  // The data is also returned so `head` can use it as loaderData; a 404 from
+  // the API is translated into the router's notFound page.
+  loader: async ({ context: { queryClient }, params }) => {
+    try {
+      return await queryClient.ensureQueryData(showQueryOptions(params.showId))
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) throw notFound()
+      throw error
+    }
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [{ title: `Zirkus Mond - ${loaderData.title}` }] : [],
@@ -20,7 +27,7 @@ export const Route = createFileRoute('/show/$showId')({
   component: RouteComponent,
 })
 
-function ReserveButton({ show }: { show: MockShow }) {
+function ReserveButton({ show }: { show: Show }) {
   if (show.thirdPartyReservation && show.thirdPartyReservationLink) {
     return (
       <Button asChild>
@@ -44,7 +51,10 @@ function ReserveButton({ show }: { show: MockShow }) {
 }
 
 function RouteComponent() {
-  const show = Route.useLoaderData()
+  const { showId } = Route.useParams()
+  // TanStack Query: same key as the loader, so this reads from the cache the
+  // loader filled instead of fetching again.
+  const { data: show } = useSuspenseQuery(showQueryOptions(showId))
 
   return (
     <PageContainer>

@@ -1,7 +1,7 @@
-import type { MockShow } from '#/lib/interfaces/shows'
+import type { Show } from '#/lib/interfaces/shows'
 
 interface ShowDetailsProps {
-  show: MockShow
+  show: Show
 }
 
 export function ShowDetails({ show }: ShowDetailsProps) {

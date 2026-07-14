@@ -1,8 +1,8 @@
 import { Slider } from '#/components/ui/slider.tsx'
-import type { MockShow } from '#/lib/interfaces/shows'
+import type { Show } from '#/lib/interfaces/shows'
 
 interface SlidingScaleProps {
-  show: MockShow
+  show: Show
   customPrice: number
   setCustomPrice: (price: number) => void
 }
