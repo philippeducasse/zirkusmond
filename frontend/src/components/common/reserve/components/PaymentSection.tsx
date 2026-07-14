@@ -1,9 +1,9 @@
 import { Button } from '#/components/ui/button.tsx'
-import type { Show } from '#/lib/interfaces/shows.ts'
-import SectionDivider from '../home/SectionDivider.tsx'
+import type { Show } from '#/interfaces/show.ts'
+import SectionDivider from '../../home/SectionDivider.tsx'
 
-import DynamicField from './DynamicField.tsx'
-import { buildNewsletterField, buildPaymentMethodField } from './helper.ts'
+import DynamicField from '../../form/DynamicField.tsx'
+import { buildPaymentMethodField } from '../helper.ts'
 import SlidingScale from './SlidingScale.tsx'
 
 interface PaymentSectionProps {
@@ -11,9 +11,6 @@ interface PaymentSectionProps {
   attendeeCount: number
   customPrice: number
   setCustomPrice: (price: number) => void
-  newsletter: boolean
-  setNewsletter: (checked: boolean) => void
-  onBack: () => void
 }
 
 export default function PaymentSection({
@@ -21,26 +18,16 @@ export default function PaymentSection({
   attendeeCount,
   customPrice,
   setCustomPrice,
-  newsletter,
-  setNewsletter,
-  onBack,
 }: PaymentSectionProps) {
   const pricePerTicket = show.baseTicketPrice
     ? customPrice
     : (show.reservationPrice ?? 5)
   const total = attendeeCount * pricePerTicket
 
-  const newsletterFields = buildNewsletterField({ newsletter, setNewsletter })
   const paymentMethodFields = buildPaymentMethodField()
 
   return (
     <>
-      <div className="bg-white/[0.19]">
-        {newsletterFields.map((field) => (
-          <DynamicField key={field.id} field={field} />
-        ))}
-      </div>
-
       <div className="my-6">
         <h3 className="text-4xl text-primary">Payment</h3>
         <SlidingScale
@@ -62,12 +49,6 @@ export default function PaymentSection({
       {paymentMethodFields.map((field) => (
         <DynamicField key={field.id} field={field} />
       ))}
-      <SectionDivider type="moon" />
-      <div className="mt-8 text-center">
-        <Button type="button" size={'sm'} variant="secondary" onClick={onBack}>
-          Back to Show
-        </Button>
-      </div>
     </>
   )
 }

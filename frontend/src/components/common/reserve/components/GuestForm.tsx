@@ -1,4 +1,4 @@
-import DynamicForm from '#/components/common/reserve/DynamicForm.tsx'
+import DynamicForm from '#/components/common/form/DynamicForm'
 import { buildGuestFields } from '#/components/common/reserve/helper.ts'
 
 interface GuestFormProps {
