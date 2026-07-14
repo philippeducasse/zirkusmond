@@ -3,7 +3,7 @@ import {
   buildPersonalInfoFields,
   buildTicketFields,
 } from '#/components/common/reserve/helper.ts'
-import type { MockShow } from '#/lib/mock-shows.ts'
+import type { MockShow } from '#/lib/interfaces/shows'
 
 interface ReservationFormProps {
   show: MockShow
