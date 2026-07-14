@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import type { HomepageResponse } from '#/interfaces/show.ts'
+import { keysToCamelCase } from '#/lib/utils.ts'
 
 /**
  * On the server (SSR loaders) we talk to Django directly; in the browser
@@ -20,7 +21,8 @@ async function fetchJson<T>(path: string): Promise<T> {
   if (!res.ok) {
     throw new Error(`API request to ${path} failed with status ${res.status}`)
   }
-  return res.json()
+  const data = await res.json()
+  return keysToCamelCase<T>(data)
 }
 
 export const homepageQueryOptions = queryOptions({
