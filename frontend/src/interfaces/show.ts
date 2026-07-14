@@ -9,16 +9,15 @@ export interface HomepageResponse {
   upcomingShows: ShowCard[]
 }
 
-export interface ShowDetailEvent {
-  id: number
-  elaborateDateStr: string
-  admissionTime: string
+export interface ShowEvent {
+  id: string
+  /** Full display date, e.g. "Sonntag 05.07.26" (used on cards and the reservation event picker). */
+  label: string
   beginTime: string
-  reservationCapacity: number
-  reservationOpen: boolean
+  admissionTime: string
 }
 
-export interface ShowDetail {
+export interface Show {
   id: number
   title: string
   description: string
@@ -33,10 +32,10 @@ export interface ShowDetail {
   reservationPrice?: number
   thirdPartyReservation?: boolean
   thirdPartyReservationLink?: string
-  upcomingEvents?: ShowDetailEvent[]
+  upcomingEvents?: ShowEvent[]
   lastModified: string
 }
 
 export interface ShowDetailResponse {
-  show: ShowDetail
+  show: Show
 }
