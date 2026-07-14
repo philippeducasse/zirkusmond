@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import SectionDivider from '#/components/common/home/SectionDivider.tsx'
 import PageContainer from '#/components/common/PageContainer.tsx'
-import { MOCK_RENTAL_OBJECTS } from '#/lib/mock-rentals.ts'
+import { MOCK_RENTAL_OBJECTS } from '#/lib/interfaces/rentals'
 
 export const Route = createFileRoute('/rentals')({
   head: () => ({
