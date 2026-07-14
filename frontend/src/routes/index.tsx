@@ -34,7 +34,7 @@ function App() {
   return (
     <>
       <Hero />
-      <EventsSection shows={data.upcoming_shows} showAllEventsLink />
+      <EventsSection shows={data.upcomingShows} showAllEventsLink />
       <GallerySection />
       <FooterSection />
     </>
