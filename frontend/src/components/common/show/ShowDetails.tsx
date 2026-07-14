@@ -1,4 +1,4 @@
-import type { MockShow } from '#/lib/mock-shows.ts'
+import type { MockShow } from '#/lib/interfaces/shows'
 
 interface ShowDetailsProps {
   show: MockShow

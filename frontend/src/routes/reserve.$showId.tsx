@@ -2,7 +2,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import PageContainer from '#/components/common/PageContainer.tsx'
 import ReservationPage from '#/components/common/reserve/reservationPage.tsx'
-import { getMockShowById } from '#/lib/mock-shows.ts'
+import { getMockShowById } from '#/lib/interfaces/shows'
 
 export const Route = createFileRoute('/reserve/$showId')({
   loader: ({ params }) => {
