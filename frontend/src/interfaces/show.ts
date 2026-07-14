@@ -32,7 +32,7 @@ export interface Show {
   reservationPrice?: number
   thirdPartyReservation?: boolean
   thirdPartyReservationLink?: string
-  upcomingEvents?: ShowEvent[]
+  upcomingEvents: ShowEvent[]
   lastModified: string
 }
 
