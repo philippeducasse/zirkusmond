@@ -11,6 +11,106 @@ from events.models import Event
 from reservations.models import Guest, Reservation, ReservationPayment
 from shows.models import Show
 
+# Varying-length HTML texts so the frontend can be tested with short,
+# medium and very long show descriptions.
+SHOW_DESCRIPTIONS = [
+    # very short
+    "<p>Ein Abend voller Zirkuszauber.</p>",
+    # short
+    (
+        "<p>Manege frei! Die jungen Artistinnen und Artisten von Zirkus Mond "
+        "zeigen ihr neues Programm — akrobatisch, poetisch und ein bisschen verrückt.</p>"
+    ),
+    # medium
+    (
+        "<p>Was passiert, wenn der Mond eines Nachts einfach nicht aufgehen will? "
+        "In dieser Inszenierung machen sich die Kinder des Zirkus Mond auf die Suche "
+        "nach dem verschwundenen Himmelskörper und begegnen dabei jonglierenden "
+        "Sternschnuppen, einer schüchternen Wolke und einem sehr eigensinnigen Kometen.</p>"
+        "<p>Eine Geschichte über Mut, Freundschaft und die Kunst, auch im Dunkeln "
+        "das Gleichgewicht zu halten. Für Zuschauerinnen und Zuschauer ab 5 Jahren.</p>"
+    ),
+    # long
+    (
+        "<p>Seit Monaten proben über vierzig Kinder und Jugendliche für diesen Abend: "
+        "<strong>Luftakrobatik am Vertikaltuch</strong>, waghalsige Pyramiden, Diabolo, "
+        "Einrad und Clownerie verweben sich zu einer Reise durch eine Nacht, in der "
+        "nichts so bleibt, wie es scheint.</p>"
+        "<p>Die Bühne verwandelt sich vom schlafenden Hinterhof in ein Meer aus "
+        "Sternen, während das Live-Orchester der Musikschule die Vorstellung mit "
+        "eigens komponierten Stücken begleitet. Zwischen den Nummern führen zwei "
+        "streitlustige Nachtwächter durch das Programm — und geraten dabei selbst "
+        "immer tiefer in den Sog der Manege.</p>"
+        "<p>Die Vorstellung dauert etwa 90 Minuten inklusive Pause. In der Pause gibt "
+        "es Getränke und selbstgebackenen Kuchen; der Erlös kommt der Zirkusschule "
+        "zugute.</p>"
+        "<ul>"
+        "<li>Dauer: ca. 90 Minuten mit Pause</li>"
+        "<li>Empfohlen ab 5 Jahren</li>"
+        "<li>Einlass eine Stunde vor Beginn</li>"
+        "</ul>"
+    ),
+    # very long
+    (
+        "<p>Es beginnt mit einem Flüstern hinter dem Vorhang. Dann ein Trommelwirbel, "
+        "ein Lichtkegel, und plötzlich steht die ganze Manege kopf: <em>Zirkus Mond</em> "
+        "lädt zur großen Jahresvorstellung, dem Höhepunkt eines langen Trainingsjahres.</p>"
+        "<p>In der ersten Hälfte entführen die jüngsten Gruppen das Publikum in einen "
+        "Traum aus Seifenblasen und Bodenakrobatik. Die Mittelstufe übernimmt mit "
+        "rasanten Jonglagen, bei denen auch mal eine Keule im Publikum landet — keine "
+        "Sorge, das gehört (meistens) so. Kurz vor der Pause zeigt die Trapezgruppe "
+        "ihre neue Nummer in sechs Metern Höhe, an der sie seit dem Winter gefeilt hat.</p>"
+        "<p>Nach der Pause wird es leiser: Ein Schattenspiel erzählt die Geschichte "
+        "eines Mädchens, das dem Mond ein Geheimnis anvertraut. Daraus entspinnt sich "
+        "das große Finale, in dem alle Gruppen gemeinsam auf der Bühne stehen — über "
+        "sechzig Mitwirkende, ein Feuerwerk aus Farben, Musik und Bewegung.</p>"
+        "<p>Der Zirkus Mond ist ein gemeinnütziger Kinder- und Jugendzirkus. Alle "
+        "Nummern wurden von den Kindern gemeinsam mit den Trainerinnen und Trainern "
+        "entwickelt. Mit dem Kauf einer Karte unterstützen Sie die pädagogische "
+        "Arbeit des Vereins.</p>"
+        "<p>Bitte beachten Sie: Die Plätze sind nicht nummeriert. Wir empfehlen, "
+        "rechtzeitig zu kommen — der Einlass beginnt eine Stunde vor der Vorstellung. "
+        "Für Rollstuhlfahrerinnen und Rollstuhlfahrer halten wir Plätze am Rand der "
+        "Tribüne frei; bitte geben Sie uns kurz Bescheid.</p>"
+    ),
+]
+
+SHOW_CASTS = [
+    # very short
+    "<p>Die Trapezgruppe des Zirkus Mond.</p>",
+    # short
+    (
+        "<p>Es spielen die Akrobatik- und Jonglagegruppen der Mittelstufe, "
+        "begleitet von der Zirkuskapelle.</p>"
+    ),
+    # medium
+    (
+        "<p><strong>Mitwirkende:</strong></p>"
+        "<ul>"
+        "<li>Luftartistik: Gruppe Sternschnuppe</li>"
+        "<li>Bodenakrobatik: Gruppe Kometenschweif</li>"
+        "<li>Clownerie: Jakob, Milla und der große Unbekannte</li>"
+        "<li>Musik: Zirkuskapelle Mondlicht</li>"
+        "</ul>"
+    ),
+    # long
+    (
+        "<p>Über vierzig Kinder und Jugendliche zwischen 6 und 17 Jahren stehen an "
+        "diesem Abend in der Manege. Die Nummern haben sie im Laufe des Jahres in "
+        "ihren Trainingsgruppen selbst entwickelt.</p>"
+        "<p><strong>In der Manege:</strong></p>"
+        "<ul>"
+        "<li>Vertikaltuch &amp; Trapez: Aylin, Bruno, Charlotte, Damian, Elif</li>"
+        "<li>Pyramiden &amp; Partnerakrobatik: die Donnerstagsgruppe</li>"
+        "<li>Diabolo &amp; Keulen: Ferdinand, Greta, Hannes</li>"
+        "<li>Einrad-Parade: die Einsteiger der Montagsgruppe</li>"
+        "<li>Clownsduo: Ida &amp; Jonathan</li>"
+        "</ul>"
+        "<p><strong>Hinter den Kulissen:</strong> Regie und Training: das Team der "
+        "Zirkusschule. Licht und Ton: die Technik-AG. Kostüme: die Eltern-Nähwerkstatt.</p>"
+    ),
+]
+
 
 class Command(BaseCommand):
     help = "Populate database with fixture shows and events"
@@ -42,8 +142,8 @@ class Command(BaseCommand):
             is_future = i <= 5
             show = Show(
                 title=f"Show {i:02d} - {'Future' if is_future else 'Past'}",
-                description=f"<p>Description for show {i}</p>",
-                cast=f"<p>Cast for show {i}</p>",
+                description=SHOW_DESCRIPTIONS[i % len(SHOW_DESCRIPTIONS)],
+                cast=SHOW_CASTS[i % len(SHOW_CASTS)],
                 base_ticket_price=15,
                 card_image=self.create_placeholder_image(),
             )
@@ -70,10 +170,9 @@ class Command(BaseCommand):
                     base_date = datetime(2036, month, day, 20, 0, 0, tzinfo=UTC)
                 else:
                     # Events in past (spread across 2022-2024), different dates
-                    year = 2022 + ((show.id - 6 + event_idx) % 3)
-                    month = 1 + ((show.id - 6 + event_idx) % 12)
-                    day = 5 + ((idx + event_idx) % 25)
-                    base_date = datetime(year, month, day, 20, 0, 0, tzinfo=UTC)
+                    start = datetime(2022, 1, 1, 20, 0, 0, tzinfo=UTC)
+                    days_offset = ((idx * 37) + (event_idx * 11)) % (3 * 365)
+                    base_date = start + timedelta(days=days_offset)
 
                 admission = base_date - timedelta(hours=1)
                 event = Event(
