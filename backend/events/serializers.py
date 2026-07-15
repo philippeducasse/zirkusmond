@@ -16,7 +16,6 @@ class EventSerializer(ModelSerializer):
             "id",
             "time_and_date",
             "admission_time",
-            "begin_time",
             "reservation_capacity",
             "reservation_open",
         ]

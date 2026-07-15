@@ -38,9 +38,6 @@ class Event(models.Model):
     def admission_time(self) -> str:
         return format_datetime(self.admission, "%H:%M")
 
-    def begin_time(self) -> str:
-        return format_datetime(self.begin, "%H:%M")
-
     @admin.display(ordering="annotated_reservation_count")
     def reserved_tickets(self) -> str:
         if hasattr(self, "annotated_reservation_count"):
