@@ -19,7 +19,7 @@ export default function EventsSection({
 }: EventsSectionProps) {
   return (
     <div>
-      <h2 className="my-12 text-center text-3xl text-primary lg:text-5xl">
+      <h2 className="my-8 sm:my-12 text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-primary">
         Upcoming Shows
       </h2>
       <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 px-6">

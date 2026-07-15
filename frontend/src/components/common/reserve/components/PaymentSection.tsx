@@ -28,8 +28,8 @@ export default function PaymentSection({
 
   return (
     <>
-      <div className="my-6">
-        <h3 className="text-4xl text-primary">Payment</h3>
+      <div className="my-4 sm:my-6">
+        <h3 className="text-2xl sm:text-3xl md:text-4xl text-primary">Payment</h3>
         <SlidingScale
           show={show}
           customPrice={customPrice}
@@ -37,13 +37,13 @@ export default function PaymentSection({
         />
       </div>
 
-      <div className="my-4 text-center">
-        <h4 className="mb-3 text-2xl text-primary">
+      <div className="my-3 sm:my-4 text-center">
+        <h4 className="mb-2 sm:mb-3 text-xl sm:text-2xl text-primary">
           Total Price: <span className="font-bold">{total.toFixed(2)}</span> €
         </h4>
       </div>
 
-      <h4 className="my-12 text-center text-2xl text-primary">
+      <h4 className="my-8 sm:my-12 text-center text-xl sm:text-2xl text-primary">
         Choose Your Payment Method
       </h4>
       {paymentMethodFields.map((field) => (

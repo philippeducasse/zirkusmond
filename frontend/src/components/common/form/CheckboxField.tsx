@@ -15,8 +15,8 @@ export default function CheckboxField({
   onChange,
 }: CheckboxFieldProps) {
   return (
-    <Field orientation="horizontal" className="my-6 flex p-4 items-center">
-      <FieldLabel htmlFor={id} className="text-xl">
+    <Field orientation="horizontal" className="my-4 sm:my-6 flex p-3 sm:p-4 items-center">
+      <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
         {label}
       </FieldLabel>
       <Checkbox
