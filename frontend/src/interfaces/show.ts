@@ -12,7 +12,6 @@ export interface HomepageResponse {
 export interface ShowEvent {
   id: string
   timeAndDate: string
-  beginTime: string
   admissionTime: string
 }
 
