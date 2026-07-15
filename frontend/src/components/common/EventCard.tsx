@@ -33,13 +33,13 @@ const EventCard = ({
         className="relative z-20 aspect-square w-full object-cover"
       />
       <CardHeader className="py-3 my-auto">
-        <CardTitle className="text-center pb-2 text-primary text-xl md:text-2xl">
+        <CardTitle className="text-center pb-2 text-primary text-lg sm:text-xl md:text-2xl">
           {eventTitle}
         </CardTitle>
         {visibleDates.map((date, i) => (
           <CardDescription
             key={`${date}_${i}`}
-            className="w-full text-center text-base text-white sm:text-lg"
+            className="w-full text-center text-sm sm:text-base md:text-lg text-white"
           >
             {date}
           </CardDescription>
@@ -56,7 +56,7 @@ const EventCard = ({
                 {hiddenDates.map((date, i) => (
                   <CardDescription
                     key={`${date}_${i}`}
-                    className="w-full text-center text-base text-white sm:text-lg"
+                    className="w-full text-center text-sm sm:text-base md:text-lg text-white"
                   >
                     {date}
                   </CardDescription>

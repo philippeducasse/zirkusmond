@@ -22,7 +22,7 @@ export default function NumberField({
 }: NumberFieldProps) {
   return (
     <Field orientation="responsive">
-      <FieldLabel htmlFor={id} className="text-xl">
+      <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
         {label}
       </FieldLabel>
       <div className="relative w-16">
@@ -33,7 +33,7 @@ export default function NumberField({
           max={max}
           value={value}
           onChange={(e) => onChange(Number(e.target.value) || min)}
-          className="h-11 w-full pr-7 text-lg! text-white [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="h-10 sm:h-11 w-full pr-7 text-base! sm:text-lg! text-white [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
         <div className="absolute inset-y-0 right-0 flex w-6 flex-col border-l-2 border-primary">
           <button

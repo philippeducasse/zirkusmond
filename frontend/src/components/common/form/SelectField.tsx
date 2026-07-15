@@ -1,11 +1,6 @@
+import { useState, useRef, useEffect } from 'react'
+import { ChevronDownIcon, CheckIcon } from 'lucide-react'
 import { Field, FieldLabel } from '#/components/ui/field.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
 
 export interface SelectFieldProps {
   id: string
@@ -24,35 +19,78 @@ export default function SelectField({
   onChange,
   options,
 }: SelectFieldProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
+  const selectedOption = options.find((opt) => opt.value === value)
+
   return (
     <Field orientation="responsive">
-      <FieldLabel htmlFor={id} className="text-xl">
+      <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
         {label}
       </FieldLabel>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger
+      <div ref={containerRef} className="relative bg-white/10">
+        <button
           id={id}
-          className="data-[size=default]:h-11 w-full border-primary border-2 text-lg hover:bg-transparent"
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex h-10 sm:h-11 w-full items-center justify-between border-2 border-primary bg-transparent px-2 sm:px-3 text-base sm:text-lg text-white hover:bg-transparent"
         >
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent
-          position="popper"
-          align="start"
-          sideOffset={4}
-          className="border-primary border-2 bg-[url(/images/general/bg_pattern.webp)]! bg-repeat hover:text-primary!"
-        >
-          {options.map((option) => (
-            <SelectItem
-              key={option.value}
-              value={option.value}
-              className="text-white text-lg data-highlighted:text-primary! data-[state=checked]:text-primary! [&_span]:text-white! [&_span]:data-highlighted:text-primary! [&_span]:data-[state=checked]:text-primary!"
-            >
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <span
+            className={selectedOption ? 'text-white' : 'text-muted-foreground'}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+          <ChevronDownIcon className="size-4 text-primary" />
+        </button>
+        {isOpen && (
+          <div className="absolute z-50 w-full border-2 border-t-0 border-primary bg-[url(/images/general/bg_pattern.webp)] bg-repeat">
+            {options.map((option) => {
+              const isSelected = option.value === value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value)
+                    setIsOpen(false)
+                  }}
+                  className={`flex w-full items-center bg-white/10 justify-between px-2 sm:px-3 py-2 text-left text-base sm:text-lg hover:bg-white/10 hover:text-primary ${
+                    isSelected ? 'text-primary' : 'text-white'
+                  }`}
+                >
+                  <span>{option.label}</span>
+                  {isSelected && (
+                    <CheckIcon
+                      className="size-4 stroke-primary"
+                      strokeWidth={3}
+                    />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </Field>
   )
 }

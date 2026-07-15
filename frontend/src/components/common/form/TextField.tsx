@@ -18,7 +18,7 @@ export default function TextField({
 }: TextFieldProps) {
   return (
     <Field>
-      <FieldLabel htmlFor={id} className="text-xl">
+      <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
         {label}
       </FieldLabel>
       <Input
@@ -26,7 +26,7 @@ export default function TextField({
         name={name ?? id}
         type={type}
         required={required}
-        className="h-11 text-lg! text-white"
+        className="h-10 sm:h-11 text-base! sm:text-lg! text-white"
       />
     </Field>
   )

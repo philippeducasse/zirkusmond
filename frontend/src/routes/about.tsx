@@ -32,17 +32,17 @@ const team = [
 function About() {
   return (
     <PageContainer className="px-4">
-      <h1 className="display-title mb-8 text-center text-5xl font-bold text-[var(--sea-ink)] sm:text-6xl">
+      <h1 className="display-title mb-6 sm:mb-8 text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--sea-ink)]">
         Welcome to the Moon
       </h1>
 
-      <section className="island-shell rounded-2xl p-6 sm:p-10">
+      <section className="island-shell rounded-2xl p-4 sm:p-6 md:p-10">
         <img
-          className="mx-auto mb-8 w-full rounded-xl"
+          className="mx-auto mb-6 sm:mb-8 w-full rounded-xl"
           src="/images/gallery/img-9.webp"
           alt="Zirkus Mond Image"
         />
-        <p className="text-xl leading-8 text-[var(--sea-ink)]">
+        <p className="text-base sm:text-lg md:text-xl leading-7 sm:leading-8 text-[var(--sea-ink)]">
           Der Zirkus Mond, Treffpunkt der Berliner Artistenszene,
           Veranstaltungsort für Zirkus, Theater, Tanz &amp; Konzerte erwuchs
           2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden
@@ -55,14 +55,14 @@ function About() {
           wobei durch wechselnde ArtistInnen und Konzepte jede Show ein
           Unikat ist.
         </p>
-        <p className="m-0 pt-6 text-base leading-8 text-[var(--sea-ink-soft)] sm:text-center sm:text-xl">
+        <p className="m-0 pt-4 sm:pt-6 text-sm sm:text-base md:text-xl leading-7 sm:leading-8 text-[var(--sea-ink-soft)] sm:text-center">
           Die Pforten unseres Zirkuszeltes stehen offen für alle, die Lust
           haben, einen Ort der Gemeinschaft, des Schaffens und der Liebe zum
           Leben zu besuchen, zu bespielen und mitzugestalten.
         </p>
       </section>
 
-      <h2 className="display-title mt-16 mb-8 text-center text-5xl font-bold text-[var(--sea-ink)] sm:text-6xl">
+      <h2 className="display-title mt-12 sm:mt-16 mb-6 sm:mb-8 text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--sea-ink)]">
         Meet the Team
       </h2>
       <img
@@ -82,10 +82,10 @@ function About() {
               src={`/images/gallery/${member.image}`}
               alt={`Photo of ${member.name}`}
             />
-            <h3 className="display-title mt-6 text-2xl font-bold text-[var(--sea-ink)]">
+            <h3 className="display-title mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl font-bold text-[var(--sea-ink)]">
               {member.name}
             </h3>
-            <p className="mt-1 text-base text-[var(--sea-ink-soft)]">
+            <p className="mt-1 text-sm sm:text-base text-[var(--sea-ink-soft)]">
               {member.role}
             </p>
           </div>
