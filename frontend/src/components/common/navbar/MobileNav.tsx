@@ -40,13 +40,13 @@ export default function MobileNav({ items }: MobileNavProps) {
           {items.map((item) =>
             item.external ? (
               <SheetClose key={item.href} asChild>
-                <a href={item.href} className="text-2xl">
+                <a href={item.href} className="text-xl sm:text-2xl">
                   {item.label}
                 </a>
               </SheetClose>
             ) : (
               <SheetClose key={item.href} asChild>
-                <Link to={item.href} className="text-2xl">
+                <Link to={item.href} className="text-xl sm:text-2xl">
                   {item.label}
                 </Link>
               </SheetClose>

@@ -11,7 +11,9 @@ export default function DynamicForm({ fields, title }: DynamicFormProps) {
   return (
     <FieldsLayout>
       {title && (
-        <h3 className="text-3xl text-primary text-center w-full">{title}</h3>
+        <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-primary text-center w-full">
+          {title}
+        </h3>
       )}
       {fields.map((field) => (
         <DynamicField key={field.id} field={field} />
