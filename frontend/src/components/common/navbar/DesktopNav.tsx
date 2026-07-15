@@ -15,7 +15,7 @@ interface DesktopNavProps {
 }
 
 const linkClassName =
-  'w-fit rounded-none text-primary bg-transparent p-0 text-2xl hover:bg-transparent focus:bg-transparent'
+  'w-fit rounded-none text-primary bg-transparent p-0 text-xl md:text-2xl hover:bg-transparent focus:bg-transparent'
 
 export default function DesktopNav({ items }: DesktopNavProps) {
   return (

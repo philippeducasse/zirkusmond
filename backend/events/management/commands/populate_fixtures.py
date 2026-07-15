@@ -59,27 +59,31 @@ class Command(BaseCommand):
         # Create events for each show with different dates
         events_to_create: list[Event] = []
         for idx, (show, is_future) in enumerate(shows):
-            if is_future:
-                # Events in 2036, spread across multiple months
-                month = 6 + (idx % 7)
-                day = 5 + (idx % 20)
-                base_date = datetime(2036, month, day, 20, 0, 0, tzinfo=UTC)
-            else:
-                # Events in past (spread across 2022-2024), different dates
-                year = 2022 + ((show.id - 6) % 3)
-                month = 1 + ((show.id - 6) % 12)
-                day = 5 + ((idx % 25) % 28)
-                base_date = datetime(year, month, day, 20, 0, 0, tzinfo=UTC)
+            # Each show gets 1-10 events
+            num_events = 1 + (idx % 10)
 
-            admission = base_date - timedelta(hours=1)
-            event = Event(
-                show=show,
-                admission=admission,
-                begin=base_date,
-                reservation_capacity=300,
-                open_for_reservation=is_future,
-            )
-            events_to_create.append(event)
+            for event_idx in range(num_events):
+                if is_future:
+                    # Events in 2036, spread across multiple months
+                    month = 6 + ((idx + event_idx) % 7)
+                    day = 5 + ((idx + event_idx) % 20)
+                    base_date = datetime(2036, month, day, 20, 0, 0, tzinfo=UTC)
+                else:
+                    # Events in past (spread across 2022-2024), different dates
+                    year = 2022 + ((show.id - 6 + event_idx) % 3)
+                    month = 1 + ((show.id - 6 + event_idx) % 12)
+                    day = 5 + ((idx + event_idx) % 25)
+                    base_date = datetime(year, month, day, 20, 0, 0, tzinfo=UTC)
+
+                admission = base_date - timedelta(hours=1)
+                event = Event(
+                    show=show,
+                    admission=admission,
+                    begin=base_date,
+                    reservation_capacity=300,
+                    open_for_reservation=is_future,
+                )
+                events_to_create.append(event)
 
         Event.objects.bulk_create(events_to_create)
 
@@ -133,9 +137,10 @@ class Command(BaseCommand):
         Guest.objects.bulk_create(guests_to_create)
         ReservationPayment.objects.bulk_create(payments_to_create)
 
+        total_events = len(events_to_create)
         self.stdout.write(
             self.style.SUCCESS(
-                "Successfully created 50 shows with 50 events\n"
+                f"Successfully created 50 shows with {total_events} events (1-10 per show)\n"
                 "  - 5 future shows with events in 2036\n"
                 "  - 45 past shows with events in 2022-2024\n"
                 "  - Added reservations and payments for revenue tracking"
