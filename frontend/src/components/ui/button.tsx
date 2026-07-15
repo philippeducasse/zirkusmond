@@ -24,9 +24,9 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          'h-auto gap-1.5 text-2xl border-4 px-12 py-4 has-data-[icon=inline-end]:pr-8 has-data-[icon=inline-start]:pl-8',
-        sm: "h-auto gap-1 text-base border-4 px-6 py-2.5 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4 [&_svg:not([class*='size-'])]:size-4",
-        xs: "h-auto gap-1 text-sm border-2 px-3 py-1.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
+          'h-auto gap-1.5 text-base border-2 px-6 py-2.5 sm:text-lg sm:border-4 sm:px-8 sm:py-3 md:text-xl md:px-12 md:py-4 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4 sm:has-data-[icon=inline-end]:pr-6 sm:has-data-[icon=inline-start]:pl-6 md:has-data-[icon=inline-end]:pr-8 md:has-data-[icon=inline-start]:pl-8',
+        sm: "h-auto gap-1 text-sm border-2 px-4 py-2 sm:text-base sm:border-4 sm:px-6 sm:py-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 sm:has-data-[icon=inline-end]:pr-4 sm:has-data-[icon=inline-start]:pl-4 [&_svg:not([class*='size-'])]:size-4",
+        xs: "h-auto gap-1 text-xs border-2 px-2.5 py-1 sm:text-sm sm:px-3 sm:py-1.5 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 sm:has-data-[icon=inline-end]:pr-2 sm:has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
         icon: 'size-8',
         'icon-xs': "size-6 rounded-none [&_svg:not([class*='size-'])]:size-3",
         'icon-sm': 'size-7 rounded-none',
