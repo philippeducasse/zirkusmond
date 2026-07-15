@@ -1,4 +1,4 @@
-import type { Show } from '#/interfaces/show.ts'
+import type { Show, ShowEvent } from '#/interfaces/show.ts'
 import type { ButtonGroupFieldProps } from '#/components/common/form/ButtonGroupField.tsx'
 import type { CheckboxFieldProps } from '#/components/common/form/CheckboxField.tsx'
 import type { NumberFieldProps } from '#/components/common/form/NumberField.tsx'
@@ -35,9 +35,9 @@ export function buildTicketFields({
       placeholder: 'Termin wählen',
       value: selectedEventId,
       onChange: setSelectedEventId,
-      options: show.upcomingEvents.map((event) => ({
+      options: show.upcomingEvents.map((event: ShowEvent) => ({
         value: event.id,
-        label: event.label,
+        label: event.timeAndDate,
       })),
     },
     {
@@ -65,7 +65,7 @@ export function buildNewsletterField({
     {
       kind: 'checkbox',
       id: 'newsletter',
-      label: 'I would like to receive the Zirkus Mond newsletter.',
+      label: 'I would like to receive the Zirkus Mond newsletter',
       checked: newsletter,
       onChange: setNewsletter,
     },
