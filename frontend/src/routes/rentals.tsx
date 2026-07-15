@@ -21,12 +21,10 @@ export const Route = createFileRoute('/rentals')({
 function RouteComponent() {
   return (
     <PageContainer>
-      <h2 className="py-6 sm:py-8 text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl">Rentals</h2>
+      <h2 className="py-6 sm:py-8 text-center">Rentals</h2>
       <div className="mb-6 sm:mb-8">
-        <h3 className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-          Rent our Zirkus stuff!!
-        </h3>
-        <p className="py-6 sm:py-8 text-center text-sm sm:text-base">
+        <h3 className="text-center">Rent our Zirkus stuff!!</h3>
+        <p className="py-6 sm:py-8 text-center">
           Very very cheap, very very nice.
         </p>
       </div>
@@ -37,8 +35,8 @@ function RouteComponent() {
         {MOCK_RENTAL_OBJECTS.map((object) => (
           <div key={object.id} className="flex flex-col gap-3">
             <img src={object.image} alt={object.name} />
-            <h3 className="text-center text-2xl sm:text-3xl md:text-4xl">{object.name}</h3>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl">{object.description}</p>
+            <h3 className="text-center">{object.name}</h3>
+            <p>{object.description}</p>
             <a
               href={object.link}
               target="_blank"
