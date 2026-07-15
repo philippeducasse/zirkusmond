@@ -11,8 +11,7 @@ export interface HomepageResponse {
 
 export interface ShowEvent {
   id: string
-  /** Full display date, e.g. "Sonntag 05.07.26" (used on cards and the reservation event picker). */
-  label: string
+  timeAndDate: string
   beginTime: string
   admissionTime: string
 }
