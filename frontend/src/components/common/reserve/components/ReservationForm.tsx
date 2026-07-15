@@ -35,7 +35,7 @@ export default function ReservationForm({
         <DynamicForm title="Tickets" fields={ticketFields} />
 
         {!show.baseTicketPrice && (
-          <p className="w-full my-3 sm:my-4 text-sm sm:text-base">
+          <p className="w-full my-3 sm:my-4">
             For your Reservation, you will have to pay{' '}
             {show.reservationPrice ?? 5} Euro per Ticket. This will be fully
             deducted from your entree fee at the box office.

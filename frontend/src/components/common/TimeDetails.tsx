@@ -12,7 +12,7 @@ export default function TimeDetails({ date, admissionTime }: TimeDetailsProps) {
         <CardDescription className="mb-2 font-bold text-center text-base sm:text-lg text-primary">
           {date}
         </CardDescription>
-        <p className="text-white font-semibold text-sm sm:text-base">
+        <p className="font-semibold">
           Admission: {admissionTime}
         </p>
       </CardContent>
