@@ -35,9 +35,6 @@ class Event(models.Model):
     def date_str(self) -> str:
         return format_datetime(self.begin, "%d.%m.%y")
 
-    def elaborate_date_str(self) -> str:
-        return format_datetime(self.begin, "%A %d.%m.%y")
-
     def admission_time(self) -> str:
         return format_datetime(self.admission, "%H:%M")
 

@@ -26,7 +26,7 @@ export default function TextField({
         name={name ?? id}
         type={type}
         required={required}
-        className="h-11 text-lg"
+        className="h-11 text-lg! text-white"
       />
     </Field>
   )
