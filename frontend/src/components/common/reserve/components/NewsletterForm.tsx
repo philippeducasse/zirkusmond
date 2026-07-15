@@ -8,9 +8,7 @@ interface NewsletterFormProps {
 
 const NewsletterForm = ({ newsletter, setNewsletter }: NewsletterFormProps) => {
   return (
-    // <div className="-mt-12">
     <DynamicForm fields={buildNewsletterField({ newsletter, setNewsletter })} />
-    // </div>
   )
 }
 
