@@ -43,7 +43,7 @@ function ReserveButton({ show }: { show: Show }) {
   }
   return (
     <Button asChild>
-      <Link to="/reserve/$showId" params={{ showId: show.id }}>
+      <Link to="/reserve/$showId" params={{ showId: String(show.id) }}>
         {show.baseTicketPrice ? 'Tickets Kaufen' : 'Zur Reservierung'}
       </Link>
     </Button>
@@ -68,8 +68,7 @@ function RouteComponent() {
         {show.upcomingEvents.map((event) => (
           <TimeDetails
             key={event.id}
-            date={event.label}
-            beginTime={event.beginTime}
+            date={event.timeAndDate}
             admissionTime={event.admissionTime}
           />
         ))}
