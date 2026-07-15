@@ -4,8 +4,6 @@
 
 @import 'tw-animate-css';
 
-@import 'tw-animate-css';
-
 @import 'shadcn/tailwind.css';
 
 @import '@fontsource-variable/manrope';
@@ -145,39 +143,37 @@ body {
   h6 {
     color: #f6ae42;
     font-family: 'Raleway Variable', sans-serif;
-    line-height: 1.2;
     margin: 0.5em 0;
   }
 
   h1 {
-    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    @apply text-4xl md:text-5xl lg:text-6xl;
   }
 
   h2 {
-    font-size: clamp(1.5rem, 4vw, 2rem);
+    @apply text-3xl md:text-4xl lg:text-5xl;
   }
 
   h3 {
-    font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+    @apply text-2xl md:text-3xl lg:text-4xl;
   }
 
   h4 {
-    font-size: clamp(1.125rem, 3vw, 1.5rem);
+    @apply text-xl md:text-2xl lg:text-3xl;
   }
 
   h5 {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    @apply text-lg md:text-xl lg:text-2xl;
   }
 
   h6 {
-    font-size: clamp(0.875rem, 2vw, 1rem);
+    @apply text-base md:text-lg lg:text-xl;
   }
 
   p {
+    @apply text-base md:text-lg;
     color: #fff;
-    font-size: clamp(1rem, 2.5vw, 1.125rem);
     font-family: 'Manrope Variable', sans-serif;
-    line-height: 1.6;
     margin: 0.5em 0;
   }
 }

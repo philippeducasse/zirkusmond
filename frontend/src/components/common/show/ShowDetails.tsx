@@ -8,7 +8,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
   return (
     <div className="flex flex-col text-base sm:text-lg lg:text-2xl">
       <div>
-        <p className="mt-6 sm:mt-8 mb-3 sm:mb-4 text-xl sm:text-2xl md:text-3xl text-primary">About the show:</p>
+        <h3 className="mt-6 sm:mt-8 mb-3 sm:mb-4">About the show:</h3>
         <div dangerouslySetInnerHTML={{ __html: show.description }} />
       </div>
       <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-8 sm:gap-12">
@@ -18,7 +18,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
           className="w-full max-w-sm object-cover"
         />
         <div className="flex flex-col lg:mt-12">
-          <p className="mt-3 sm:mt-4 mb-3 sm:mb-4 text-xl sm:text-2xl md:text-3xl text-primary">Cast:</p>
+          <h3 className="mt-3 sm:mt-4 mb-3 sm:mb-4">Cast:</h3>
           <div dangerouslySetInnerHTML={{ __html: show.cast }} />
         </div>
       </div>

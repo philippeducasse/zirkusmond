@@ -12,7 +12,7 @@ export const Route = createFileRoute('/impressum')({
 function RouteComponent() {
   return (
     <PageContainer className="text-center lg:text-lg">
-      <h2 className="mb-5 text-2xl text-white">Impressum</h2>
+      <h2 className="mb-5 text-white">Impressum</h2>
       <p>
         Kultstätte 58 GmbH
         <br />

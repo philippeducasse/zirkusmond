@@ -32,7 +32,7 @@ function RouteComponent() {
 
   return (
     <PageContainer>
-      <h1 className="mb-4 text-center text-3xl text-primary lg:text-5xl">
+      <h1 className="mb-4 text-center text-primary">
         {show.title}
       </h1>
       <ReservationPage show={show} />
