@@ -1,5 +1,5 @@
 import { buildNewsletterField } from '../helper'
-import DynamicField from '../../form/DynamicField'
+import DynamicForm from '../../form/DynamicForm'
 
 interface NewsletterFormProps {
   newsletter: boolean
@@ -7,13 +7,11 @@ interface NewsletterFormProps {
 }
 
 const NewsletterForm = ({ newsletter, setNewsletter }: NewsletterFormProps) => {
-  const newsletterFields = buildNewsletterField({ newsletter, setNewsletter })
-
   return (
-    <div className="bg-white/10">
-      {newsletterFields.map((field) => (
-        <DynamicField key={field.id} field={field} />
-      ))}
+    <div className="-mt-12">
+      <DynamicForm
+        fields={buildNewsletterField({ newsletter, setNewsletter })}
+      />
     </div>
   )
 }

@@ -14,7 +14,7 @@ class EventSerializer(ModelSerializer):
         model = Event
         fields = [
             "id",
-            "elaborate_date_str",
+            "time_and_date",
             "admission_time",
             "begin_time",
             "reservation_capacity",

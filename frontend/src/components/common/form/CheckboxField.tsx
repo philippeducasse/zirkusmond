@@ -16,14 +16,14 @@ export default function CheckboxField({
 }: CheckboxFieldProps) {
   return (
     <Field orientation="horizontal" className="my-6 flex p-4 items-center">
+      <FieldLabel htmlFor={id} className="text-xl">
+        {label}
+      </FieldLabel>
       <Checkbox
         id={id}
         checked={checked}
-        onCheckedChange={(checked) => onChange(checked === true)}
+        onCheckedChange={(check) => onChange(check === true)}
       />
-      <FieldLabel htmlFor={id} className="text-xl font-normal">
-        {label}
-      </FieldLabel>
     </Field>
   )
 }

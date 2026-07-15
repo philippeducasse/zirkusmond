@@ -32,7 +32,7 @@ export default function SelectField({
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           id={id}
-          className="data-[size=default]:h-11 w-full border-primary border-2 bg-transparent text-lg hover:bg-transparent"
+          className="data-[size=default]:h-11 w-full border-primary border-2 text-lg hover:bg-transparent"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -40,13 +40,13 @@ export default function SelectField({
           position="popper"
           align="start"
           sideOffset={4}
-          className="border-primary border-2 bg-[url(/images/general/bg_pattern.webp]! bg-repeat"
+          className="border-primary border-2 bg-[url(/images/general/bg_pattern.webp)]! bg-repeat hover:text-primary!"
         >
           {options.map((option) => (
             <SelectItem
               key={option.value}
               value={option.value}
-              className="text-white text-lg"
+              className="text-white text-lg data-highlighted:text-primary! data-[state=checked]:text-primary! [&_span]:text-white! [&_span]:data-highlighted:text-primary! [&_span]:data-[state=checked]:text-primary!"
             >
               {option.label}
             </SelectItem>
