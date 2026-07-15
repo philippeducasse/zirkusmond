@@ -19,8 +19,8 @@ export default function SlidingScale({
 
   return (
     <div className="my-4 sm:my-6">
-      <h4 className="mb-2 sm:mb-3 text-xl sm:text-2xl text-primary">Choose Your Price</h4>
-      <p className="my-4 sm:my-6 text-base sm:text-lg">
+      <h4 className="mb-2 sm:mb-3 text-primary">Choose Your Price</h4>
+      <p className="my-4 sm:my-6">
         We offer sliding scale pricing to make our shows accessible. Pay what
         feels right for you! Your generosity directly supports the artists and
         sustains our community.

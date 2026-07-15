@@ -27,7 +27,7 @@ export default function FooterSection() {
     <div className="mx-auto max-w-[1800px] px-6 lg:px-16">
       <div className="flex flex-col justify-between gap-12 border-2 border-[#e7b548] bg-[#00000040] p-6 text-center text-primary lg:flex-row">
         <div className="flex flex-col items-center lg:w-1/3">
-          <h2 className="my-4 sm:my-6 text-xl sm:text-2xl md:text-3xl">Contact</h2>
+          <h2 className="my-4 sm:my-6">Contact</h2>
           <div className="flex items-center justify-evenly gap-6 py-4">
             {SOCIAL_LINKS.map((social) => (
               <a
@@ -40,7 +40,7 @@ export default function FooterSection() {
               </a>
             ))}
           </div>
-          <p className="p-4 sm:p-6 text-base sm:text-lg">
+          <p className="p-4 sm:p-6">
             Direct matters concerning reservations
             <a
               className="my-4 sm:my-6 block underline"
@@ -53,7 +53,7 @@ export default function FooterSection() {
 
         <div className="flex justify-center lg:w-1/3">
           <div className="w-4/5 lg:w-3/5">
-            <h2 className="my-4 sm:my-6 text-xl sm:text-2xl md:text-3xl">Find us</h2>
+            <h2 className="my-4 sm:my-6">Find us</h2>
             <img
               className="m-auto w-9/12 max-w-80"
               src="/images/general/map.webp"
@@ -63,13 +63,13 @@ export default function FooterSection() {
         </div>
 
         <div className="lg:w-1/3">
-          <h2 className="my-4 sm:my-6 text-xl sm:text-2xl md:text-3xl">Mailing List</h2>
-          <p className="text-base sm:text-lg lg:pr-6">
+          <h2 className="my-4 sm:my-6">Mailing List</h2>
+          <p className="lg:pr-6">
             Want to be notified about new Shows? Hear what's going on on the
             moon? Not be forgotten or left out? Become part of our magical
             Mailing List!
           </p>
-          <p className="pt-3 sm:pt-4 text-base sm:text-lg lg:pr-6">
+          <p className="pt-3 sm:pt-4 lg:pr-6">
             You can also join our Telegram{' '}
             <a
               className="underline"
@@ -104,11 +104,11 @@ export default function FooterSection() {
             </Button>
           </form>
 
-          <h2 className="text-xl sm:text-2xl md:text-3xl">Support Us</h2>
+          <h2>Support Us</h2>
           <div className="my-4 sm:my-6 text-center">
-            <h3 className="my-3 sm:my-4 text-sm sm:text-base">Bank Transfer/Überweisung:</h3>
-            <p className="py-2 text-sm sm:text-base">IBAN: DE34 4306 0967 1226 9437 00</p>
-            <p className="text-sm sm:text-base">BIC: GENODEM1GLS</p>
+            <h3 className="my-3 sm:my-4">Bank Transfer/Überweisung:</h3>
+            <p className="py-2">IBAN: DE34 4306 0967 1226 9437 00</p>
+            <p>BIC: GENODEM1GLS</p>
           </div>
           <Button asChild>
             <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E">
