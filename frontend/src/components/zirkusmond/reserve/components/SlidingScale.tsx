@@ -1,6 +1,27 @@
 import { Slider } from '#/components/ui/slider.tsx'
 import type { Show } from '#/interfaces/show'
 
+interface PriceLabelProps {
+  label: string
+  price: number
+  alignment: 'start' | 'center' | 'end'
+}
+
+function PriceLabel({ label, price, alignment }: PriceLabelProps) {
+  const alignmentClasses = {
+    start: 'items-start',
+    center: 'items-center',
+    end: 'items-end',
+  }
+
+  return (
+    <div className={`flex flex-col ${alignmentClasses[alignment]}`}>
+      <span className="text-primary uppercase tracking-wider">{label}</span>
+      <span className="text-white font-bold">{price} EUR</span>
+    </div>
+  )
+}
+
 interface SlidingScaleProps {
   show: Show
   customPrice: number
@@ -25,13 +46,14 @@ export default function SlidingScale({
         feels right for you! Your generosity directly supports the artists and
         sustains our community.
       </p>
-      <div className="mb-3 sm:mb-4 flex items-center justify-center gap-2 sm:gap-3">
-        <span className="text-lg sm:text-xl font-bold text-primary">
+      <div className="mb-6 sm:mb-8 flex items-center justify-center gap-3 sm:gap-4 p-4 sm:p-5">
+        <span className="text-lg sm:text-xl md:text-2xl font-semibold text-white/80">
           Price per Ticket:
         </span>
-        <span className="text-lg sm:text-xl font-bold text-primary min-w-[80px] sm:min-w-[100px] text-right">
-          {customPrice} EUR
+        <span className="text-xl md:text-3xl font-bold text-primary">
+          {customPrice}
         </span>
+        <span className="text-xl md:text-3xll text-primary">€</span>
       </div>
       <Slider
         value={[customPrice]}
@@ -40,10 +62,14 @@ export default function SlidingScale({
         max={maxPrice}
         step={1}
       />
-      <div className="mt-2 flex justify-between text-xs sm:text-sm">
-        <span>Soli price: {minPrice} EUR</span>
-        <span>Standard: {show.baseTicketPrice} EUR</span>
-        <span>Support price: {maxPrice} EUR</span>
+      <div className="mt-4 sm:mt-5 flex justify-between text-xs sm:text-sm md:text-base text-white/80 font-medium px-2 sm:px-4">
+        <PriceLabel label="Solidarity" price={minPrice} alignment="start" />
+        <PriceLabel
+          label="Standard"
+          price={show.baseTicketPrice}
+          alignment="center"
+        />
+        <PriceLabel label="Support" price={maxPrice} alignment="end" />
       </div>
     </div>
   )

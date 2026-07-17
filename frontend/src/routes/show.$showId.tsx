@@ -60,7 +60,7 @@ function RouteComponent() {
       <ShowDetails show={show} />
 
       <div className="my-12 flex justify-evenly">
-        <Button variant={'secondary'}>
+        <Button variant={'secondary'} asChild>
           <Link to="/">Home</Link>
         </Button>
         <ReserveButton show={show} />
