@@ -26,12 +26,20 @@ def make_image() -> SimpleUploadedFile:
     return SimpleUploadedFile("test.jpg", buf.read(), content_type="image/jpeg")
 
 
+def make_banner_image() -> SimpleUploadedFile:
+    buf = BytesIO()
+    Image.new("RGB", (400, 225), color="blue").save(buf, format="JPEG")
+    buf.seek(0)
+    return SimpleUploadedFile("banner.jpg", buf.read(), content_type="image/jpeg")
+
+
 def make_show(**kwargs: Any) -> Show:
     defaults = dict(
         title="Test Show",
         description="",
         cast="",
         card_image=make_image(),
+        banner_image=make_banner_image(),
         private=False,
         base_ticket_price=15,
     )

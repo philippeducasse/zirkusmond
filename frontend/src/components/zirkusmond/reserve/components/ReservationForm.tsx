@@ -1,8 +1,8 @@
-import DynamicForm from '#/components/common/form/DynamicForm'
+import DynamicForm from '#/components/zirkusmond/form/DynamicForm'
 import {
   buildPersonalInfoFields,
   buildTicketFields,
-} from '#/components/common/reserve/helper.ts'
+} from '#/components/zirkusmond/reserve/helper'
 import type { Show } from '#/interfaces/show'
 
 interface ReservationFormProps {

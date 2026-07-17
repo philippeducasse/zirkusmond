@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import PageContainer from '#/components/common/PageContainer.tsx'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
 
 export const Route = createFileRoute('/impressum')({
   head: () => ({
