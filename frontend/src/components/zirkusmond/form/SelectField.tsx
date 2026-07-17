@@ -48,7 +48,7 @@ export default function SelectField({
       <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
         {label}
       </FieldLabel>
-      <div ref={containerRef} className="relative bg-white/10">
+      <div ref={containerRef} className="relative bg-black/10">
         <button
           id={id}
           type="button"
@@ -74,7 +74,7 @@ export default function SelectField({
                     onChange(option.value)
                     setIsOpen(false)
                   }}
-                  className={`flex w-full items-center bg-white/10 justify-between px-2 sm:px-3 py-2 text-left text-base sm:text-lg hover:bg-white/10 hover:text-primary ${
+                  className={`flex w-full items-center bg-black/10 justify-between px-2 sm:px-3 py-2 text-left text-base sm:text-lg hover:bg-black/10 hover:text-primary ${
                     isSelected ? 'text-primary' : 'text-white'
                   }`}
                 >
