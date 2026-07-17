@@ -130,11 +130,22 @@ class Command(BaseCommand):
         image_io.seek(0)
         return ContentFile(image_io.getvalue(), name="placeholder.png")
 
+    def create_banner_image(self) -> ContentFile:
+        """Create a banner image with 400x225 dimensions."""
+        image = Image.new("RGB", (400, 225), color="darkblue")
+        image_io = BytesIO()
+        image.save(image_io, format="PNG")
+        image_io.seek(0)
+        return ContentFile(image_io.getvalue(), name="banner.png")
+
     def handle(self, *args: Any, **options: Any) -> None:
-        if options["clear"]:
-            Show.objects.all().delete()
-            Event.objects.all().delete()
-            self.stdout.write(self.style.WARNING("Deleted all existing shows and events"))
+        # Clear the database first
+        Guest.objects.all().delete()
+        ReservationPayment.objects.all().delete()
+        Reservation.objects.all().delete()
+        Event.objects.all().delete()
+        Show.objects.all().delete()
+        self.stdout.write(self.style.WARNING("Wiped all existing data from database"))
 
         # Create 50 shows: 5 with future events (2036), 45 with past events
         shows_to_create: list[tuple[Show, bool]] = []
@@ -146,6 +157,7 @@ class Command(BaseCommand):
                 cast=SHOW_CASTS[i % len(SHOW_CASTS)],
                 base_ticket_price=15,
                 card_image=self.create_placeholder_image(),
+                banner_image=self.create_banner_image(),
             )
             shows_to_create.append((show, is_future))
 

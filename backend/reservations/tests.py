@@ -25,12 +25,20 @@ def make_image() -> SimpleUploadedFile:
     return SimpleUploadedFile("test.jpg", buf.read(), content_type="image/jpeg")
 
 
+def make_banner_image() -> SimpleUploadedFile:
+    buf = BytesIO()
+    Image.new("RGB", (400, 225), color="blue").save(buf, format="JPEG")
+    buf.seek(0)
+    return SimpleUploadedFile("banner.jpg", buf.read(), content_type="image/jpeg")
+
+
 def make_show(**kwargs: Any) -> Show:
     defaults = dict(
         title="Test Show",
         description="",
         cast="",
         card_image=make_image(),
+        banner_image=make_banner_image(),
         private=False,
         base_ticket_price=15,
     )
@@ -247,6 +255,97 @@ class ReserveViewTest(TestCase):
     def test_no_newsletter_checkbox_skips_registration(self) -> None:
         self.client.post(f"/reserve/{self.show.pk}", self._post_data())
         self.assertEqual(NewsletterRegistration.objects.count(), 0)
+
+    def test_invalid_attendee_count_zero_rerenders(self) -> None:
+        data = self._post_data(**{"res-attendee_count": 0})
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
+
+    def test_invalid_attendee_count_negative_rerenders(self) -> None:
+        data = self._post_data(**{"res-attendee_count": -1})
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
+
+    def test_invalid_attendee_count_exceeds_max_rerenders(self) -> None:
+        data = self._post_data(**{"res-attendee_count": 11})
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
+
+    def test_invalid_guest_missing_first_name_rerenders(self) -> None:
+        data = self._post_data(
+            **{
+                "res-attendee_count": 2,
+                "gues-0-first_name": "",
+                "gues-0-last_name": "Smith",
+            }
+        )
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
+        self.assertEqual(Guest.objects.count(), 0)
+
+    def test_invalid_guest_missing_last_name_rerenders(self) -> None:
+        data = self._post_data(
+            **{
+                "res-attendee_count": 2,
+                "gues-0-first_name": "Bob",
+                "gues-0-last_name": "",
+            }
+        )
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
+        self.assertEqual(Guest.objects.count(), 0)
+
+    def test_second_guest_form_empty_succeeds_if_not_required(self) -> None:
+        # Django formsets treat completely empty forms as valid if they're not required
+        # This test documents the actual behavior
+        data = self._post_data(
+            **{
+                "res-attendee_count": 3,
+                "gues-0-first_name": "Bob",
+                "gues-0-last_name": "Smith",
+                "gues-1-first_name": "",
+                "gues-1-last_name": "",
+            }
+        )
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        # Empty forms are considered valid by Django's formset, so this succeeds
+        self.assertRedirects(response, f"/payments/{ReservationPayment.objects.first().pk}", fetch_redirect_response=False)
+        self.assertEqual(Reservation.objects.count(), 1)
+        # Only 1 guest is created because the second form was empty
+        self.assertEqual(Guest.objects.count(), 1)
+
+    def test_missing_payment_method_raises_key_error(self) -> None:
+        data = self._post_data()
+        del data["payment-method"]
+        with self.assertRaises(KeyError):
+            self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(Reservation.objects.count(), 0)
+
+    def test_empty_payment_method_creates_payment_with_empty_variant(self) -> None:
+        data = self._post_data(**{"payment-method": ""})
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertRedirects(response, f"/payments/{ReservationPayment.objects.first().pk}", fetch_redirect_response=False)
+        payment = ReservationPayment.objects.first()
+        self.assertEqual(payment.variant, "")
+
+    def test_invalid_custom_price_non_numeric_treated_as_none(self) -> None:
+        # Non-numeric custom price is treated as None, so reservation succeeds
+        data = self._post_data(**{"custom-price": "not-a-number"})
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertRedirects(response, f"/payments/{ReservationPayment.objects.first().pk}", fetch_redirect_response=False)
+        payment = ReservationPayment.objects.first()
+        self.assertIsNone(payment.custom_ticket_price)
+
+    def test_invalid_custom_price_above_maximum_rerenders(self) -> None:
+        data = self._post_data(**{"custom-price": "99"})
+        response = self.client.post(f"/reserve/{self.show.pk}", data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Reservation.objects.count(), 0)
 
 
 # ---------------------------------------------------------------------------

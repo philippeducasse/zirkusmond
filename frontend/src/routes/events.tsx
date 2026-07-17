@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import EventsSection from '#/components/common/home/EventsSection.tsx'
-import PageContainer from '#/components/common/PageContainer.tsx'
+import EventsSection from '#/components/zirkusmond/home/EventsSection'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import { homepageQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/events')({

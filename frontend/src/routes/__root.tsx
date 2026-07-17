@@ -2,14 +2,13 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
-  ClientOnly,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 
 import { getLocale } from '#/paraglide/runtime'
-import Navbar from '#/components/common/Navbar.tsx'
+import Navbar from '#/components/zirkusmond/general/Navbar'
 
 import appCss from '../styles.css?url'
 
@@ -58,9 +57,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        {/* <ClientOnly> */}
         <Navbar />
-        {/* </ClientOnly> */}
         {children}
         <TanStackDevtools
           config={{

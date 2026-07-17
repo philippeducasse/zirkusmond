@@ -1,6 +1,6 @@
-import DynamicField from '#/components/common/form/DynamicField'
-import FieldsLayout from '#/components/common/form/FieldsLayout'
-import type { DynamicFieldConfig } from '#/components/common/reserve/helper.ts'
+import DynamicField from '#/components/zirkusmond/form/DynamicField'
+import FieldsLayout from '#/components/zirkusmond/form/FieldsLayout'
+import type { DynamicFieldConfig } from '#/components/zirkusmond/reserve/helper'
 
 interface DynamicFormProps {
   fields: DynamicFieldConfig[]

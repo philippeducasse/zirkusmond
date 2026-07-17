@@ -58,3 +58,8 @@ export const showQueryOptions = (showId: string) =>
       return data.show
     },
   })
+
+export const reserveQueryOptions = () =>
+  queryOptions({
+    queryKey: ['reserve'],
+  })

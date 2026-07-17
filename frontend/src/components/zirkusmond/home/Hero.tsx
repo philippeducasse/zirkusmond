@@ -1,4 +1,4 @@
-import SectionDivider from '#/components/common/home/SectionDivider.tsx'
+import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
 
 export default function Hero() {
   return (
