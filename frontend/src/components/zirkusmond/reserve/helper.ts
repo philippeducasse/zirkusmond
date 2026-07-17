@@ -1,9 +1,9 @@
 import type { Show, ShowEvent } from '#/interfaces/show.ts'
-import type { ButtonGroupFieldProps } from '#/components/common/form/ButtonGroupField.tsx'
-import type { CheckboxFieldProps } from '#/components/common/form/CheckboxField.tsx'
-import type { NumberFieldProps } from '#/components/common/form/NumberField.tsx'
-import type { SelectFieldProps } from '#/components/common/form/SelectField.tsx'
-import type { TextFieldProps } from '#/components/common/form/TextField.tsx'
+import type { ButtonGroupFieldProps } from '#/components/zirkusmond/form/ButtonGroupField'
+import type { CheckboxFieldProps } from '#/components/zirkusmond/form/CheckboxField'
+import type { NumberFieldProps } from '#/components/zirkusmond/form/NumberField'
+import type { SelectFieldProps } from '#/components/zirkusmond/form/SelectField'
+import type { TextFieldProps } from '#/components/zirkusmond/form/TextField'
 
 export type DynamicFieldConfig =
   | ({ kind: 'select' } & SelectFieldProps)

@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import EventsSection from '#/components/common/home/EventsSection.tsx'
-import FooterSection from '#/components/common/home/FooterSection.tsx'
-import GallerySection from '#/components/common/home/GallerySection.tsx'
-import Hero from '#/components/common/home/Hero.tsx'
+import EventsSection from '#/components/zirkusmond/home/EventsSection'
+import FooterSection from '#/components/zirkusmond/home/FooterSection'
+import GallerySection from '#/components/zirkusmond/home/GallerySection'
+import Hero from '#/components/zirkusmond/home/Hero'
 import { homepageQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/')({

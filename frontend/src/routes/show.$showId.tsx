@@ -1,12 +1,12 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import PageContainer from '#/components/common/PageContainer.tsx'
-import SectionDivider from '#/components/common/home/SectionDivider.tsx'
-import { ShowDetails } from '#/components/common/show/ShowDetails.tsx'
-import TimeDetails from '#/components/common/TimeDetails.tsx'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
+import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
+import { ShowDetails } from '#/components/zirkusmond/show/ShowDetails'
+import { ReserveButton } from '#/components/zirkusmond/show/ReserveButton'
+import TimeDetails from '#/components/zirkusmond/event/TimeDetails'
 import { Button } from '#/components/ui/button.tsx'
-import type { Show } from '#/interfaces/show.ts'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/show/$showId')({
@@ -26,29 +26,6 @@ export const Route = createFileRoute('/show/$showId')({
   }),
   component: RouteComponent,
 })
-
-function ReserveButton({ show }: { show: Show }) {
-  if (show.thirdPartyReservation && show.thirdPartyReservationLink) {
-    return (
-      <Button asChild>
-        <a
-          href={show.thirdPartyReservationLink}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Zur Reservierung
-        </a>
-      </Button>
-    )
-  }
-  return (
-    <Button asChild>
-      <Link to="/reserve/$showId" params={{ showId: String(show.id) }}>
-        {show.baseTicketPrice ? 'Tickets Kaufen' : 'Zur Reservierung'}
-      </Link>
-    </Button>
-  )
-}
 
 function RouteComponent() {
   const { showId } = Route.useParams()

@@ -1,9 +1,9 @@
-import ButtonGroupField from '#/components/common/form/ButtonGroupField.tsx'
-import CheckboxField from '#/components/common/form/CheckboxField.tsx'
-import NumberField from '#/components/common/form/NumberField.tsx'
-import SelectField from '#/components/common/form/SelectField.tsx'
-import TextField from '#/components/common/form/TextField.tsx'
-import type { DynamicFieldConfig } from '#/components/common/reserve/helper.ts'
+import ButtonGroupField from '#/components/zirkusmond/form/ButtonGroupField'
+import CheckboxField from '#/components/zirkusmond/form/CheckboxField'
+import NumberField from '#/components/zirkusmond/form/NumberField'
+import SelectField from '#/components/zirkusmond/form/SelectField'
+import TextField from '#/components/zirkusmond/form/TextField'
+import type { DynamicFieldConfig } from '#/components/zirkusmond/reserve/helper'
 
 interface DynamicFieldProps {
   field: DynamicFieldConfig

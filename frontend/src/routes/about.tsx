@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import PageContainer from '#/components/common/PageContainer.tsx'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
@@ -45,15 +45,14 @@ function About() {
         <p className="leading-7 sm:leading-8 text-[var(--sea-ink)]">
           Der Zirkus Mond, Treffpunkt der Berliner Artistenszene,
           Veranstaltungsort für Zirkus, Theater, Tanz &amp; Konzerte erwuchs
-          2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden
-          Kollektiv internationaler ArtistInnen, TänzerInnen &amp;
-          KünstlerInnen, die zuvor über 10 Jahre im kulturellen Untergrund
-          Berlins agierten und in unregelmäßigen Abständen leer stehende
-          Gebäude, Brachflächen oder auch öffentliche Plätze mit Liebe und
-          Leben füllten. Nun gibt es im Himmelskörper-Habitat Zirkus Mond
-          jeden Monat 2 eigenproduzierte Shows und 2 Gastveranstaltungen,
-          wobei durch wechselnde ArtistInnen und Konzepte jede Show ein
-          Unikat ist.
+          2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden Kollektiv
+          internationaler ArtistInnen, TänzerInnen &amp; KünstlerInnen, die
+          zuvor über 10 Jahre im kulturellen Untergrund Berlins agierten und in
+          unregelmäßigen Abständen leer stehende Gebäude, Brachflächen oder auch
+          öffentliche Plätze mit Liebe und Leben füllten. Nun gibt es im
+          Himmelskörper-Habitat Zirkus Mond jeden Monat 2 eigenproduzierte Shows
+          und 2 Gastveranstaltungen, wobei durch wechselnde ArtistInnen und
+          Konzepte jede Show ein Unikat ist.
         </p>
         <p className="m-0 pt-4 sm:pt-6 leading-7 sm:leading-8 text-[var(--sea-ink-soft)] sm:text-center">
           Die Pforten unseres Zirkuszeltes stehen offen für alle, die Lust
