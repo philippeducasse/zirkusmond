@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
-import EventCard from '#/components/common/EventCard.tsx'
-import SectionDivider from '#/components/common/home/SectionDivider.tsx'
+import EventCard from '#/components/zirkusmond/event/EventCard'
+import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
 import { Button } from '#/components/ui/button.tsx'
 
 import type { ShowCard } from '#/interfaces/show.ts'

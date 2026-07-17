@@ -1,8 +1,8 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
-import PageContainer from '#/components/common/PageContainer.tsx'
-import ReservationPage from '#/components/common/reserve/ReservationPage'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
+import ReservationPage from '#/components/zirkusmond/reserve/ReservationPage'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/reserve/$showId')({

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import FooterSection from '#/components/common/home/FooterSection.tsx'
-import PageContainer from '#/components/common/PageContainer.tsx'
+import FooterSection from '#/components/zirkusmond/home/FooterSection'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
 
 export const Route = createFileRoute('/contact')({
   head: () => ({
