@@ -11,9 +11,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'font-bold text-primary bg-white/5 border-primary border-double tracking-wide duration-300 shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)] hover:bg-black/10 hover:border-primary/80 hover:-translate-y-1 hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_rgba(246,174,66,0.8)] active:shadow-[0_4px_10px_-4px_rgba(0,0,0,0.4),0_0_10px_-4px_rgba(246,174,66,0.35)] disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
+          'font-bold text-primary bg-black/5 border-primary border-double tracking-wide duration-300 shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)] hover:bg-black/10 hover:border-primary/80 hover:-translate-y-1 hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_rgba(246,174,66,0.8)] active:shadow-[0_4px_10px_-4px_rgba(0,0,0,0.4),0_0_10px_-4px_rgba(246,174,66,0.35)] disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
         outline:
-          'font-bold text-primary bg-white/5 tracking-wide duration-300 hover:bg-black/10 aria-expanded:bg-muted aria-expanded:text-foreground disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
+          'font-bold text-primary bg-black/5 tracking-wide duration-300 hover:bg-black/10 aria-expanded:bg-muted aria-expanded:text-foreground disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
         secondary:
           'font-bold text-white bg-transparent border-primary border-double tracking-wide duration-300 shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_color-mix(in_oklch,var(--secondary-foreground)_35%,transparent)]  hover:bg-black/10 hover:border-primary/80 hover:-translate-y-1 hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_rgba(246,174,66,0.8)] active:shadow-[0_4px_10px_-4px_rgba(0,0,0,0.4),0_0_10px_-4px_rgba(246,174,66,0.35)]  aria-expanded:bg-secondary aria-expanded:text-secondary-foreground disabled:opacity-80 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0',
         ghost:

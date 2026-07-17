@@ -24,7 +24,7 @@ export default function LocaleSwitcher() {
             onClick={() => setLocale(locale as Locale)}
             className={cn(
               isActive
-                ? 'border-primary bg-white/5 text-primary shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)]'
+                ? 'border-primary bg-black/5 text-primary shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)]'
                 : 'border-transparent text-primary/50 hover:text-primary/80',
             )}
           >

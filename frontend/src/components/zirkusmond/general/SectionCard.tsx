@@ -6,7 +6,11 @@ interface SectionCardProps {
 }
 
 const SectionCard = ({ children }: SectionCardProps) => {
-  return <Card>{children}</Card>
+  return (
+    <Card className="text-white bg-black/10 border-5 border-primary border-double p-2 md:p-8">
+      {children}
+    </Card>
+  )
 }
 
 export default SectionCard

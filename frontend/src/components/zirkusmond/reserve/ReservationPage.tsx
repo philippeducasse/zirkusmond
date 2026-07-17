@@ -8,6 +8,7 @@ import PaymentSection from './components/PaymentSection.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
 import SectionDivider from '../home/SectionDivider.tsx'
+import SectionCard from '../general/SectionCard.tsx'
 
 interface ReservationPageProps {
   show: Show
@@ -38,7 +39,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
   return (
     <div className="flex items-center justify-center max-w-7xl mx-auto text-white p-1 md:p-8">
       <form onSubmit={handleSubmit} id="reservation-form">
-        <div className="p-4 md:p-8 border-5 border-double border-primary">
+        <SectionCard>
           <ReservationForm
             show={show}
             selectedEventId={selectedEventId}
@@ -52,16 +53,17 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             newsletter={newsletter}
             setNewsletter={setNewsletter}
           />
-        </div>
+        </SectionCard>
+
         <SectionDivider type="flower" />
-        <div className="p-4 md:p-8 border-5 border-double border-primary">
+        <SectionCard>
           <PaymentSection
             show={show}
             attendeeCount={attendeeCount}
             customPrice={customPrice}
             setCustomPrice={setCustomPrice}
           />
-        </div>
+        </SectionCard>
         <SectionDivider type="moon" />
         <div className="mt-8 text-center">
           <Button
