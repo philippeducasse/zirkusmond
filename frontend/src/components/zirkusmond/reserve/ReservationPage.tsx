@@ -7,7 +7,7 @@ import GuestForm from './components/GuestForm.tsx'
 import PaymentSection from './components/PaymentSection.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
-import SectionDivider from '../home/SectionDivider.tsx'
+import SectionDivider from '../general/SectionDivider.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 
 interface ReservationPageProps {
