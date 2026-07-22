@@ -91,6 +91,7 @@ THUMBNAIL_PROCESSORS = (
 PAYMENT_MODEL = "reservations.ReservationPayment"
 
 # Stripe configuration
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_TEST_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
