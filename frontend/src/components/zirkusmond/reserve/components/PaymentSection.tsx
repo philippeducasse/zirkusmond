@@ -1,6 +1,6 @@
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
-import SectionDivider from '../../home/SectionDivider.tsx'
+import SectionDivider from '../../general/SectionDivider.tsx'
 
 import DynamicField from '../../form/DynamicField.tsx'
 import { buildPaymentMethodField } from '../helper.ts'

@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
-import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
+import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import { ShowDetails } from '#/components/zirkusmond/show/ShowDetails'
 import { ReserveButton } from '#/components/zirkusmond/show/ReserveButton'
 import TimeDetails from '#/components/zirkusmond/event/TimeDetails'

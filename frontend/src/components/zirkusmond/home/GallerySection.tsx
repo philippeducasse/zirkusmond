@@ -5,7 +5,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '#/components/ui/carousel.tsx'
-import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
+import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 
 const GALLERY_IMAGES = Array.from(
   { length: 10 },
