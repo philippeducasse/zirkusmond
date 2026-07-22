@@ -21,7 +21,7 @@ export default function TeamGrid({ members, className }: TeamGridProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5',
+        'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3',
         className,
       )}
     >
@@ -39,17 +39,15 @@ interface TeamMemberCardProps {
 
 function TeamMemberCard({ member, className }: TeamMemberCardProps) {
   return (
-    <SectionCard>
-      <div className={cn('text-center', className)}>
+    <SectionCard className="p-0!">
+      <div className={cn('text-center mb-4', className)}>
         <img
-          className="mx-auto aspect-square w-full rounded-xl object-cover"
+          className="mx-auto aspect-square w-full  object-cover"
           src={member.image}
           alt={`Photo of ${member.name}`}
         />
-        <h3 className="display-title mt-4 sm:mt-6 font-bold text-(--sea-ink)">
-          {member.name}
-        </h3>
-        <p className="mt-1 text-(--sea-ink-soft)">{member.role}</p>
+        <h3>{member.name}</h3>
+        <p>{member.role}</p>
       </div>
     </SectionCard>
   )
