@@ -7,6 +7,7 @@ import GuestForm from './components/GuestForm.tsx'
 import PaymentSection from './components/PaymentSection.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
+import SlidingScale from './components/SlidingScale.tsx'
 import SectionDivider from '../general/SectionDivider.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 
@@ -100,15 +101,31 @@ export default function ReservationPage({ show }: ReservationPageProps) {
           />
 
           {!clientSecret && (
-            <div className="mt-8 text-center">
-              <Button
-                type="submit"
-                disabled={mutation.isPending}
-                className="min-w-[200px]"
-              >
-                {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
-              </Button>
-            </div>
+            <>
+              <div className="my-4 sm:my-6">
+                <SlidingScale
+                  show={show}
+                  customPrice={customPrice}
+                  setCustomPrice={setCustomPrice}
+                />
+              </div>
+
+              <div className="my-3 sm:my-4 text-center">
+                <h4>
+                  Total Price: <span className="font-bold">{(attendeeCount * customPrice).toFixed(2)}</span> €
+                </h4>
+              </div>
+
+              <div className="mt-8 text-center">
+                <Button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="min-w-[200px]"
+                >
+                  {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
+                </Button>
+              </div>
+            </>
           )}
         </SectionCard>
 
@@ -122,10 +139,6 @@ export default function ReservationPage({ show }: ReservationPageProps) {
                 </div>
               )}
               <PaymentSection
-                show={show}
-                attendeeCount={attendeeCount}
-                customPrice={customPrice}
-                setCustomPrice={setCustomPrice}
                 clientSecret={clientSecret}
                 onPaymentSuccess={handlePaymentSuccess}
                 onPaymentError={handlePaymentError}
