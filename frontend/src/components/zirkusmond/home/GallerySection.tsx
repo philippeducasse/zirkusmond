@@ -6,6 +6,7 @@ import {
   CarouselPrevious,
 } from '#/components/ui/carousel.tsx'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
+import ContentSection from '../general/ContentSection'
 
 const GALLERY_IMAGES = Array.from(
   { length: 10 },
@@ -14,7 +15,7 @@ const GALLERY_IMAGES = Array.from(
 
 export default function GallerySection() {
   return (
-    <div className="mx-auto max-w-[1800px] px-6 lg:px-16">
+    <ContentSection>
       {/* TODO: prepend a video slide once media/video/video.mp4 exists */}
       <Carousel className="mx-auto max-w-4xl">
         <CarouselContent>
@@ -32,6 +33,6 @@ export default function GallerySection() {
         <CarouselNext />
       </Carousel>
       <SectionDivider type="flower" />
-    </div>
+    </ContentSection>
   )
 }
