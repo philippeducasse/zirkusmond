@@ -16,16 +16,11 @@ class ReservationSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=25)
     email = serializers.EmailField()
     attendee_count = serializers.IntegerField(min_value=1, max_value=10)
-    payment_method = serializers.ChoiceField(choices=[])
     custom_price = serializers.DecimalField(
         max_digits=10, decimal_places=2, required=False, allow_null=True
     )
     newsletter = serializers.BooleanField(required=False, default=False)
     guests = GuestSerializer(many=True, required=False)
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.fields["payment_method"].choices = list(settings.PAYMENT_VARIANTS.keys())
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         guests = data.get("guests", [])

@@ -1,16 +1,15 @@
-import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
-import SectionDivider from '../../general/SectionDivider.tsx'
-
-import DynamicField from '../../form/DynamicField.tsx'
-import { buildPaymentMethodField } from '../helper.ts'
 import SlidingScale from './SlidingScale.tsx'
+import StripePaymentWrapper from './StripePaymentWrapper.tsx'
 
 interface PaymentSectionProps {
   show: Show
   attendeeCount: number
   customPrice: number
   setCustomPrice: (price: number) => void
+  clientSecret: string | null
+  onPaymentSuccess: () => void
+  onPaymentError: (error: string) => void
 }
 
 export default function PaymentSection({
@@ -18,13 +17,14 @@ export default function PaymentSection({
   attendeeCount,
   customPrice,
   setCustomPrice,
+  clientSecret,
+  onPaymentSuccess,
+  onPaymentError,
 }: PaymentSectionProps) {
   const pricePerTicket = show.baseTicketPrice
     ? customPrice
     : (show.reservationPrice ?? 5)
   const total = attendeeCount * pricePerTicket
-
-  const paymentMethodFields = buildPaymentMethodField()
 
   return (
     <>
@@ -43,10 +43,19 @@ export default function PaymentSection({
         </h4>
       </div>
 
-      <h4 className="text-center mb-12">Choose Your Payment Method</h4>
-      {paymentMethodFields.map((field) => (
-        <DynamicField key={field.id} field={field} />
-      ))}
+      <div className="my-6">
+        {clientSecret ? (
+          <StripePaymentWrapper
+            clientSecret={clientSecret}
+            onSuccess={onPaymentSuccess}
+            onError={onPaymentError}
+          />
+        ) : (
+          <div className="text-center text-gray-400">
+            Loading payment form...
+          </div>
+        )}
+      </div>
     </>
   )
 }

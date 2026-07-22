@@ -34,6 +34,23 @@ async function fetchJson<T>(path: string): Promise<T> {
   return keysToCamelCase<T>(data)
 }
 
+export async function postJson<T>(
+  path: string,
+  body: unknown,
+  options?: { skipCamelCase?: boolean },
+): Promise<T> {
+  const res = await fetch(apiUrl(path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    throw new ApiError(res.status, path)
+  }
+  const data = await res.json()
+  return options?.skipCamelCase ? data : keysToCamelCase<T>(data)
+}
+
 /**
  * TanStack Query: `queryOptions` bundles a cache key with its fetch function
  * so the same definition can be used by route loaders (ensureQueryData) and
