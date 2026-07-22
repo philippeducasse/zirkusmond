@@ -3,6 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
+import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import { ShowDetails } from '#/components/zirkusmond/show/ShowDetails'
 import { ReserveButton } from '#/components/zirkusmond/show/ReserveButton'
 import TimeDetails from '#/components/zirkusmond/event/TimeDetails'
@@ -34,11 +35,11 @@ function RouteComponent() {
   const { data: show } = useSuspenseQuery(showQueryOptions(showId))
 
   return (
-    <PageContainer>
+    <PageContainer className="px-4">
       <img
         src={show.bannerImage}
         alt={`${show.title} Banner`}
-        className="mx-auto w-full object-cover"
+        className="mx-auto w-full object-cover rounded-xl"
       />
 
       <div className="flex flex-wrap justify-center gap-6 py-8">
