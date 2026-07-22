@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router'
 
 import EventCard from '#/components/zirkusmond/event/EventCard'
-import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import { Button } from '#/components/ui/button.tsx'
 
 import type { ShowCard } from '#/interfaces/show.ts'
+import PageHeader from '../general/PageHeader'
+import ContentSection from '../general/ContentSection'
 
 interface EventsSectionProps {
   shows: ShowCard[]
@@ -18,8 +19,9 @@ export default function EventsSection({
   showHomeLink = false,
 }: EventsSectionProps) {
   return (
-    <div>
-      <h2 className="my-8 sm:my-12 text-center">Upcoming Shows</h2>
+    <ContentSection>
+      <PageHeader>Upcoming Shows</PageHeader>
+
       <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 px-6">
         {shows.map((show) => (
           <Link
@@ -36,7 +38,7 @@ export default function EventsSection({
         ))}
       </div>
       {(showAllEventsLink || showHomeLink) && (
-        <div className="flex justify-center pt-12">
+        <div className="flex justify-center pt-24">
           <Button asChild>
             {showAllEventsLink ? (
               <Link to="/events">Alle Events ansehen</Link>
@@ -46,7 +48,6 @@ export default function EventsSection({
           </Button>
         </div>
       )}
-      <SectionDivider type="kite" />
-    </div>
+    </ContentSection>
   )
 }
