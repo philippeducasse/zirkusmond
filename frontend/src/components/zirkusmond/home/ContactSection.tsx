@@ -22,13 +22,13 @@ const SOCIAL_LINKS = [
   },
 ]
 
-export default function FooterSection() {
+export default function ContactSection() {
   return (
     <div className="mx-auto max-w-[1800px] px-6 lg:px-16">
-      <div className="flex flex-col justify-between gap-12 border-2 border-[#e7b548] bg-[#00000040] p-6 text-center text-primary lg:flex-row">
-        <div className="flex flex-col items-center lg:w-1/3">
-          <h2 className="my-4 sm:my-6">Contact</h2>
-          <div className="flex items-center justify-evenly gap-6 py-4">
+      <div className="flex flex-col justify-between gap-12 p-12 border-2 border-primary bg-black/20 text-center text-primary lg:flex-row ">
+        <div className="flex flex-col justify-center align-middle lg:w-1/3">
+          <h3 className="my-4 sm:my-6">Contact</h3>
+          <div className="flex items-center justify-evenly py-4">
             {SOCIAL_LINKS.map((social) => (
               <a
                 key={social.label}
@@ -49,11 +49,16 @@ export default function FooterSection() {
               zirkusmond@gmail.com
             </a>
           </p>
+          <Button asChild variant={'primary'} className="self-center w-sm">
+            <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E">
+              Donate via PayPal
+            </a>
+          </Button>
         </div>
 
         <div className="flex justify-center lg:w-1/3">
           <div className="w-4/5 lg:w-3/5">
-            <h2 className="my-4 sm:my-6">Find us</h2>
+            <h3 className="my-4 sm:my-6">Find us</h3>
             <img
               className="m-auto w-9/12 max-w-80"
               src="/images/general/map.webp"
@@ -62,8 +67,8 @@ export default function FooterSection() {
           </div>
         </div>
 
-        <div className="lg:w-1/3">
-          <h2 className="my-4 sm:my-6">Mailing List</h2>
+        <div className="lg:w-1/3 flex flex-col justify-center align-middle">
+          <h3 className="my-4 sm:my-6">Mailing List</h3>
           <p className="lg:pr-6">
             Want to be notified about new Shows? Hear what's going on on the
             moon? Not be forgotten or left out? Become part of our magical
@@ -84,12 +89,13 @@ export default function FooterSection() {
           <form
             className="my-6"
             onSubmit={(e) => {
-              // TODO: wire up to POST /newsletter/register once an API client exists
               e.preventDefault()
             }}
           >
             <Field className="items-center">
-              <FieldLabel htmlFor="newsletter-email">Email:</FieldLabel>
+              <FieldLabel htmlFor="newsletter-email" className="text-lg">
+                Email:
+              </FieldLabel>
               <Input
                 className="my-2"
                 id="newsletter-email"
@@ -103,40 +109,6 @@ export default function FooterSection() {
               Submit
             </Button>
           </form>
-
-          <h2>Support Us</h2>
-          <div className="my-4 sm:my-6 text-center">
-            <h3 className="my-3 sm:my-4">Bank Transfer/Überweisung:</h3>
-            <p className="py-2">IBAN: DE34 4306 0967 1226 9437 00</p>
-            <p>BIC: GENODEM1GLS</p>
-          </div>
-          <Button asChild>
-            <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E">
-              Donate via PayPal
-            </a>
-          </Button>
-        </div>
-      </div>
-
-      <div className="mb-6 sm:mb-8 pt-6 sm:pt-8 text-center">
-        <div className="flex justify-evenly gap-4">
-          <a href="/impressum" className="text-base sm:text-lg md:text-xl underline">
-            Impressum
-          </a>
-          <a href="/datenschutz" className="text-base sm:text-lg md:text-xl underline">
-            Datenschutz
-          </a>
-        </div>
-        <div className="flex flex-col md:flex-row text-sm sm:text-base">
-          <div className="px-4 lg:w-1/3">
-            Tent at: Lilli-Henoch-Str. Office at: Kultstätte 58 GmbH Körtestraße
-            38 10967 Berlin
-          </div>
-          <div className="px-4 lg:w-1/3">Geschäftsführer Max Mohr</div>
-          <div className="px-4 lg:w-1/3">
-            Steuer-Nr.: 37 / 406 / 50011 Steuer-ID: DE65 812 397 023 USt-IdNr:
-            DE319431419
-          </div>
         </div>
       </div>
     </div>
