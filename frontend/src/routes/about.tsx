@@ -5,6 +5,7 @@ import PageHeader from '#/components/zirkusmond/general/PageHeader'
 import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import TeamGrid from '#/components/zirkusmond/general/TeamGrid'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
+import SectionCard from '#/components/zirkusmond/general/SectionCard'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
@@ -55,34 +56,37 @@ function About() {
       <PageHeader>Welcome to the Moon</PageHeader>
 
       <ContentSection>
-        <img
-          className="mx-auto mb-6 sm:mb-8 w-full rounded-xl"
-          src="/images/gallery/img-9.webp"
-          alt="Zirkus Mond Image"
-        />
-        <p className="leading-7 sm:leading-8 text-(--sea-ink)">
-          Der Zirkus Mond, Treffpunkt der Berliner Artistenszene,
-          Veranstaltungsort für Zirkus, Theater, Tanz &amp; Konzerte erwuchs
-          2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden Kollektiv
-          internationaler ArtistInnen, TänzerInnen &amp; KünstlerInnen, die
-          zuvor über 10 Jahre im kulturellen Untergrund Berlins agierten und in
-          unregelmäßigen Abständen leer stehende Gebäude, Brachflächen oder auch
-          öffentliche Plätze mit Liebe und Leben füllten. Nun gibt es im
-          Himmelskörper-Habitat Zirkus Mond jeden Monat 2 eigenproduzierte Shows
-          und 2 Gastveranstaltungen, wobei durch wechselnde ArtistInnen und
-          Konzepte jede Show ein Unikat ist.
-        </p>
-        <p className="m-0 pt-4 sm:pt-6 leading-7 sm:leading-8 text-(--sea-ink-soft) sm:text-center">
-          Die Pforten unseres Zirkuszeltes stehen offen für alle, die Lust
-          haben, einen Ort der Gemeinschaft, des Schaffens und der Liebe zum
-          Leben zu besuchen, zu bespielen und mitzugestalten.
-        </p>
+        <SectionCard className="p-0!">
+          <img
+            className="w-full"
+            src="/images/gallery/img-9.webp"
+            alt="Zirkus Mond Image"
+          />
+          <div className="p-6">
+            <p>
+              Der Zirkus Mond, Treffpunkt der Berliner Artistenszene,
+              Veranstaltungsort für Zirkus, Theater, Tanz &amp; Konzerte erwuchs
+              2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden
+              Kollektiv internationaler ArtistInnen, TänzerInnen &amp;
+              KünstlerInnen, die zuvor über 10 Jahre im kulturellen Untergrund
+              Berlins agierten und in unregelmäßigen Abständen leer stehende
+              Gebäude, Brachflächen oder auch öffentliche Plätze mit Liebe und
+              Leben füllten. Nun gibt es im Himmelskörper-Habitat Zirkus Mond
+              jeden Monat 2 eigenproduzierte Shows und 2 Gastveranstaltungen,
+              wobei durch wechselnde ArtistInnen und Konzepte jede Show ein
+              Unikat ist.
+            </p>
+            <p>
+              Die Pforten unseres Zirkuszeltes stehen offen für alle, die Lust
+              haben, einen Ort der Gemeinschaft, des Schaffens und der Liebe zum
+              Leben zu besuchen, zu bespielen und mitzugestalten.
+            </p>
+          </div>
+        </SectionCard>
       </ContentSection>
 
-      <PageHeader className="mt-12 sm:mt-16">Meet the Team</PageHeader>
-
       <SectionDivider type="kite" margin="small" className="mb-10" />
-
+      <PageHeader className="mt-12 sm:mt-16">Meet the Team</PageHeader>
       <TeamGrid members={team} />
     </PageContainer>
   )
