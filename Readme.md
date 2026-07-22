@@ -56,6 +56,4 @@ Tests run automatically on every push/PR via the `tests` GitHub Actions workflow
 
 # add way for juan to change videos && images
 
-# early bird tickets
-
 # tickets umbuchen
