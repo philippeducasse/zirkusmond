@@ -4,6 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import ReservationPage from '#/components/zirkusmond/reserve/ReservationPage'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
+import PageHeader from '#/components/zirkusmond/general/PageHeader'
 
 export const Route = createFileRoute('/reserve/$showId')({
   // TanStack Query: same query as /show/$showId, so a user coming from the
@@ -32,9 +33,7 @@ function RouteComponent() {
 
   return (
     <PageContainer>
-      <h1 className="mb-4 text-center text-primary">
-        {show.title}
-      </h1>
+      <PageHeader>{show.title}</PageHeader>
       <ReservationPage show={show} />
     </PageContainer>
   )

@@ -91,6 +91,7 @@ THUMBNAIL_PROCESSORS = (
 PAYMENT_MODEL = "reservations.ReservationPayment"
 
 # Stripe configuration
+STRIPE_TOKEN = os.environ.get("STRIPE_TEST_TOKEN", "")
 STRIPE_HOOK_TOKEN = os.environ.get("STRIPE_HOOK_TOKEN", "")
 
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
