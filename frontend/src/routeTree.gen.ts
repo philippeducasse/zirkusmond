@@ -9,39 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RentalsRouteImport } from './routes/rentals'
-import { Route as ImpressumRouteImport } from './routes/impressum'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as DatenschutzRouteImport } from './routes/datenschutz'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ShowShowIdRouteImport } from './routes/show.$showId'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DatenschutzRouteImport } from './routes/datenschutz'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as ImpressumRouteImport } from './routes/impressum'
+import { Route as RentalsRouteImport } from './routes/rentals'
 import { Route as ReserveShowIdRouteImport } from './routes/reserve.$showId'
+import { Route as ShowShowIdRouteImport } from './routes/show.$showId'
 
-const RentalsRoute = RentalsRouteImport.update({
-  id: '/rentals',
-  path: '/rentals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImpressumRoute = ImpressumRouteImport.update({
-  id: '/impressum',
-  path: '/impressum',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DatenschutzRoute = DatenschutzRouteImport.update({
-  id: '/datenschutz',
-  path: '/datenschutz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -49,19 +29,39 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShowShowIdRoute = ShowShowIdRouteImport.update({
-  id: '/show/$showId',
-  path: '/show/$showId',
+const DatenschutzRoute = DatenschutzRouteImport.update({
+  id: '/datenschutz',
+  path: '/datenschutz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpressumRoute = ImpressumRouteImport.update({
+  id: '/impressum',
+  path: '/impressum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RentalsRoute = RentalsRouteImport.update({
+  id: '/rentals',
+  path: '/rentals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReserveShowIdRoute = ReserveShowIdRouteImport.update({
   id: '/reserve/$showId',
   path: '/reserve/$showId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowShowIdRoute = ShowShowIdRouteImport.update({
+  id: '/show/$showId',
+  path: '/show/$showId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -149,39 +149,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/rentals': {
-      id: '/rentals'
-      path: '/rentals'
-      fullPath: '/rentals'
-      preLoaderRoute: typeof RentalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/impressum': {
-      id: '/impressum'
-      path: '/impressum'
-      fullPath: '/impressum'
-      preLoaderRoute: typeof ImpressumRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/datenschutz': {
-      id: '/datenschutz'
-      path: '/datenschutz'
-      fullPath: '/datenschutz'
-      preLoaderRoute: typeof DatenschutzRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -191,18 +163,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/show/$showId': {
-      id: '/show/$showId'
-      path: '/show/$showId'
-      fullPath: '/show/$showId'
-      preLoaderRoute: typeof ShowShowIdRouteImport
+    '/datenschutz': {
+      id: '/datenschutz'
+      path: '/datenschutz'
+      fullPath: '/datenschutz'
+      preLoaderRoute: typeof DatenschutzRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impressum': {
+      id: '/impressum'
+      path: '/impressum'
+      fullPath: '/impressum'
+      preLoaderRoute: typeof ImpressumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rentals': {
+      id: '/rentals'
+      path: '/rentals'
+      fullPath: '/rentals'
+      preLoaderRoute: typeof RentalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reserve/$showId': {
@@ -210,6 +203,13 @@ declare module '@tanstack/react-router' {
       path: '/reserve/$showId'
       fullPath: '/reserve/$showId'
       preLoaderRoute: typeof ReserveShowIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/show/$showId': {
+      id: '/show/$showId'
+      path: '/show/$showId'
+      fullPath: '/show/$showId'
+      preLoaderRoute: typeof ShowShowIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

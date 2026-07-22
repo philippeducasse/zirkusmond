@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { cn } from '#/lib/utils.ts'
 import SectionCard from './SectionCard'
 
@@ -13,10 +12,6 @@ interface TeamGridProps {
   className?: string
 }
 
-/**
- * Standardized team member grid component.
- * Displays team members in a responsive grid with photos, names, and roles.
- */
 export default function TeamGrid({ members, className }: TeamGridProps) {
   return (
     <div

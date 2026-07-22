@@ -1,8 +1,8 @@
-import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
+import { useCreateReservationWithPayment } from '#/lib/payments.ts'
 import GuestForm from './components/GuestForm.tsx'
 import PaymentSection from './components/PaymentSection.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
@@ -24,16 +24,61 @@ export default function ReservationPage({ show }: ReservationPageProps) {
     show.baseTicketPrice ?? show.reservationPrice ?? 15,
   )
   const [newsletter, setNewsletter] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const guestCount = Math.min(9, Math.max(0, attendeeCount - 1))
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const mutation = useCreateReservationWithPayment()
+
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: wire up to POST /reservation/:showId and the payment redirect once an API client exists
+    setError(null)
+
+    const formData = new FormData(e.currentTarget)
+    const guests = []
+
+    for (let i = 0; i < guestCount; i++) {
+      guests.push({
+        firstName: formData.get(`guest-${i}-first-name`) as string,
+        lastName: formData.get(`guest-${i}-last-name`) as string,
+      })
+    }
+
+    mutation.mutate(
+      {
+        showId: String(show.id),
+        eventId: selectedEventId,
+        firstName: formData.get('firstName') as string,
+        lastName: formData.get('lastName') as string,
+        email: formData.get('email') as string,
+        newsletter,
+        attendeeCount,
+        guests,
+        customTicketPrice: customPrice,
+      },
+      {
+        onSuccess: (data) => {
+          setClientSecret(data.clientSecret)
+        },
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : 'An error occurred')
+        },
+      },
+    )
   }
 
   function handleBack() {
     navigate({ to: '/show/$showId', params: { showId: String(show.id) } })
+  }
+
+  function handlePaymentSuccess() {
+    // TODO: Create proper success route
+    window.location.href = '/payment/success'
+  }
+
+  function handlePaymentError(errorMessage: string) {
+    setError(errorMessage)
   }
 
   return (
@@ -53,18 +98,43 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             newsletter={newsletter}
             setNewsletter={setNewsletter}
           />
+
+          {!clientSecret && (
+            <div className="mt-8 text-center">
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="min-w-[200px]"
+              >
+                {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
+              </Button>
+            </div>
+          )}
         </SectionCard>
 
-        <SectionDivider type="flower" />
-        <SectionCard>
-          <PaymentSection
-            show={show}
-            attendeeCount={attendeeCount}
-            customPrice={customPrice}
-            setCustomPrice={setCustomPrice}
-          />
-        </SectionCard>
-        <SectionDivider type="moon" />
+        {clientSecret && (
+          <>
+            <SectionDivider type="flower" />
+            <SectionCard>
+              {error && (
+                <div className="mb-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-200 text-sm">
+                  {error}
+                </div>
+              )}
+              <PaymentSection
+                show={show}
+                attendeeCount={attendeeCount}
+                customPrice={customPrice}
+                setCustomPrice={setCustomPrice}
+                clientSecret={clientSecret}
+                onPaymentSuccess={handlePaymentSuccess}
+                onPaymentError={handlePaymentError}
+              />
+            </SectionCard>
+          </>
+        )}
+
+        <SectionDivider type="kite" />
         <div className="mt-8 text-center">
           <Button
             type="button"

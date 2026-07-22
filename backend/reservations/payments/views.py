@@ -33,6 +33,8 @@ class CreatePaymentIntentView(generics.GenericAPIView):
     serializer_class = CreatePaymentIntentSerializer
 
     def post(self, request: Request, reservation_id: uuid.UUID) -> Response:
+        stripe.api_key = settings.STRIPE_TOKEN
+
         reservation = get_object_or_404(Reservation, id=reservation_id)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
