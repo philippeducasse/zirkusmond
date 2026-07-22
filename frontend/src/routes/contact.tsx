@@ -1,7 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-
-import FooterSection from '#/components/zirkusmond/home/FooterSection'
-import PageContainer from '#/components/zirkusmond/general/PageContainer'
+import ContactSection from '#/components/zirkusmond/home/ContactSection'
 
 export const Route = createFileRoute('/contact')({
   head: () => ({
@@ -12,8 +10,8 @@ export const Route = createFileRoute('/contact')({
 
 function RouteComponent() {
   return (
-    <PageContainer>
-      <FooterSection />
-    </PageContainer>
+    <div className="flex items-center justify-center py-12">
+      <ContactSection />
+    </div>
   )
 }

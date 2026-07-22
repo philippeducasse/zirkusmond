@@ -1,4 +1,4 @@
-import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
+import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 
 export default function Hero() {
   return (

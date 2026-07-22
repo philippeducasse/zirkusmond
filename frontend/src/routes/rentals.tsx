@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import SectionDivider from '#/components/zirkusmond/home/SectionDivider'
+import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import { MOCK_RENTAL_OBJECTS } from '#/interfaces/rentals'
 

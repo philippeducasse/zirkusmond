@@ -2,10 +2,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import EventsSection from '#/components/zirkusmond/home/EventsSection'
-import FooterSection from '#/components/zirkusmond/home/FooterSection'
 import GallerySection from '#/components/zirkusmond/home/GallerySection'
 import Hero from '#/components/zirkusmond/home/Hero'
 import { homepageQueryOptions } from '#/lib/api.ts'
+import PageContainer from '#/components/zirkusmond/general/PageContainer'
+import ContactSection from '#/components/zirkusmond/home/ContactSection'
 
 export const Route = createFileRoute('/')({
   // TanStack Query: `ensureQueryData` fetches into the cache unless the data
@@ -39,9 +40,11 @@ function App() {
   return (
     <>
       <Hero />
-      <EventsSection shows={data.upcomingShows} showAllEventsLink />
-      <GallerySection />
-      <FooterSection />
+      <PageContainer>
+        <EventsSection shows={data.upcomingShows} showAllEventsLink />
+        <GallerySection />
+      </PageContainer>
+      <ContactSection />
     </>
   )
 }
