@@ -4,12 +4,14 @@ interface PaymentSectionProps {
   clientSecret: string
   onPaymentSuccess: () => void
   onPaymentError: (error: string) => void
+  onPaymentCancel: () => void
 }
 
 export default function PaymentSection({
   clientSecret,
   onPaymentSuccess,
   onPaymentError,
+  onPaymentCancel,
 }: PaymentSectionProps) {
   return (
     <>
@@ -22,6 +24,7 @@ export default function PaymentSection({
           clientSecret={clientSecret}
           onSuccess={onPaymentSuccess}
           onError={onPaymentError}
+          onCancel={onPaymentCancel}
         />
       </div>
     </>

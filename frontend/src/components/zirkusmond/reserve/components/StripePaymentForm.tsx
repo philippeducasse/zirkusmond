@@ -1,19 +1,17 @@
 import { useState } from 'react'
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js'
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '#/components/ui/button.tsx'
 
 interface StripePaymentFormProps {
   onSuccess: () => void
   onError: (error: string) => void
+  onCancel: () => void
 }
 
 export default function StripePaymentForm({
   onSuccess,
   onError,
+  onCancel,
 }: StripePaymentFormProps) {
   const stripe = useStripe()
   const elements = useElements()
@@ -55,29 +53,29 @@ export default function StripePaymentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-6">
+    <form onSubmit={handleSubmit} className="flex flex-col">
+      <div className="mb-6 [&_iframe]:outline-none">
         <PaymentElement
           options={{
             layout: 'tabs',
-            paymentMethodOrder: ['card', 'paypal'],
           }}
         />
       </div>
 
       {errorMessage && (
-        <div className="mb-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-200 text-sm">
+        <div className="mb-4 p-3 bg-white/10 border-2 border-destructive text-red/30 text-xl">
           {errorMessage}
         </div>
       )}
 
-      <Button
-        type="submit"
-        disabled={!stripe || isProcessing}
-        className="w-full"
-      >
-        {isProcessing ? 'Processing...' : 'Pay Now'}
-      </Button>
+      <div className="mt-8 flex items-center justify-between">
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Back
+        </Button>
+        <Button type="submit" disabled={!stripe || isProcessing}>
+          {isProcessing ? 'Processing...' : 'Pay Now'}
+        </Button>
+      </div>
     </form>
   )
 }
