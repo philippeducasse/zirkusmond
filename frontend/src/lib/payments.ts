@@ -55,7 +55,7 @@ export async function createPaymentIntent(
   })
 }
 
-interface CreateReservationWithPaymentParams {
+interface CreateReservationParams {
   showId: string
   eventId: string
   firstName: string
@@ -67,10 +67,10 @@ interface CreateReservationWithPaymentParams {
   customTicketPrice: number
 }
 
-export function useCreateReservationWithPayment() {
+export function useCreateReservation() {
   return useMutation({
-    mutationFn: async (params: CreateReservationWithPaymentParams) => {
-      const reservation = await createReservation(params.showId, {
+    mutationFn: (params: CreateReservationParams) =>
+      createReservation(params.showId, {
         eventId: params.eventId,
         firstName: params.firstName,
         lastName: params.lastName,
@@ -79,14 +79,21 @@ export function useCreateReservationWithPayment() {
         attendeeCount: params.attendeeCount,
         customPrice: params.customTicketPrice,
         guests: params.guests,
-      })
+      }),
+  })
+}
 
-      const paymentIntent = await createPaymentIntent(reservation.reservationId, {
+interface CreatePaymentIntentParams {
+  reservationId: string
+  customTicketPrice: number
+}
+
+export function useCreatePaymentIntent() {
+  return useMutation({
+    mutationFn: (params: CreatePaymentIntentParams) =>
+      createPaymentIntent(params.reservationId, {
         customTicketPrice: params.customTicketPrice,
         paymentMethod: 'card',
-      })
-
-      return paymentIntent
-    },
+      }),
   })
 }

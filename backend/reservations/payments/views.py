@@ -31,6 +31,7 @@ def payment(request: HttpRequest, payment_id: uuid.UUID) -> HttpResponseRedirect
 
 class CreatePaymentIntentView(generics.GenericAPIView):
     serializer_class = CreatePaymentIntentSerializer
+    authentication_classes = []
 
     def post(self, request: Request, reservation_id: uuid.UUID) -> Response:
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -80,6 +81,8 @@ def payment_fail(request: HttpRequest, payment_id: uuid.UUID) -> TemplateRespons
 
 class StripeWebhookView(APIView):
     """Handle Stripe webhook events for PaymentIntent confirmations."""
+
+    authentication_classes = []
 
     def post(self, request: Request) -> Response | JsonResponse:
         payload = request.body

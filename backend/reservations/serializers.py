@@ -10,6 +10,20 @@ class GuestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
 
 
+class GuestDetailSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+
+
+class ReservationDetailSerializer(serializers.Serializer):
+    show_title = serializers.CharField(source="event.show.title")
+    event_date = serializers.CharField(source="event.time_and_date")
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    ticket_count = serializers.IntegerField()
+    guests = GuestDetailSerializer(many=True)
+
+
 class ReservationSerializer(serializers.Serializer):
     event_id = serializers.IntegerField()
     first_name = serializers.CharField(max_length=25)
