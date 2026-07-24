@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
-import { useCreateReservationWithPayment } from '#/lib/payments.ts'
+import { useCreateReservation } from '#/lib/payments.ts'
 import GuestForm from './components/GuestForm.tsx'
-import PaymentSection from './components/PaymentSection.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
 import SlidingScale from './components/SlidingScale.tsx'
@@ -25,12 +24,11 @@ export default function ReservationPage({ show }: ReservationPageProps) {
     show.baseTicketPrice ?? show.reservationPrice ?? 15,
   )
   const [newsletter, setNewsletter] = useState(false)
-  const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const guestCount = Math.min(9, Math.max(0, attendeeCount - 1))
 
-  const mutation = useCreateReservationWithPayment()
+  const mutation = useCreateReservation()
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -60,7 +58,14 @@ export default function ReservationPage({ show }: ReservationPageProps) {
       },
       {
         onSuccess: (data) => {
-          setClientSecret(data.clientSecret)
+          navigate({
+            to: '/reserve/$showId/payment',
+            params: { showId: String(show.id) },
+            search: {
+              reservationId: data.reservationId,
+              customTicketPrice: customPrice,
+            },
+          })
         },
         onError: (err) => {
           setError(err instanceof Error ? err.message : 'An error occurred')
@@ -71,15 +76,6 @@ export default function ReservationPage({ show }: ReservationPageProps) {
 
   function handleBack() {
     navigate({ to: '/show/$showId', params: { showId: String(show.id) } })
-  }
-
-  function handlePaymentSuccess() {
-    // TODO: Create proper success route
-    window.location.href = '/payment/success'
-  }
-
-  function handlePaymentError(errorMessage: string) {
-    setError(errorMessage)
   }
 
   return (
@@ -100,64 +96,43 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             setNewsletter={setNewsletter}
           />
 
-          {!clientSecret && (
-            <>
-              <div className="my-4 sm:my-6">
-                <SlidingScale
-                  show={show}
-                  customPrice={customPrice}
-                  setCustomPrice={setCustomPrice}
-                />
-              </div>
+          <div className="my-4 sm:my-6">
+            <SlidingScale
+              show={show}
+              customPrice={customPrice}
+              setCustomPrice={setCustomPrice}
+            />
+          </div>
 
-              <div className="my-3 sm:my-4 text-center">
-                <h4>
-                  Total Price: <span className="font-bold">{(attendeeCount * customPrice).toFixed(2)}</span> €
-                </h4>
-              </div>
+          <div className="my-3 sm:my-4 text-center">
+            <h4>
+              Total Price:{' '}
+              <span className="font-bold">
+                {(attendeeCount * customPrice).toFixed(2)}
+              </span>{' '}
+              €
+            </h4>
+          </div>
 
-              <div className="mt-8 text-center">
-                <Button
-                  type="submit"
-                  disabled={mutation.isPending}
-                  className="min-w-[200px]"
-                >
-                  {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
-                </Button>
-              </div>
-            </>
+          {error && (
+            <div className="mb-4 p-3 border bg-white/20 border-red-500 rounded text-xl text-red-200">
+              {error}
+            </div>
           )}
+
+          <div className=" flex justify-between mt-8 text-center">
+            <Button type="button" variant="secondary" onClick={handleBack}>
+              Back to Show
+            </Button>
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="min-w-[200px]"
+            >
+              {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
+            </Button>
+          </div>
         </SectionCard>
-
-        {clientSecret && (
-          <>
-            <SectionDivider type="flower" />
-            <SectionCard>
-              {error && (
-                <div className="mb-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-200 text-sm">
-                  {error}
-                </div>
-              )}
-              <PaymentSection
-                clientSecret={clientSecret}
-                onPaymentSuccess={handlePaymentSuccess}
-                onPaymentError={handlePaymentError}
-              />
-            </SectionCard>
-          </>
-        )}
-
-        <SectionDivider type="kite" />
-        <div className="mt-8 text-center">
-          <Button
-            type="button"
-            size={'sm'}
-            variant="secondary"
-            onClick={handleBack}
-          >
-            Back to Show
-          </Button>
-        </div>
       </form>
     </div>
   )
