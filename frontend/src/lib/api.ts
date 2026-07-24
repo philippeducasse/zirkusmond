@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 
+import type { ReservationDetail } from '#/interfaces/reservation.ts'
 import type { HomepageResponse, ShowDetailResponse } from '#/interfaces/show.ts'
 import { keysToCamelCase } from '#/lib/utils.ts'
 
@@ -76,7 +77,8 @@ export const showQueryOptions = (showId: string) =>
     },
   })
 
-export const reserveQueryOptions = () =>
+export const reservationDetailQueryOptions = (reservationId: string) =>
   queryOptions({
-    queryKey: ['reserve'],
+    queryKey: ['reservation', reservationId],
+    queryFn: () => fetchJson<ReservationDetail>(`/reservation/detail/${reservationId}`),
   })
