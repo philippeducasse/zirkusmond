@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
 import { useCreateReservation, createPaymentIntent } from '#/lib/payments.ts'
+import { fillReservationFormWithDummyData } from './fillDummyData.ts'
 import GuestForm from './components/GuestForm.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
@@ -90,9 +91,26 @@ export default function ReservationPage({ show }: ReservationPageProps) {
     navigate({ to: '/show/$showId', params: { showId: String(show.id) } })
   }
 
+  function handleFillDummyData() {
+    fillReservationFormWithDummyData({
+      show,
+      setSelectedEventId,
+      setAttendeeCount,
+      setNewsletter,
+      setCustomPrice,
+    })
+  }
+
   return (
     <div className="flex items-center justify-center max-w-7xl mx-auto text-white p-1 md:p-8">
       <form onSubmit={handleSubmit} id="reservation-form">
+        {import.meta.env.DEV && (
+          <div className="flex justify-end mb-2">
+            <Button type="button" variant="secondary" onClick={handleFillDummyData}>
+              Fill test data
+            </Button>
+          </div>
+        )}
         <SectionCard>
           <ReservationForm
             show={show}
@@ -108,7 +126,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             setNewsletter={setNewsletter}
           />
 
-          <div className="my-4 sm:my-6">
+          <div className="my-4 sm:my-6 max-w-2xl mx-auto">
             <SlidingScale
               show={show}
               customPrice={customPrice}
