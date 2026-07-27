@@ -52,7 +52,7 @@ function RouteComponent() {
       ) : (
         <ContentSection className="text-center text-white md:text-xl max-w-3xl mx-auto">
           <SectionCard className="space-y-6">
-            <p>
+            <p className="text-pretty">
               A confirmation email has been sent to{' '}
               <span className="font-bold text-primary">
                 {reservationQuery.data.email}
@@ -63,7 +63,7 @@ function RouteComponent() {
 
             {(reservationQuery.data.showTime ||
               reservationQuery.data.admissionTime) && (
-              <p>
+              <p className="text-pretty">
                 We open our gates at{' '}
                 <span className="font-bold text-primary">
                   {reservationQuery.data.admissionTime}
@@ -75,7 +75,7 @@ function RouteComponent() {
               </p>
             )}
 
-            <p>
+            <p className="text-pretty">
               If you have not been to our tent yet, here are{' '}
               <a
                 href="https://www.openstreetmap.org/directions?from=&to=52.54226%2C13.43250"
@@ -87,7 +87,9 @@ function RouteComponent() {
               </a>
             </p>
 
-            <p className="text-2xl">See you at Zirkus Mond and have fun!</p>
+            <p className="text-2xl text-pretty">
+              See you at Zirkus Mond and have fun!
+            </p>
           </SectionCard>
           <SectionDivider type="flower" />
           <Button asChild>

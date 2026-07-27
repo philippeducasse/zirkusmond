@@ -9,16 +9,18 @@ import { Button } from '#/components/ui/button'
 
 interface PaymentFailureSearch {
   paymentId?: string
-  eventShowId?: string
+  eventShowId?: number
 }
 
 function validatePaymentFailureSearch(
   search: Record<string, unknown>,
 ): PaymentFailureSearch {
-  console.log('Raw search params:', search)
+  console.log('Raw search params:', search, 'type: ', typeof search.eventShowId)
   const result = {
-    paymentId: typeof search.paymentId === 'string' ? search.paymentId : undefined,
-    eventShowId: typeof search.eventShowId === 'string' ? search.eventShowId : undefined,
+    paymentId:
+      typeof search.paymentId === 'string' ? search.paymentId : undefined,
+    eventShowId:
+      typeof search.eventShowId === 'number' ? search.eventShowId : undefined,
   }
   console.log('Validated result:', result)
   return result
@@ -38,14 +40,17 @@ function RouteComponent() {
 
       <ContentSection className="text-center text-white max-w-2xl mx-auto">
         <SectionCard className="space-y-6">
+          <h4>Sorry, something went wrong!</h4>
           {eventShowId && (
-            <Link
-              to="/reserve/$showId"
-              params={{ showId: eventShowId }}
-              className="button mx-auto"
-            >
-              Try again?
-            </Link>
+            <Button asChild>
+              <Link
+                to="/reserve/$showId"
+                params={{ showId: String(eventShowId) }}
+                className="mx-auto"
+              >
+                Try again?
+              </Link>
+            </Button>
           )}
 
           <p>
