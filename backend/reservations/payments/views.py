@@ -91,25 +91,30 @@ def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
 
     try:
         # Retrieve the payment intent from Stripe to verify status
-        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        intent = stripe.PaymentIntent.retrieve(
+            payment_intent_id, expand=["latest_charge.payment_method_details"]
+        )
 
         # Update payment method on the Payment object
         payment_id = None
         try:
             payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
             payment_id = payment.id
-            charges = intent.get("charges")
-            if charges and charges.get("data"):
-                charge = charges.data[0]
-                payment_method_type = charge.payment_method_details.type
+            charge = intent.get("latest_charge")
+            if charge:
+                details = charge.payment_method_details
+                payment_method_type = details.type
                 if payment_method_type == "card":
-                    payment.payment_method = Payment.PaymentMethod.CARD
-                if payment_method_type == "paypal":
+                    wallet = details.card.wallet
+                    wallet_type = wallet.type if wallet else None
+                    if wallet_type == "apple_pay":
+                        payment.payment_method = Payment.PaymentMethod.APPLE
+                    elif wallet_type == "google_pay":
+                        payment.payment_method = Payment.PaymentMethod.GOOGLE
+                    else:
+                        payment.payment_method = Payment.PaymentMethod.CARD
+                elif payment_method_type == "paypal":
                     payment.payment_method = Payment.PaymentMethod.PAYPAL
-                if payment_method_type == "apple":
-                    payment.payment_method = Payment.PaymentMethod.APPLE
-                if payment_method_type == "google":
-                    payment.payment_method = Payment.PaymentMethod.GOOGLE
                 else:
                     payment.payment_method = Payment.PaymentMethod.UNKNOWN
                 payment.save()
@@ -190,6 +195,43 @@ class StripeWebhookView(APIView):
             except Payment.DoesNotExist:
                 logger.warning(
                     "payment_intent.succeeded: payment not found for %s", payment_intent_id
+                )
+                return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        elif event["type"] in ("payment_intent.payment_failed", "payment_intent.canceled"):
+            intent = event["data"]["object"]
+            payment_intent_id = intent["id"]
+
+            try:
+                payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+                payment.status = Payment.Status.FAILED
+                payment.save()
+                logger.info(
+                    "payment_failed: payment=%s intent=%s event=%s",
+                    payment.id,
+                    payment_intent_id,
+                    event["type"],
+                )
+            except Payment.DoesNotExist:
+                logger.warning(
+                    "%s: payment not found for %s", event["type"], payment_intent_id
+                )
+                return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        elif event["type"] == "charge.refunded":
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+
+            try:
+                payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+                payment.status = Payment.Status.REFUNDED
+                payment.save()
+                logger.info(
+                    "payment_refunded: payment=%s intent=%s", payment.id, payment_intent_id
+                )
+            except Payment.DoesNotExist:
+                logger.warning(
+                    "charge.refunded: payment not found for %s", payment_intent_id
                 )
                 return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
 
