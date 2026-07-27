@@ -2,11 +2,9 @@ from decimal import Decimal
 from typing import Any
 
 from django.db import transaction
-from django.forms import BaseFormSet
 
-from events.forms import ReservationForm
 from events.models import Event
-from reservations.models import Guest, Reservation, ReservationPayment
+from reservations.models import Guest, Reservation
 from shows.models import Show
 
 
@@ -26,26 +24,6 @@ def parse_custom_price(show: Show, raw_custom_price: str | None) -> Decimal | No
     ):
         raise ValueError("Invalid ticket price selected")
     return price
-
-
-def create_reservation_with_payment(
-    reservation_form: ReservationForm,
-    guest_formset: BaseFormSet,
-    guest_count: int,
-    variant: str,
-    custom_price: Decimal | None,
-) -> ReservationPayment:
-    with transaction.atomic():
-        reservation = reservation_form.save()
-        for i in range(guest_count):
-            guest = guest_formset[i].save(commit=False)
-            guest.reservation = reservation
-            guest.save()
-        payment = ReservationPayment.from_reservation(
-            reservation, variant=variant, custom_ticket_price=custom_price
-        )
-        payment.save()
-    return payment
 
 
 def create_reservation(
