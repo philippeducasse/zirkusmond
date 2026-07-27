@@ -3,7 +3,6 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
-import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import { ShowDetails } from '#/components/zirkusmond/show/ShowDetails'
 import { ReserveButton } from '#/components/zirkusmond/show/ReserveButton'
 import TimeDetails from '#/components/zirkusmond/event/TimeDetails'
@@ -56,7 +55,7 @@ function RouteComponent() {
         <ReserveButton show={show} />
       </div>
 
-      <SectionDivider type="kite" />
+      <SectionDivider type="flower" />
 
       <ShowDetails show={show} />
 
@@ -66,8 +65,6 @@ function RouteComponent() {
         </Button>
         <ReserveButton show={show} />
       </div>
-
-      <SectionDivider type="flower" />
     </PageContainer>
   )
 }

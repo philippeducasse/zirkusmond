@@ -48,22 +48,20 @@ export default function SelectField({
       <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
         {label}
       </FieldLabel>
-      <div ref={containerRef} className="relative bg-black/10">
+      <div ref={containerRef} className="relative bg-white/10">
         <button
           id={id}
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="flex h-10 sm:h-11 w-full items-center justify-between border-2 border-primary bg-transparent px-2 sm:px-3 text-base sm:text-lg text-white hover:bg-transparent"
         >
-          <span
-            className={selectedOption ? 'text-white' : 'text-muted-foreground'}
-          >
+          <span className={'text-white'}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <ChevronDownIcon className="size-4 text-primary" />
         </button>
         {isOpen && (
-          <div className="absolute z-50 w-full border-2 border-t-0 border-primary bg-[url(/images/general/bg_pattern.webp)] bg-repeat">
+          <div className="absolute z-50 w-full max-h-[400px] overflow-y-auto border-2 border-t-0 border-primary bg-[url(/images/general/bg_pattern.webp)] bg-repeat [scrollbar-width:thin] [scrollbar-color:white_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-white [&::-webkit-scrollbar-track]:bg-transparent">
             {options.map((option) => {
               const isSelected = option.value === value
               return (

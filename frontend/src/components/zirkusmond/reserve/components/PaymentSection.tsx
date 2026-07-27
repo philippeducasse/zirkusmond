@@ -2,13 +2,15 @@ import StripePaymentWrapper from './StripePaymentWrapper.tsx'
 
 interface PaymentSectionProps {
   clientSecret: string
+  reservationId: string
   onPaymentSuccess: () => void
-  onPaymentError: (error: string) => void
+  onPaymentError: () => void
   onPaymentCancel: () => void
 }
 
 export default function PaymentSection({
   clientSecret,
+  reservationId,
   onPaymentSuccess,
   onPaymentError,
   onPaymentCancel,
@@ -22,6 +24,7 @@ export default function PaymentSection({
       <div className="my-6">
         <StripePaymentWrapper
           clientSecret={clientSecret}
+          reservationId={reservationId}
           onSuccess={onPaymentSuccess}
           onError={onPaymentError}
           onCancel={onPaymentCancel}

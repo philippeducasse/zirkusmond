@@ -16,6 +16,8 @@ import { Route as DatenschutzRouteImport } from './routes/datenschutz'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as RentalsRouteImport } from './routes/rentals'
+import { Route as PaymentFailureRouteImport } from './routes/payment.failure'
+import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ReserveShowIdRouteImport } from './routes/reserve.$showId'
 import { Route as ShowShowIdRouteImport } from './routes/show.$showId'
 import { Route as ReserveShowIdPaymentRouteImport } from './routes/reserve.$showId_.payment'
@@ -55,6 +57,16 @@ const RentalsRoute = RentalsRouteImport.update({
   path: '/rentals',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentFailureRoute = PaymentFailureRouteImport.update({
+  id: '/payment/failure',
+  path: '/payment/failure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment/success',
+  path: '/payment/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReserveShowIdRoute = ReserveShowIdRouteImport.update({
   id: '/reserve/$showId',
   path: '/reserve/$showId',
@@ -79,6 +91,8 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/impressum': typeof ImpressumRoute
   '/rentals': typeof RentalsRoute
+  '/payment/failure': typeof PaymentFailureRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/reserve/$showId': typeof ReserveShowIdRoute
   '/show/$showId': typeof ShowShowIdRoute
   '/reserve/$showId/payment': typeof ReserveShowIdPaymentRoute
@@ -91,6 +105,8 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/impressum': typeof ImpressumRoute
   '/rentals': typeof RentalsRoute
+  '/payment/failure': typeof PaymentFailureRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/reserve/$showId': typeof ReserveShowIdRoute
   '/show/$showId': typeof ShowShowIdRoute
   '/reserve/$showId/payment': typeof ReserveShowIdPaymentRoute
@@ -104,6 +120,8 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/impressum': typeof ImpressumRoute
   '/rentals': typeof RentalsRoute
+  '/payment/failure': typeof PaymentFailureRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/reserve/$showId': typeof ReserveShowIdRoute
   '/show/$showId': typeof ShowShowIdRoute
   '/reserve/$showId_/payment': typeof ReserveShowIdPaymentRoute
@@ -118,6 +136,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/impressum'
     | '/rentals'
+    | '/payment/failure'
+    | '/payment/success'
     | '/reserve/$showId'
     | '/show/$showId'
     | '/reserve/$showId/payment'
@@ -130,6 +150,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/impressum'
     | '/rentals'
+    | '/payment/failure'
+    | '/payment/success'
     | '/reserve/$showId'
     | '/show/$showId'
     | '/reserve/$showId/payment'
@@ -142,6 +164,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/impressum'
     | '/rentals'
+    | '/payment/failure'
+    | '/payment/success'
     | '/reserve/$showId'
     | '/show/$showId'
     | '/reserve/$showId_/payment'
@@ -155,6 +179,8 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   ImpressumRoute: typeof ImpressumRoute
   RentalsRoute: typeof RentalsRoute
+  PaymentFailureRoute: typeof PaymentFailureRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   ReserveShowIdRoute: typeof ReserveShowIdRoute
   ShowShowIdRoute: typeof ShowShowIdRoute
   ReserveShowIdPaymentRoute: typeof ReserveShowIdPaymentRoute
@@ -211,6 +237,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RentalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment/failure': {
+      id: '/payment/failure'
+      path: '/payment/failure'
+      fullPath: '/payment/failure'
+      preLoaderRoute: typeof PaymentFailureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/success': {
+      id: '/payment/success'
+      path: '/payment/success'
+      fullPath: '/payment/success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reserve/$showId': {
       id: '/reserve/$showId'
       path: '/reserve/$showId'
@@ -243,6 +283,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   ImpressumRoute: ImpressumRoute,
   RentalsRoute: RentalsRoute,
+  PaymentFailureRoute: PaymentFailureRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   ReserveShowIdRoute: ReserveShowIdRoute,
   ShowShowIdRoute: ShowShowIdRoute,
   ReserveShowIdPaymentRoute: ReserveShowIdPaymentRoute,

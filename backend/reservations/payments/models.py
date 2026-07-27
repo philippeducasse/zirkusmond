@@ -99,6 +99,9 @@ class Payment(models.Model):
     class PaymentMethod(models.TextChoices):
         CARD = "card"
         PAYPAL = "paypal"
+        APPLE = "apple"
+        GOOGLE = "google"
+        UNKNOWN = "unknown"
 
     class Status(models.TextChoices):
         PENDING = "pending"
@@ -107,7 +110,7 @@ class Payment(models.Model):
         REFUNDED = "refunded"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices)
+    payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices, null=True, blank=True)
     reservation = models.ForeignKey(
         "reservations.Reservation", null=True, on_delete=models.SET_NULL
     )
@@ -123,7 +126,7 @@ class Payment(models.Model):
         cls,
         reservation: "Reservation",
         custom_ticket_price: int | None,
-        payment_method: str,
+        payment_method: str | None = None,
     ) -> Self:
         if custom_ticket_price is None:
             raise ValueError("Custom ticket price must be provided")

@@ -1,6 +1,5 @@
 from typing import Any
 
-from django.conf import settings
 from rest_framework import serializers
 
 
@@ -18,6 +17,9 @@ class GuestDetailSerializer(serializers.Serializer):
 class ReservationDetailSerializer(serializers.Serializer):
     show_title = serializers.CharField(source="event.show.title")
     event_date = serializers.CharField(source="event.time_and_date")
+    admission_time = serializers.CharField(source="event.admission_time")
+    show_time = serializers.CharField(source="event.show_time")
+    email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     ticket_count = serializers.IntegerField()

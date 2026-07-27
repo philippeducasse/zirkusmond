@@ -3,12 +3,14 @@ import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '#/components/ui/button.tsx'
 
 interface StripePaymentFormProps {
+  reservationId: string
   onSuccess: () => void
-  onError: (error: string) => void
+  onError: () => void
   onCancel: () => void
 }
 
 export default function StripePaymentForm({
+  reservationId,
   onSuccess,
   onError,
   onCancel,
@@ -32,23 +34,37 @@ export default function StripePaymentForm({
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/payment/success`,
+          return_url: `${import.meta.env.VITE_API_URL}/payments/return/stripe?reservationId=${reservationId}`,
+          payment_method_data: {
+            billing_details: {
+              // hardcode the billing details. cant reliably display the country drop down, so have to pass this info to stripe manually.
+              // shouldnt affect payment success
+              address: {
+                country: 'DE',
+                postal_code: '00000',
+                line1: 'N/A',
+                line2: null,
+                city: 'N/A',
+                state: null,
+              },
+            },
+          },
         },
         redirect: 'if_required',
       })
 
       if (error) {
         setErrorMessage(error.message ?? 'An error occurred')
-        onError(error.message ?? 'An error occurred')
+        setIsProcessing(false)
+        onError()
       } else {
         onSuccess()
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An error occurred'
       setErrorMessage(message)
-      onError(message)
-    } finally {
       setIsProcessing(false)
+      onError()
     }
   }
 
@@ -58,6 +74,11 @@ export default function StripePaymentForm({
         <PaymentElement
           options={{
             layout: 'tabs',
+            fields: {
+              billingDetails: {
+                address: 'never',
+              },
+            },
           }}
         />
       </div>
@@ -67,7 +88,6 @@ export default function StripePaymentForm({
           {errorMessage}
         </div>
       )}
-
       <div className="mt-8 flex items-center justify-between">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Back
