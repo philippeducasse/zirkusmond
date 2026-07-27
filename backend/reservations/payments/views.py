@@ -41,10 +41,9 @@ class CreatePaymentIntentView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         custom_ticket_price = serializer.validated_data.get("custom_ticket_price")
-        payment_method = serializer.validated_data["payment_method"]
 
         try:
-            payment = Payment.create_for_reservation(reservation, custom_ticket_price, payment_method)
+            payment = Payment.create_for_reservation(reservation, custom_ticket_price)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -79,6 +78,86 @@ def payment_fail(request: HttpRequest, payment_id: uuid.UUID) -> TemplateRespons
     return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
 
 
+def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
+    """Handle Stripe redirect after payment attempt."""
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    payment_intent_id = request.GET.get("payment_intent")
+    reservation_id = request.GET.get("reservationId")
+
+    if not payment_intent_id or not reservation_id:
+        frontend_base = settings.FRONTEND_URL
+        return redirect(f"{frontend_base}/payment/failure")
+
+    try:
+        # Retrieve the payment intent from Stripe to verify status
+        intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+
+        # Update payment method on the Payment object
+        payment_id = None
+        try:
+            payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+            payment_id = payment.id
+            charges = intent.get("charges")
+            if charges and charges.get("data"):
+                charge = charges.data[0]
+                payment_method_type = charge.payment_method_details.type
+                if payment_method_type == "card":
+                    payment.payment_method = Payment.PaymentMethod.CARD
+                if payment_method_type == "paypal":
+                    payment.payment_method = Payment.PaymentMethod.PAYPAL
+                if payment_method_type == "apple":
+                    payment.payment_method = Payment.PaymentMethod.APPLE
+                if payment_method_type == "google":
+                    payment.payment_method = Payment.PaymentMethod.GOOGLE
+                else:
+                    payment.payment_method = Payment.PaymentMethod.UNKNOWN
+                payment.save()
+        except Payment.DoesNotExist:
+            logger.warning("stripe_return: payment not found for intent %s", payment_intent_id)
+
+        frontend_base = settings.FRONTEND_URL
+        if intent.status == "succeeded":
+            return redirect(f"{frontend_base}/payment/success?reservationId={reservation_id}")
+        else:
+            # Get the show_id from the reservation if possible
+            show_id = None
+            try:
+                reservation = Reservation.objects.select_related("event__show").get(
+                    id=reservation_id
+                )
+                if reservation.event and reservation.event.show:
+                    show_id = str(reservation.event.show.id)
+                    logger.info(
+                        "stripe_return: found show_id=%s for reservation=%s",
+                        show_id,
+                        reservation_id,
+                    )
+                else:
+                    logger.warning(
+                        "stripe_return: reservation %s has no event or show", reservation_id
+                    )
+            except Reservation.DoesNotExist:
+                logger.warning("stripe_return: reservation not found: %s", reservation_id)
+
+            # Build failure URL
+            failure_url = f"{frontend_base}/payment/failure"
+            params = []
+            if show_id:
+                logger.info("ADDING SHOW ID")
+                params.append(f"eventShowId={show_id}")
+            if payment_id:
+                params.append(f"paymentId={payment_id}")
+            if params:
+                failure_url += "?" + "&".join(params)
+
+            return redirect(failure_url)
+    except stripe.error.StripeError as e:
+        logger.error("stripe_return: error retrieving payment intent: %s", e)
+        frontend_base = settings.FRONTEND_URL
+        return redirect(f"{frontend_base}/payment/failure")
+
+
 class StripeWebhookView(APIView):
     """Handle Stripe webhook events for PaymentIntent confirmations."""
 
@@ -109,7 +188,9 @@ class StripeWebhookView(APIView):
                     "payment_completed: payment=%s intent=%s", payment.id, payment_intent_id
                 )
             except Payment.DoesNotExist:
-                logger.warning("payment_intent.succeeded: payment not found for %s", payment_intent_id)
+                logger.warning(
+                    "payment_intent.succeeded: payment not found for %s", payment_intent_id
+                )
                 return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
 
         return JsonResponse({"status": "ok"})

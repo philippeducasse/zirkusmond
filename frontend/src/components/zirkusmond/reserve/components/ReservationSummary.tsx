@@ -1,5 +1,4 @@
 import type { ReservationDetail } from '#/interfaces/reservation.ts'
-import SectionDivider from '../../general/SectionDivider.tsx'
 
 interface ReservationSummaryProps {
   reservation: ReservationDetail
@@ -13,7 +12,7 @@ export default function ReservationSummary({
   const total = customTicketPrice * reservation.ticketCount
 
   return (
-    <div className="text-center text-lg">
+    <div className="flex flex-col text-center text-lg gap-2">
       <h3 className="text-center mb-12">Reservation Summary</h3>
 
       <dl className="space-y-2">
@@ -37,15 +36,16 @@ export default function ReservationSummary({
         </div>
       </dl>
 
-      {reservation.guests.length > 0 && (
-        <ul className="mt-3 space-y-1 opacity-70">
-          {reservation.guests.map((guest, index) => (
-            <li key={index}>
+      {reservation.guests.length > 0 &&
+        reservation.guests.map((guest, index) => (
+          <div className="flex justify-between">
+            <dt className="opacity-70">Guest {index + 1}</dt>
+
+            <dd key={index}>
               {guest.firstName} {guest.lastName}
-            </li>
-          ))}
-        </ul>
-      )}
+            </dd>
+          </div>
+        ))}
 
       <div className="flex justify-between">
         <span className="opacity-70">Price per ticket</span>

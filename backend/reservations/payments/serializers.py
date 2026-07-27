@@ -5,9 +5,9 @@ from reservations.payments.models import Payment
 
 class CreatePaymentIntentSerializer(serializers.Serializer):
     custom_ticket_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False, allow_null=True
+        max_digits=10,
+        decimal_places=2,
     )
-    payment_method = serializers.ChoiceField(choices=Payment.PaymentMethod.choices)
 
 
 class PaymentIntentResponseSerializer(serializers.ModelSerializer):
