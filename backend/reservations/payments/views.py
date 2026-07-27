@@ -5,28 +5,18 @@ import stripe
 from django.conf import settings
 from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.template.response import TemplateResponse
-from payments import RedirectNeeded
 from rest_framework import generics, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from reservations.models import Payment, Reservation, ReservationPayment
+from reservations.models import Payment, Reservation
 from reservations.payments.serializers import (
     CreatePaymentIntentSerializer,
     PaymentIntentResponseSerializer,
 )
 
 logger = logging.getLogger(__name__)
-
-
-def payment(request: HttpRequest, payment_id: uuid.UUID) -> HttpResponseRedirect | None:
-    reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    try:
-        reservation_payment.get_form(data=request.POST or None)
-    except RedirectNeeded as redirect_to:
-        return redirect(str(redirect_to))
 
 
 class CreatePaymentIntentView(generics.GenericAPIView):
@@ -58,24 +48,6 @@ class CreatePaymentIntentView(generics.GenericAPIView):
         payment._client_secret = intent.client_secret
         response_serializer = PaymentIntentResponseSerializer(payment)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
-
-def payment_success(request: HttpRequest, payment_id: uuid.UUID) -> TemplateResponse:
-    reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    logger.info("payment_success: payment=%s status=%s", payment_id, reservation_payment.status)
-    return TemplateResponse(
-        request,
-        "reservation_success.html",
-        {
-            "payment": reservation_payment,
-            "show": reservation_payment.reservation.event.show,
-        },
-    )
-
-
-def payment_fail(request: HttpRequest, payment_id: uuid.UUID) -> TemplateResponse:
-    reservation_payment = get_object_or_404(ReservationPayment, id=payment_id)
-    return TemplateResponse(request, "payment_failure.html", {"payment": reservation_payment})
 
 
 def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
