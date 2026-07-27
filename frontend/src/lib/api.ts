@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import type { ReservationDetail } from '#/interfaces/reservation.ts'
 import type { HomepageResponse, ShowDetailResponse } from '#/interfaces/show.ts'
-import { keysToCamelCase } from '#/lib/utils.ts'
+import { keysToCamelCase, keysToSnakeCase } from '#/lib/utils.ts'
 
 /**
  * On the server (SSR loaders) we talk to Django directly; in the browser
@@ -35,21 +35,17 @@ async function fetchJson<T>(path: string): Promise<T> {
   return keysToCamelCase<T>(data)
 }
 
-export async function postJson<T>(
-  path: string,
-  body: unknown,
-  options?: { skipCamelCase?: boolean },
-): Promise<T> {
+export async function postJson<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(apiUrl(path), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify(keysToSnakeCase(body)),
   })
   if (!res.ok) {
     throw new ApiError(res.status, path)
   }
   const data = await res.json()
-  return options?.skipCamelCase ? data : keysToCamelCase<T>(data)
+  return keysToCamelCase<T>(data)
 }
 
 /**
@@ -80,5 +76,6 @@ export const showQueryOptions = (showId: string) =>
 export const reservationDetailQueryOptions = (reservationId: string) =>
   queryOptions({
     queryKey: ['reservation', reservationId],
-    queryFn: () => fetchJson<ReservationDetail>(`/reservation/detail/${reservationId}`),
+    queryFn: () =>
+      fetchJson<ReservationDetail>(`/reservation/detail/${reservationId}`),
   })

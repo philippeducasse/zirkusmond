@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
-import { useCreateReservation } from '#/lib/payments.ts'
+import { useCreateReservation, createPaymentIntent } from '#/lib/payments.ts'
 import GuestForm from './components/GuestForm.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
 import SlidingScale from './components/SlidingScale.tsx'
-import SectionDivider from '../general/SectionDivider.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 
 interface ReservationPageProps {
@@ -25,6 +24,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
   )
   const [newsletter, setNewsletter] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const guestCount = Math.min(9, Math.max(0, attendeeCount - 1))
 
@@ -33,6 +33,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
+    setIsProcessing(true)
 
     const formData = new FormData(e.currentTarget)
     const guests = []
@@ -57,17 +58,28 @@ export default function ReservationPage({ show }: ReservationPageProps) {
         customTicketPrice: customPrice,
       },
       {
-        onSuccess: (data) => {
-          navigate({
-            to: '/reserve/$showId/payment',
-            params: { showId: String(show.id) },
-            search: {
-              reservationId: data.reservationId,
-              customTicketPrice: customPrice,
-            },
-          })
+        onSuccess: async (data) => {
+          try {
+            const paymentIntent = await createPaymentIntent(
+              data.reservationId,
+              customPrice,
+            )
+            navigate({
+              to: '/reserve/$showId/payment',
+              params: { showId: String(show.id) },
+              search: {
+                reservationId: data.reservationId,
+                customTicketPrice: customPrice,
+                clientSecret: paymentIntent.clientSecret,
+              },
+            })
+          } catch (err) {
+            setIsProcessing(false)
+            setError(err instanceof Error ? err.message : 'An error occurred')
+          }
         },
         onError: (err) => {
+          setIsProcessing(false)
           setError(err instanceof Error ? err.message : 'An error occurred')
         },
       },
@@ -126,10 +138,10 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             </Button>
             <Button
               type="submit"
-              disabled={mutation.isPending}
+              disabled={isProcessing}
               className="min-w-[200px]"
             >
-              {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
+              {isProcessing ? 'Processing...' : 'Proceed to Payment'}
             </Button>
           </div>
         </SectionCard>
