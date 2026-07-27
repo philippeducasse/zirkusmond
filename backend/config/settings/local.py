@@ -6,6 +6,7 @@ DEBUG = True
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000"]
+FRONTEND_URL = "http://localhost:3000"
 
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False

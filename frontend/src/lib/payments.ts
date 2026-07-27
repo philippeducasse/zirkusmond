@@ -35,11 +35,6 @@ export async function createReservation(
   })
 }
 
-interface CreatePaymentIntentRequest {
-  customTicketPrice: number
-  paymentMethod: 'card' | 'paypal'
-}
-
 interface CreatePaymentIntentResponse {
   id: string
   clientSecret: string
@@ -47,11 +42,10 @@ interface CreatePaymentIntentResponse {
 
 export async function createPaymentIntent(
   reservationId: string,
-  data: CreatePaymentIntentRequest,
+  customTicketPrice: number,
 ): Promise<CreatePaymentIntentResponse> {
   return postJson(`/payments/${reservationId}/intent`, {
-    custom_ticket_price: data.customTicketPrice,
-    payment_method: data.paymentMethod,
+    customTicketPrice,
   })
 }
 
@@ -83,17 +77,13 @@ export function useCreateReservation() {
   })
 }
 
-interface CreatePaymentIntentParams {
-  reservationId: string
-  customTicketPrice: number
-}
-
-export function useCreatePaymentIntent() {
-  return useMutation({
-    mutationFn: (params: CreatePaymentIntentParams) =>
-      createPaymentIntent(params.reservationId, {
-        customTicketPrice: params.customTicketPrice,
-        paymentMethod: 'card',
-      }),
+export function useCreatePaymentIntent(
+  reservationId: string,
+  customTicketPrice: number,
+) {
+  const mutation = useMutation({
+    mutationFn: () => createPaymentIntent(reservationId, customTicketPrice),
   })
+  console.log({ mutation })
+  return mutation.data?.clientSecret
 }

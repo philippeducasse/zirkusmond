@@ -7,12 +7,14 @@ import PaymentPage from '#/components/zirkusmond/reserve/PaymentPage'
 interface PaymentSearch {
   reservationId: string
   customTicketPrice: number
+  clientSecret: string
 }
 
 function validatePaymentSearch(search: Record<string, unknown>): PaymentSearch {
   return {
     reservationId: typeof search.reservationId === 'string' ? search.reservationId : '',
     customTicketPrice: Number(search.customTicketPrice),
+    clientSecret: typeof search.clientSecret === 'string' ? search.clientSecret : '',
   }
 }
 
@@ -23,7 +25,7 @@ export const Route = createFileRoute('/reserve/$showId_/payment')({
   // reservation form if someone lands here directly without a
   // reservationId/price from step one (bookmark, back button, manual URL).
   beforeLoad: ({ search, params }) => {
-    if (!search.reservationId || !Number.isFinite(search.customTicketPrice)) {
+    if (!search.reservationId || !Number.isFinite(search.customTicketPrice) || !search.clientSecret) {
       throw redirect({ to: '/reserve/$showId', params: { showId: params.showId } })
     }
   },
@@ -32,7 +34,7 @@ export const Route = createFileRoute('/reserve/$showId_/payment')({
 
 function RouteComponent() {
   const { showId } = Route.useParams()
-  const { reservationId, customTicketPrice } = Route.useSearch()
+  const { reservationId, customTicketPrice, clientSecret } = Route.useSearch()
 
   return (
     <PageContainer>
@@ -41,6 +43,7 @@ function RouteComponent() {
         showId={showId}
         reservationId={reservationId}
         customTicketPrice={customTicketPrice}
+        clientSecret={clientSecret}
       />
     </PageContainer>
   )

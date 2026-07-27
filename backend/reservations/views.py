@@ -12,12 +12,12 @@ from rest_framework.response import Response
 from events.forms import GuestForm, ReservationForm
 from events.models import Event
 from newsletter.services import register_newsletter_email
+from reservations.models import Reservation
 from reservations.payments.services import (
     create_reservation,
     create_reservation_with_payment,
     parse_custom_price,
 )
-from reservations.models import Reservation
 from reservations.serializers import ReservationDetailSerializer, ReservationSerializer
 from shows.models import Show
 

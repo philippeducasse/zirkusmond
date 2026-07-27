@@ -1,9 +1,6 @@
 import { Elements } from '@stripe/react-stripe-js'
-import {
-  loadStripe,
-  type Appearance,
-  type StripeElementsOptions,
-} from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import type { Appearance, StripeElementsOptions } from '@stripe/stripe-js'
 import StripePaymentForm from './StripePaymentForm.tsx'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
@@ -17,7 +14,6 @@ const MANROPE_FONT_SRC =
 // components/ui/input.tsx): bg-black/10, border-2 border-primary, rounded-none,
 // white text, muted-foreground placeholders, no focus ring/shadow.
 const appearance: Appearance = {
-  theme: 'flat',
   variables: {
     colorPrimary: '#f6ae42',
     colorBackground: '#FFFFFF1A',
@@ -25,7 +21,7 @@ const appearance: Appearance = {
     colorTextPlaceholder: '#dedede',
     colorDanger: '#ef4444',
     fontFamily: 'Manrope, sans-serif',
-    fontSizeBase: '16px',
+    fontSizeBase: '1.25rem',
     borderRadius: '0px',
   },
   rules: {
@@ -35,83 +31,26 @@ const appearance: Appearance = {
       padding: '10px 12px',
       boxShadow: 'none',
     },
-    '.Input:focus': {
-      border: '2px solid var(--colorPrimary)',
-      boxShadow: 'none',
-      outline: 'none',
-    },
-    '.Input--invalid': {
-      border: '2px solid var(--colorDanger)',
-      boxShadow: 'none',
-    },
-    '.Label': {
-      color: '#ffffff',
-      fontFamily: 'Manrope, sans-serif',
-      fontSize: '16px',
-      fontWeight: '500',
-      marginBottom: '6px',
-    },
-    '.Tab': {
-      border: '2px solid var(--colorPrimary)',
-      backgroundColor: '#FFFFFF1A',
-      borderRadius: '0px',
-      boxShadow: 'none',
-    },
-    '.Tab:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.2)',
-      boxShadow: 'none',
-    },
-    '.Tab--selected': {
-      border: '2px solid var(--colorPrimary)',
-      backgroundColor: 'rgba(246, 174, 66, 0.15)',
-      boxShadow: 'none',
-    },
-    '.Tab--selected:hover': {
-      backgroundColor: 'rgba(246, 174, 66, 0.15)',
-    },
-    '.TabLabel': {
-      color: '#ffffff',
-    },
-    '.TabLabel--selected': {
-      color: '#f6ae42',
-    },
-    '.TabIcon': {
-      fill: '#ffffff',
-    },
-    '.TabIcon--selected': {
-      fill: '#f6ae42',
-    },
     '.Block': {
       backgroundColor: '#FFFFFF1A',
       border: '2px solid var(--colorPrimary)',
       borderRadius: '0px',
       boxShadow: 'none',
     },
-    '.CheckboxInput': {
-      backgroundColor: '#FFFFFF1A',
-      border: '2px solid var(--colorPrimary)',
-      borderRadius: '0px',
-    },
-    '.CheckboxInput--checked': {
-      backgroundColor: '#f6ae42',
-      border: '2px solid var(--colorPrimary)',
-    },
-    '.Error': {
-      color: '#EFFFFF4444',
-      fontSize: '13px',
-    },
   },
 }
 
 interface StripePaymentWrapperProps {
   clientSecret: string
+  reservationId: string
   onSuccess: () => void
-  onError: (error: string) => void
+  onError: () => void
   onCancel: () => void
 }
 
 export default function StripePaymentWrapper({
   clientSecret,
+  reservationId,
   onSuccess,
   onError,
   onCancel,
@@ -125,6 +64,7 @@ export default function StripePaymentWrapper({
   return (
     <Elements stripe={stripePromise} options={options}>
       <StripePaymentForm
+        reservationId={reservationId}
         onSuccess={onSuccess}
         onError={onError}
         onCancel={onCancel}
