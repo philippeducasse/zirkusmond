@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router'
+
 import SectionDivider from './SectionDivider'
 
 const Footer = () => {
@@ -6,18 +8,18 @@ const Footer = () => {
       <SectionDivider type="moon" margin={'small'} />
       <div className="max-w-2/3 mx-auto flex flex-col text-center p-1 md:p-8 gap-6">
         <div className="flex gap-6 justify-center text-white ">
-          <a
-            href="/impressum"
+          <Link
+            to="/impressum"
             className="text-base sm:text-lg md:text-xl underline"
           >
             Impressum
-          </a>
-          <a
-            href="/datenschutz"
+          </Link>
+          <Link
+            to="/datenschutz"
             className="text-base sm:text-lg md:text-xl underline"
           >
             Datenschutz
-          </a>
+          </Link>
         </div>
         <div className="flex flex-col md:flex-row align-middle justify-centertext-sm sm:text-base">
           <div className="px-4 lg:w-1/3">
