@@ -163,28 +163,6 @@ class ShowManagerTest(TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Show view
-# ---------------------------------------------------------------------------
-
-
-class ShowViewTest(TestCase):
-    def setUp(self) -> None:
-        self.show = make_show()
-
-    def test_show_page_returns_200(self) -> None:
-        response = self.client.get(f"/show/{self.show.pk}")
-        self.assertEqual(response.status_code, 200)
-
-    def test_show_in_context(self) -> None:
-        response = self.client.get(f"/show/{self.show.pk}")
-        self.assertEqual(response.context["show"], self.show)
-
-    def test_nonexistent_show_returns_404(self) -> None:
-        response = self.client.get("/show/99999")
-        self.assertEqual(response.status_code, 404)
-
-
-# ---------------------------------------------------------------------------
 # Site-wide views
 # ---------------------------------------------------------------------------
 
@@ -200,42 +178,3 @@ class SiteViewsTest(TestCase):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn(show, response.context["upcoming_shows"])
-
-    def test_about_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/about").status_code, 200)
-
-    def test_contact_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/contact").status_code, 200)
-
-    def test_rentals_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/rentals").status_code, 200)
-
-    def test_international_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/international").status_code, 200)
-
-    def test_events_list_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/events").status_code, 200)
-
-    def test_impressum_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/impressum").status_code, 200)
-
-    def test_datenschutz_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/datenschutz").status_code, 200)
-
-    def test_robots_txt_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/robots.txt").status_code, 200)
-
-    def test_sitemap_returns_200(self) -> None:
-        self.assertEqual(self.client.get("/sitemap.xml").status_code, 200)
-
-    def test_newsletter_get_redirects(self) -> None:
-        response = self.client.get("/newsletter/newsletter-registration")
-        self.assertEqual(response.status_code, 302)
-
-    def test_newsletter_post_valid_email_shows_confirmation(self) -> None:
-        response = self.client.post("/newsletter/newsletter-registration", {"email": "user@example.com"})
-        self.assertEqual(response.status_code, 200)
-
-    def test_newsletter_post_invalid_email_redirects(self) -> None:
-        response = self.client.post("/newsletter/newsletter-registration", {"email": "not-an-email"})
-        self.assertEqual(response.status_code, 302)

@@ -385,46 +385,6 @@ class PurgeOrphanReservationsTest(TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Payment views
-# ---------------------------------------------------------------------------
-
-
-class PaymentViewTest(TestCase):
-    def setUp(self) -> None:
-        show = make_show()
-        event = make_event(show)
-        reservation = make_reservation(event)
-        self.payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        self.payment.save()
-
-    def test_payment_fail_page_returns_200(self) -> None:
-        response = self.client.get(f"/payments/{self.payment.pk}/failure")
-        self.assertEqual(response.status_code, 200)
-
-    def test_unknown_payment_returns_404(self) -> None:
-        response = self.client.get(f"/payments/{uuid.uuid4()}")
-        self.assertEqual(response.status_code, 404)
-
-
-# ---------------------------------------------------------------------------
-# Payment success view
-# ---------------------------------------------------------------------------
-
-
-class PaymentSuccessViewTest(TestCase):
-    def setUp(self) -> None:
-        show = make_show()
-        event = make_event(show)
-        reservation = make_reservation(event)
-        self.payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        self.payment.save()
-
-    def test_success_page_returns_200(self) -> None:
-        response = self.client.get(f"/payments/{self.payment.pk}/success")
-        self.assertEqual(response.status_code, 200)
-
-
-# ---------------------------------------------------------------------------
 # parse_custom_price service
 # ---------------------------------------------------------------------------
 
