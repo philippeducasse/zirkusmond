@@ -4,15 +4,10 @@ import { useNavbar } from '#/hooks/useNavbar.ts'
 import Logo from './navbar/Logo.tsx'
 import DesktopNav from './navbar/DesktopNav.tsx'
 import MobileNav from './navbar/MobileNav.tsx'
-import { NAV_ITEMS, QR_SCANNER_ITEM } from './navbar/nav-items.ts'
+import { NAV_ITEMS } from './navbar/nav-items.ts'
 
-interface NavbarProps {
-  isStaff?: boolean
-}
-
-export default function Navbar({ isStaff = false }: NavbarProps) {
+export default function Navbar() {
   const { fixed, sentinelRef, scrollThreshold } = useNavbar()
-  const items = isStaff ? [...NAV_ITEMS, QR_SCANNER_ITEM] : NAV_ITEMS
   return (
     <>
       <div
@@ -30,8 +25,8 @@ export default function Navbar({ isStaff = false }: NavbarProps) {
         )}
       >
         <Logo />
-        <DesktopNav items={items} />
-        <MobileNav items={items} />
+        <DesktopNav items={NAV_ITEMS} />
+        <MobileNav items={NAV_ITEMS} />
       </header>
     </>
   )
