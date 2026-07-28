@@ -23,6 +23,6 @@ def _upcoming_shows() -> list[Show]:
 
 
 @api_view(["GET"])
-def homepage_api(request: Request) -> Response:
+def homepage(request: Request) -> Response:
     shows = _upcoming_shows()[:6]
     return Response({"upcoming_shows": ShowCardSerializer(shows, many=True).data})
