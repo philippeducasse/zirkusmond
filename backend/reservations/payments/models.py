@@ -88,10 +88,14 @@ class ReservationPayment(BasePayment):
 
     @admin.display
     def ticket_count(self) -> int:
+        if self.reservation is None:
+            return 0
         return self.reservation.ticket_count()
 
     @admin.display
     def event(self) -> str:
+        if self.reservation is None:
+            return "—"
         return f"{self.reservation.event}"
 
 
@@ -157,3 +161,19 @@ class Payment(models.Model):
     def get_success_url(self) -> str:
         protocol = "https" if settings.PAYMENT_USES_SSL else "http"
         return f"{protocol}://{settings.PAYMENT_HOST}/payments/{self.pk}/success"
+
+    @admin.display
+    def ticket_count(self) -> int:
+        if self.reservation is None:
+            return 0
+        return self.reservation.ticket_count()
+
+    @admin.display
+    def event(self) -> str:
+        if self.reservation is None:
+            return "—"
+        return f"{self.reservation.event}"
+
+    @property
+    def ticket_price(self) -> Decimal:
+        return Decimal(self.custom_ticket_price)

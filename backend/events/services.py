@@ -66,7 +66,7 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list[tuple[str, BytesI
         canvas.drawCentredString(
             center_x,
             qr_y - 54,
-            f"Einlass {reservation.event.admission_time()}  ·  Beginn {reservation.event.begin_time()}",
+            f"Einlass {reservation.event.admission_time()}  ·  Beginn {reservation.event.show_time()}",
         )
         canvas.drawCentredString(
             center_x,
@@ -135,7 +135,7 @@ Reservierungs-ID: {reservation.id}
 Tickets: {reservation.ticket_count()}{guests_de}{payment_de}
 Im Anhang findest du das PDF mit deinen Tickets – für jede Person gibt es einen eigenen QR-Code. Falls ihr nicht gemeinsam ankommt, leite bitte den jeweiligen QR-Code an deine Gäste weiter.
 
-Wir öffnen unsere Tore um {reservation.event.admission_time()}, die Show beginnt um {reservation.event.begin_time()}.
+Wir öffnen unsere Tore um {reservation.event.admission_time()}, die Show beginnt um {reservation.event.show_time()}.
 
 Falls du noch nie in unserem Zelt warst, empfehlen wir dir, dir den Weg über OpenStreetMap zeigen zu lassen:
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
@@ -154,7 +154,7 @@ Reservation ID: {reservation.id}
 Tickets: {reservation.ticket_count()}{guests_en}{payment_en}
 The attached PDF contains a individual QR code for each person in your booking. If you're not arriving together, please forward the relevant QR code to your guests.
 
-We open our gates at {reservation.event.admission_time()}, the Show will start at {reservation.event.begin_time()}.
+We open our gates at {reservation.event.admission_time()}, the Show will start at {reservation.event.show_time()}.
 
 If you have not been to our tent yet, you should ask OpenStreetMap for directions.
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
