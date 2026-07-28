@@ -10,9 +10,3 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
-
-export const QR_SCANNER_ITEM: NavItem = {
-  label: 'QR Scanner',
-  href: '/qr-scanner/',
-  external: true,
-}
