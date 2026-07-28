@@ -20,6 +20,7 @@ dependencies = [
     "django-anymail==15.0",
     "django-unfold>=0.97.0",
     "djangorestframework>=3.17.1",
+    "django-cors-headers>=4.9.0",
 ]
 
 [tool.pytest.ini_options]
