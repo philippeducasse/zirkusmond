@@ -1,21 +1,19 @@
 import json as _json
-import uuid
 from datetime import timedelta
 from decimal import Decimal
 from io import BytesIO
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from payments import PaymentStatus
 from PIL import Image
+from rest_framework.test import APIClient
 
-from events import services
 from events.models import Event
-from reservations.models import Guest, Reservation, ReservationPayment
+from reservations.models import Guest, Reservation
 from reservations.payments.models import Payment
 from shows.models import Show
 
@@ -67,109 +65,6 @@ def make_reservation(event: Event, **kwargs: Any) -> Reservation:
     defaults = dict(first_name="Test", last_name="User", email="test@example.com")
     defaults.update(kwargs)
     return Reservation.objects.create(event=event, **defaults)
-
-
-# ---------------------------------------------------------------------------
-# ReservationPayment model
-# ---------------------------------------------------------------------------
-
-
-class ReservationPaymentModelTest(TestCase):
-    def setUp(self) -> None:
-        self.show = make_show(
-            base_ticket_price=20,
-            min_ticket_price=10,
-            max_ticket_price=30,
-        )
-        self.event = make_event(self.show)
-        self.reservation = make_reservation(self.event)
-
-    def test_from_reservation_sets_fields(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.assertEqual(payment.reservation, self.reservation)
-        self.assertEqual(payment.billing_email, "test@example.com")
-        self.assertEqual(payment.currency, "EUR")
-
-    def test_ticket_price_uses_custom_when_set(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 25
-        self.assertEqual(payment.ticket_price, 25)
-
-    def test_ticket_price_is_decimal_when_custom_set(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 25
-        self.assertIsInstance(payment.ticket_price, Decimal)
-
-    def test_ticket_price_uses_show_price(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.assertEqual(payment.ticket_price, 20)
-
-    def test_ticket_price_defaults_to_15_when_no_show_price(self) -> None:
-        self.show.base_ticket_price = None
-        self.show.save()
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.assertEqual(payment.ticket_price, Decimal("15.0"))
-
-    def test_ticket_price_uses_reservation_price_fallback(self) -> None:
-        self.show.base_ticket_price = None
-        self.show.reservation_price = 8
-        self.show.save()
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.assertEqual(payment.ticket_price, 8)
-
-    def test_validate_custom_price_within_range(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 15
-        self.assertTrue(payment.validate_custom_price(20))
-
-    def test_validate_custom_price_at_min(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 10
-        self.assertTrue(payment.validate_custom_price(20))
-
-    def test_validate_custom_price_at_max(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 30
-        self.assertTrue(payment.validate_custom_price(20))
-
-    def test_validate_custom_price_below_min_fails(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 5
-        self.assertFalse(payment.validate_custom_price(20))
-
-    def test_validate_custom_price_above_max_fails(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = 35
-        self.assertFalse(payment.validate_custom_price(20))
-
-    def test_validate_custom_price_none_passes(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.custom_ticket_price = None
-        self.assertTrue(payment.validate_custom_price(20))
-
-    def test_total_calculated_from_ticket_count(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.assertEqual(payment.total, 20)
-
-    def test_total_with_guests(self) -> None:
-        Guest.objects.create(reservation=self.reservation, first_name="G", last_name="H")
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.assertEqual(payment.total, 40)
-
-    def test_get_metadata_contains_reservation_id(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        metadata = payment.get_metadata()
-        self.assertIn("reservation_id", metadata)
-
-    def test_event_display(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.save()
-        self.assertIn(str(self.event), payment.event())
-
-    def test_ticket_count_display(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.save()
-        self.assertEqual(payment.ticket_count(), 1)
 
 
 # ---------------------------------------------------------------------------
@@ -248,224 +143,11 @@ class PaymentCreateForReservationTest(TestCase):
         self.assertEqual(payment.payment_method, "paypal")
         self.assertEqual(payment.custom_ticket_price, 20)
 
+    def test_payment_method_card_value(self) -> None:
+        self.assertEqual(Payment.PaymentMethod.CARD, "card")
 
-# ---------------------------------------------------------------------------
-# Send confirmation mail
-# ---------------------------------------------------------------------------
-
-
-@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
-class SendConfirmationMailTest(TestCase):
-    def setUp(self) -> None:
-        from django.core import mail
-
-        self.outbox = mail.outbox
-
-        show = make_show()
-        event = make_event(show)
-        self.reservation = make_reservation(
-            event, first_name="Anna", last_name="Doe", email="anna@example.com"
-        )
-
-    def test_email_sent_to_reservant(self) -> None:
-        services.send_confirmation_mail(self.reservation)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("anna@example.com", self.outbox[0].to)
-
-    def test_email_has_pdf_attachment(self) -> None:
-        services.send_confirmation_mail(self.reservation)
-        email = self.outbox[0]
-        self.assertEqual(len(email.attachments), 1)
-        filename, content, mimetype = email.attachments[0]
-        self.assertEqual(mimetype, "application/pdf")
-        self.assertTrue(content[:4] == b"%PDF")
-
-    def test_pdf_filename_contains_reservation_id(self) -> None:
-        services.send_confirmation_mail(self.reservation)
-        filename, _, _ = self.outbox[0].attachments[0]
-        self.assertIn(str(self.reservation.id), filename)
-
-    def test_pdf_one_page_for_solo_reservation(self) -> None:
-        services.send_confirmation_mail(self.reservation)
-        _, content, _ = self.outbox[0].attachments[0]
-        self.assertEqual(content.count(b"/Type /Page\n"), 1)
-
-    def test_pdf_multi_page_with_guests(self) -> None:
-        Guest.objects.create(reservation=self.reservation, first_name="B", last_name="C")
-        Guest.objects.create(reservation=self.reservation, first_name="D", last_name="E")
-        services.send_confirmation_mail(self.reservation)
-        _, content, _ = self.outbox[0].attachments[0]
-        self.assertEqual(content.count(b"/Type /Page\n"), 3)
-
-    def test_guest_with_null_ticket_id_excluded_from_pdf(self) -> None:
-        guest = Guest.objects.create(
-            reservation=self.reservation, first_name="Old", last_name="Guest"
-        )
-        guest.ticket_id = None
-        guest.save()
-        services.send_confirmation_mail(self.reservation)
-        _, content, _ = self.outbox[0].attachments[0]
-        self.assertEqual(content.count(b"/Type /Page\n"), 1)
-
-    def test_email_body_contains_first_name(self) -> None:
-        services.send_confirmation_mail(self.reservation)
-        self.assertIn("Anna", self.outbox[0].body)
-
-    def test_email_body_contains_reservation_id(self) -> None:
-        services.send_confirmation_mail(self.reservation)
-        self.assertIn(str(self.reservation.id), self.outbox[0].body)
-
-    def test_email_includes_payment_info_when_present(self) -> None:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.save()
-        services.send_confirmation_mail(self.reservation)
-        self.assertIn("EUR", self.outbox[0].body)
-
-
-# ---------------------------------------------------------------------------
-# Purge services
-# ---------------------------------------------------------------------------
-
-
-class PurgeOldPaymentsTest(TestCase):
-    def setUp(self) -> None:
-        show = make_show()
-        event = make_event(show)
-        self.reservation = make_reservation(event)
-        self.payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.payment.save()
-
-    def _age_payment(self, days: int = 230) -> None:
-        ReservationPayment.objects.filter(pk=self.payment.pk).update(
-            created=timezone.now() - timedelta(days=days)
-        )
-
-    def test_dry_run_returns_counts_without_deleting(self) -> None:
-        self._age_payment()
-        result = services.purge_old_payments(dry_run=True)
-        self.assertTrue(result["dry_run"])
-        self.assertEqual(result["payments_found"], 1)
-        self.assertEqual(result["deleted_count"], 0)
-        self.assertTrue(ReservationPayment.objects.filter(pk=self.payment.pk).exists())
-
-    def test_deletes_old_payments(self) -> None:
-        self._age_payment()
-        result = services.purge_old_payments(dry_run=False)
-        self.assertEqual(result["deleted_count"], 1)
-        self.assertFalse(ReservationPayment.objects.filter(pk=self.payment.pk).exists())
-
-    def test_recent_payment_not_deleted(self) -> None:
-        result = services.purge_old_payments(dry_run=False)
-        self.assertEqual(result["deleted_count"], 0)
-        self.assertTrue(ReservationPayment.objects.filter(pk=self.payment.pk).exists())
-
-
-class PurgeOrphanReservationsTest(TestCase):
-    def setUp(self) -> None:
-        show = make_show()
-        event = make_event(show)
-        self.reservation_with_payment = make_reservation(event)
-        payment = ReservationPayment.from_reservation(
-            self.reservation_with_payment, variant="paypal"
-        )
-        payment.save()
-        self.orphan = make_reservation(event, email="orphan@example.com")
-
-    def test_dry_run_counts_orphans(self) -> None:
-        result = services.purge_orphan_reservations(dry_run=True)
-        self.assertTrue(result["dry_run"])
-        self.assertEqual(result["reservations_to_delete"], 1)
-        self.assertEqual(result["deleted_reservations"], 0)
-
-    def test_deletes_orphan_reservations(self) -> None:
-        result = services.purge_orphan_reservations(dry_run=False)
-        self.assertEqual(result["deleted_reservations"], 1)
-        self.assertFalse(Reservation.objects.filter(pk=self.orphan.pk).exists())
-        self.assertTrue(Reservation.objects.filter(pk=self.reservation_with_payment.pk).exists())
-
-
-# ---------------------------------------------------------------------------
-# parse_custom_price service
-# ---------------------------------------------------------------------------
-
-
-class ParseCustomPriceTest(TestCase):
-    def setUp(self) -> None:
-        from reservations.payments.services import parse_custom_price
-
-        self.parse = parse_custom_price
-        self.show = make_show(base_ticket_price=20, min_ticket_price=10, max_ticket_price=30)
-
-    def test_none_returns_none(self) -> None:
-        self.assertIsNone(self.parse(self.show, None))
-
-    def test_empty_string_returns_none(self) -> None:
-        self.assertIsNone(self.parse(self.show, ""))
-
-    def test_unparseable_string_returns_none(self) -> None:
-        self.assertIsNone(self.parse(self.show, "abc"))
-
-    def test_valid_price_returns_decimal(self) -> None:
-        self.assertEqual(self.parse(self.show, "20"), Decimal("20"))
-
-    def test_price_at_minimum_is_valid(self) -> None:
-        self.assertEqual(self.parse(self.show, "10"), Decimal("10"))
-
-    def test_price_at_maximum_is_valid(self) -> None:
-        self.assertEqual(self.parse(self.show, "30"), Decimal("30"))
-
-    def test_price_below_minimum_raises(self) -> None:
-        with self.assertRaises(ValueError):
-            self.parse(self.show, "1")
-
-    def test_price_above_maximum_raises(self) -> None:
-        with self.assertRaises(ValueError):
-            self.parse(self.show, "99")
-
-
-# ---------------------------------------------------------------------------
-# Payment confirmed signal
-# ---------------------------------------------------------------------------
-
-
-@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
-class PaymentConfirmedSignalTest(TestCase):
-    def setUp(self) -> None:
-        from django.core import mail
-
-        self.outbox = mail.outbox
-        show = make_show()
-        event = make_event(show)
-        self.reservation = make_reservation(event, email="test@example.com")
-        self.payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        self.payment.save()
-
-    def test_email_sent_on_confirmed(self) -> None:
-        self.payment.change_status(PaymentStatus.CONFIRMED)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("test@example.com", self.outbox[0].to)
-
-    def test_email_not_sent_on_waiting(self) -> None:
-        self.payment.change_status(PaymentStatus.WAITING)
-        self.assertEqual(len(self.outbox), 0)
-
-    def test_rejection_email_sent_on_rejected(self) -> None:
-        self.payment.change_status(PaymentStatus.REJECTED)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("test@example.com", self.outbox[0].to)
-
-    def test_send_failure_does_not_raise(self) -> None:
-        with patch("events.services.send_confirmation_mail", side_effect=Exception("smtp error")):
-            self.payment.change_status(PaymentStatus.CONFIRMED)
-        self.payment.refresh_from_db()
-        self.assertEqual(self.payment.status, PaymentStatus.CONFIRMED)
-
-    def test_payment_without_reservation_does_not_raise(self) -> None:
-        from reservations.payments.signals import on_payment_status_changed
-
-        self.payment.reservation = None
-        on_payment_status_changed(sender=ReservationPayment, instance=self.payment)
-        self.assertEqual(len(self.outbox), 0)
+    def test_payment_method_paypal_value(self) -> None:
+        self.assertEqual(Payment.PaymentMethod.PAYPAL, "paypal")
 
 
 # ---------------------------------------------------------------------------
@@ -509,288 +191,388 @@ class PaymentURLTest(TestCase):
         url = self.payment.get_success_url()
         self.assertTrue(url.startswith("http://"))
 
-    def test_payment_method_card_value(self) -> None:
-        self.assertEqual(Payment.PaymentMethod.CARD, "card")
 
-    def test_payment_method_paypal_value(self) -> None:
-        self.assertEqual(Payment.PaymentMethod.PAYPAL, "paypal")
+# ---------------------------------------------------------------------------
+# CreatePaymentIntentView
+# ---------------------------------------------------------------------------
+
+
+class CreatePaymentIntentViewTest(TestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.show = make_show(base_ticket_price=20, min_ticket_price=10, max_ticket_price=30)
+        self.event = make_event(self.show)
+        self.reservation = make_reservation(self.event)
+
+    def _url(self, reservation_id=None) -> str:
+        res_id = reservation_id or self.reservation.id
+        return f"/payments/{res_id}/intent"
+
+    @patch("stripe.PaymentIntent.create")
+    def test_creates_payment_intent(self, mock_create: MagicMock) -> None:
+        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
+
+        response = self.client.post(
+            self._url(), {"custom_ticket_price": 20}, format="json"
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("id", response.data)
+        self.assertIn("client_secret", response.data)
+
+    @patch("stripe.PaymentIntent.create")
+    def test_creates_payment_record(self, mock_create: MagicMock) -> None:
+        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
+
+        self.client.post(
+            self._url(), {"custom_ticket_price": 20}, format="json"
+        )
+
+        self.assertEqual(Payment.objects.count(), 1)
+        payment = Payment.objects.first()
+        self.assertEqual(payment.custom_ticket_price, 20)
+        self.assertEqual(payment.stripe_payment_intent_id, "pi_test_123")
+
+    @patch("stripe.PaymentIntent.create")
+    def test_payment_intent_amount_is_total_in_cents(self, mock_create: MagicMock) -> None:
+        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
+
+        self.client.post(
+            self._url(), {"custom_ticket_price": 20}, format="json"
+        )
+
+        # Should be called with amount in cents (20 EUR = 2000 cents)
+        mock_create.assert_called_once()
+        call_kwargs = mock_create.call_args[1]
+        self.assertEqual(call_kwargs["amount"], 2000)
+        self.assertEqual(call_kwargs["currency"], "eur")
+
+    @patch("stripe.PaymentIntent.create")
+    def test_invalid_price_returns_400(self, mock_create: MagicMock) -> None:
+        response = self.client.post(
+            self._url(), {"custom_ticket_price": 5}, format="json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("error", response.data)
+        mock_create.assert_not_called()
+
+    @patch("stripe.PaymentIntent.create")
+    def test_missing_price_returns_400(self, mock_create: MagicMock) -> None:
+        response = self.client.post(self._url(), {}, format="json")
+
+        self.assertEqual(response.status_code, 400)
+        mock_create.assert_not_called()
+
+    def test_nonexistent_reservation_returns_404(self) -> None:
+        import uuid
+        response = self.client.post(
+            f"/payments/{uuid.uuid4()}/intent",
+            {"custom_ticket_price": 20},
+            format="json"
+        )
+        self.assertEqual(response.status_code, 404)
 
 
 # ---------------------------------------------------------------------------
 # Stripe webhook view
 # ---------------------------------------------------------------------------
 
-STRIPE_TEST_SETTINGS = {
-    "stripe": (
-        "reservations.payments.stripe_provider.StripeProviderV3",
-        {
-            "api_key": "test",
-            "endpoint_secret": "",
-            "secure_endpoint": False,
-        },
-    ),
-}
 
-
-@override_settings(PAYMENT_VARIANTS=STRIPE_TEST_SETTINGS)
 class StripeWebhookViewTest(TestCase):
-    URL = "/payments/process/stripe/"
-
-    def _make_payment(self) -> ReservationPayment:
-        show = make_show()
-        event = make_event(show)
-        reservation = make_reservation(event)
-        payment = ReservationPayment.from_reservation(reservation, variant="stripe")
-        payment.save()
-        return payment
-
-    def _post_event(
-        self,
-        token: str | uuid.UUID,
-        event_type: str,
-        status: str = "complete",
-        payment_status: str = "paid",
-    ) -> HttpResponse:
-        body = {
-            "type": event_type,
-            "data": {
-                "object": {
-                    "client_reference_id": str(token),
-                    "status": status,
-                    "payment_status": payment_status,
-                }
-            },
-        }
-        return self.client.post(self.URL, data=_json.dumps(body), content_type="application/json")
-
-    def test_completed_paid_session_confirms_payment(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(payment.token, "checkout.session.completed")
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
-
-    def test_expired_session_sets_error_status(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(payment.token, "checkout.session.expired", status="expired")
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.ERROR)
-
-    def test_unknown_event_type_does_not_change_status(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(payment.token, "payment_intent.created")
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.WAITING)
-
-    def test_unknown_token_returns_404(self) -> None:
-        response = self._post_event(uuid.uuid4(), "checkout.session.completed")
-        self.assertEqual(response.status_code, 404)
-
-    def test_async_payment_succeeded_confirms_payment(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(
-            payment.token, "checkout.session.async_payment_succeeded", payment_status="paid"
-        )
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
-
-    def test_async_payment_failed_rejects_payment(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(
-            payment.token, "checkout.session.async_payment_failed", payment_status="unpaid"
-        )
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.REJECTED)
-
-    def test_completed_with_unpaid_status_does_not_confirm(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(
-            payment.token, "checkout.session.completed", payment_status="unpaid"
-        )
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.WAITING)
-
-    def test_already_confirmed_payment_stays_confirmed(self) -> None:
-        payment = self._make_payment()
-        payment.change_status(PaymentStatus.CONFIRMED)
-        response = self._post_event(payment.token, "checkout.session.completed")
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
-
-    def test_rejected_payment_updated_to_confirmed_by_completed_webhook(self) -> None:
-        """Webhook updates payment status, so rejected can become confirmed if webhook says so"""
-        payment = self._make_payment()
-        payment.change_status(PaymentStatus.REJECTED)
-        response = self._post_event(payment.token, "checkout.session.completed")
-        self.assertEqual(response.status_code, 200)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
-
-    def test_missing_client_reference_id_raises_error(self) -> None:
-        from payments import PaymentError
-
-        body = {
-            "type": "checkout.session.completed",
-            "data": {
-                "object": {
-                    "status": "complete",
-                    "payment_status": "paid",
-                }
-            },
-        }
-        with self.assertRaises(PaymentError):
-            self.client.post(self.URL, data=_json.dumps(body), content_type="application/json")
-
-    def test_missing_object_raises_error(self) -> None:
-        from payments import PaymentError
-
-        body = {"type": "checkout.session.completed", "data": {}}
-        with self.assertRaises(PaymentError):
-            self.client.post(self.URL, data=_json.dumps(body), content_type="application/json")
-
-    def test_invalid_json_raises_error(self) -> None:
-        import json
-
-        with self.assertRaises(json.JSONDecodeError):
-            self.client.post(self.URL, data="invalid json", content_type="application/json")
-
-
-# ---------------------------------------------------------------------------
-# Stripe payment rejection/failure emails
-# ---------------------------------------------------------------------------
-
-
-@override_settings(PAYMENT_VARIANTS=STRIPE_TEST_SETTINGS)
-@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
-class StripePaymentRejectionEmailTest(TestCase):
-    URL = "/payments/process/stripe/"
+    URL = "/payments/webhook/stripe"
 
     def setUp(self) -> None:
-        from django.core import mail
-
-        self.outbox = mail.outbox
-
-    def _make_payment(self) -> ReservationPayment:
         show = make_show()
         event = make_event(show)
         reservation = make_reservation(event)
-        payment = ReservationPayment.from_reservation(reservation, variant="stripe")
-        payment.save()
-        return payment
+        self.payment = Payment.objects.create(
+            payment_method=Payment.PaymentMethod.CARD,
+            reservation=reservation,
+            custom_ticket_price=20,
+            total=Decimal("20"),
+            stripe_payment_intent_id="pi_test_123",
+        )
 
-    def _post_event(
-        self,
-        token: str | uuid.UUID,
-        event_type: str,
-        status: str = "complete",
-        payment_status: str = "paid",
-    ) -> HttpResponse:
-        body = {
+    def _construct_event(self, event_type: str, payment_intent_id: str, **kwargs: Any) -> dict:
+        return {
             "type": event_type,
             "data": {
                 "object": {
-                    "client_reference_id": str(token),
-                    "status": status,
-                    "payment_status": payment_status,
+                    "id": payment_intent_id,
+                    **kwargs
                 }
             },
         }
-        return self.client.post(self.URL, data=_json.dumps(body), content_type="application/json")
 
-    def test_rejected_payment_sends_failure_email(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(
-            payment.token,
-            "checkout.session.async_payment_failed",
-            status="requires_payment_method",
-            payment_status="unpaid",
+    @patch("stripe.Webhook.construct_event")
+    def test_payment_intent_succeeded_marks_completed(self, mock_construct: MagicMock) -> None:
+        mock_construct.return_value = self._construct_event(
+            "payment_intent.succeeded", "pi_test_123"
         )
+
+        response = self.client.post(
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig"
+        )
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("Failed", self.outbox[0].subject)
-        self.assertIn(payment.reservation.email, self.outbox[0].to)
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.status, Payment.Status.COMPLETED)
 
-    def test_confirmed_payment_sends_confirmation_email(self) -> None:
-        payment = self._make_payment()
-        response = self._post_event(payment.token, "checkout.session.completed")
+    @patch("stripe.Webhook.construct_event")
+    def test_payment_intent_payment_failed_marks_failed(self, mock_construct: MagicMock) -> None:
+        mock_construct.return_value = self._construct_event(
+            "payment_intent.payment_failed", "pi_test_123"
+        )
+
+        response = self.client.post(
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig"
+        )
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("thank you", self.outbox[0].subject.lower())
-        self.assertIn(payment.reservation.email, self.outbox[0].to)
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.status, Payment.Status.FAILED)
 
-    def test_rejection_email_includes_order_id(self) -> None:
-        payment = self._make_payment()
-        self._post_event(
-            payment.token,
-            "checkout.session.async_payment_failed",
-            status="requires_payment_method",
-            payment_status="unpaid",
+    @patch("stripe.Webhook.construct_event")
+    def test_payment_intent_canceled_marks_failed(self, mock_construct: MagicMock) -> None:
+        mock_construct.return_value = self._construct_event(
+            "payment_intent.canceled", "pi_test_123"
         )
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn(str(payment.pk), self.outbox[0].body)
 
-    def test_rejection_email_includes_event_info(self) -> None:
-        payment = self._make_payment()
-        self._post_event(
-            payment.token,
-            "checkout.session.async_payment_failed",
-            status="requires_payment_method",
-            payment_status="unpaid",
+        response = self.client.post(
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig"
         )
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn(payment.reservation.event.show.title, self.outbox[0].body)
 
-    def test_expired_session_does_not_send_email(self) -> None:
-        payment = self._make_payment()
-        self._post_event(payment.token, "checkout.session.expired", status="expired")
-        self.assertEqual(len(self.outbox), 0)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.ERROR)
+        self.assertEqual(response.status_code, 200)
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.status, Payment.Status.FAILED)
 
-    def test_charge_failed_sends_rejection_email(self) -> None:
-        payment = self._make_payment()
-        payment.attrs.session = {"payment_intent": "pi_test_charge_abc123"}
-        payment.save()
-        body = {
-            "type": "charge.failed",
+    @patch("stripe.Webhook.construct_event")
+    def test_charge_refunded_marks_refunded(self, mock_construct: MagicMock) -> None:
+        mock_construct.return_value = {
+            "type": "charge.refunded",
             "data": {
                 "object": {
-                    "id": "ch_test_abc123",
-                    "payment_intent": "pi_test_charge_abc123",
-                    "status": "failed",
+                    "payment_intent": "pi_test_123"
                 }
             },
         }
-        response = self.client.post(
-            self.URL, data=_json.dumps(body), content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("Failed", self.outbox[0].subject)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.REJECTED)
 
-    def test_payment_intent_payment_failed_sends_rejection_email(self) -> None:
-        payment = self._make_payment()
-        payment.attrs.session = {"payment_intent": "pi_test_pi_failed_xyz789"}
-        payment.save()
-        body = {
-            "type": "payment_intent.payment_failed",
-            "data": {
-                "object": {"id": "pi_test_pi_failed_xyz789", "status": "requires_payment_method"}
-            },
-        }
         response = self.client.post(
-            self.URL, data=_json.dumps(body), content_type="application/json"
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig"
         )
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(self.outbox), 1)
-        self.assertIn("Failed", self.outbox[0].subject)
-        payment.refresh_from_db()
-        self.assertEqual(payment.status, PaymentStatus.REJECTED)
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.status, Payment.Status.REFUNDED)
+
+    @patch("stripe.Webhook.construct_event")
+    def test_unknown_payment_intent_returns_404(self, mock_construct: MagicMock) -> None:
+        mock_construct.return_value = self._construct_event(
+            "payment_intent.succeeded", "pi_unknown"
+        )
+
+        response = self.client.post(
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig"
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch("stripe.Webhook.construct_event")
+    def test_invalid_signature_returns_401(self, mock_construct: MagicMock) -> None:
+        import stripe
+        mock_construct.side_effect = stripe.error.SignatureVerificationError(
+            "Invalid signature", "sig"
+        )
+
+        response = self.client.post(
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="bad_sig"
+        )
+
+        self.assertEqual(response.status_code, 401)
+
+    @patch("stripe.Webhook.construct_event")
+    def test_invalid_payload_returns_400(self, mock_construct: MagicMock) -> None:
+        mock_construct.side_effect = ValueError("Invalid payload")
+
+        response = self.client.post(
+            self.URL,
+            data=_json.dumps({}),
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="test_sig"
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+
+# ---------------------------------------------------------------------------
+# Stripe return view
+# ---------------------------------------------------------------------------
+
+
+@override_settings(FRONTEND_URL="http://testfrontend.com")
+class StripeReturnViewTest(TestCase):
+    URL = "/payments/return/stripe"
+
+    def setUp(self) -> None:
+        self.show = make_show()
+        self.event = make_event(self.show)
+        self.reservation = make_reservation(self.event)
+        self.payment = Payment.objects.create(
+            payment_method=Payment.PaymentMethod.CARD,
+            reservation=self.reservation,
+            custom_ticket_price=20,
+            total=Decimal("20"),
+            stripe_payment_intent_id="pi_test_123",
+        )
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_successful_payment_redirects_to_success(self, mock_retrieve: MagicMock) -> None:
+        mock_retrieve.return_value = MagicMock(status="succeeded")
+
+        response = self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("payment/success", response.url)
+        self.assertIn(str(self.reservation.id), response.url)
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_failed_payment_redirects_to_failure(self, mock_retrieve: MagicMock) -> None:
+        mock_retrieve.return_value = MagicMock(status="failed")
+
+        response = self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("payment/failure", response.url)
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_updates_payment_method_card(self, mock_retrieve: MagicMock) -> None:
+        mock_charge = MagicMock()
+        mock_charge.payment_method_details = MagicMock(
+            type="card",
+            card=MagicMock(wallet=None)
+        )
+        mock_retrieve.return_value = MagicMock(
+            status="succeeded",
+            get=lambda key: mock_charge if key == "latest_charge" else None
+        )
+
+        self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.payment_method, Payment.PaymentMethod.CARD)
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_updates_payment_method_apple_pay(self, mock_retrieve: MagicMock) -> None:
+        mock_charge = MagicMock()
+        mock_charge.payment_method_details = MagicMock(
+            type="card",
+            card=MagicMock(wallet=MagicMock(type="apple_pay"))
+        )
+        mock_retrieve.return_value = MagicMock(
+            status="succeeded",
+            get=lambda key: mock_charge if key == "latest_charge" else None
+        )
+
+        self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.payment_method, Payment.PaymentMethod.APPLE)
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_updates_payment_method_google_pay(self, mock_retrieve: MagicMock) -> None:
+        mock_charge = MagicMock()
+        mock_charge.payment_method_details = MagicMock(
+            type="card",
+            card=MagicMock(wallet=MagicMock(type="google_pay"))
+        )
+        mock_retrieve.return_value = MagicMock(
+            status="succeeded",
+            get=lambda key: mock_charge if key == "latest_charge" else None
+        )
+
+        self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.payment_method, Payment.PaymentMethod.GOOGLE)
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_updates_payment_method_paypal(self, mock_retrieve: MagicMock) -> None:
+        mock_charge = MagicMock()
+        mock_charge.payment_method_details = MagicMock(type="paypal")
+        mock_retrieve.return_value = MagicMock(
+            status="succeeded",
+            get=lambda key: mock_charge if key == "latest_charge" else None
+        )
+
+        self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.payment.refresh_from_db()
+        self.assertEqual(self.payment.payment_method, Payment.PaymentMethod.PAYPAL)
+
+    def test_missing_payment_intent_redirects_to_failure(self) -> None:
+        response = self.client.get(
+            self.URL,
+            {"reservationId": str(self.reservation.id)}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("payment/failure", response.url)
+
+    def test_missing_reservation_id_redirects_to_failure(self) -> None:
+        response = self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("payment/failure", response.url)
+
+    @patch("stripe.PaymentIntent.retrieve")
+    def test_stripe_error_redirects_to_failure(self, mock_retrieve: MagicMock) -> None:
+        import stripe
+        mock_retrieve.side_effect = stripe.error.StripeError("Error")
+
+        response = self.client.get(
+            self.URL,
+            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("payment/failure", response.url)
