@@ -11,7 +11,7 @@ import { keysToCamelCase, keysToSnakeCase } from '#/lib/utils.ts'
  */
 const SERVER_API_URL = process.env.API_URL ?? 'http://localhost:8000'
 
-function apiUrl(path: string) {
+export function apiUrl(path: string) {
   return typeof window === 'undefined'
     ? `${SERVER_API_URL}${path}`
     : `/api${path}`
@@ -26,7 +26,7 @@ export class ApiError extends Error {
   }
 }
 
-async function fetchJson<T>(path: string): Promise<T> {
+export async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(apiUrl(path))
   if (!res.ok) {
     throw new ApiError(res.status, path)
