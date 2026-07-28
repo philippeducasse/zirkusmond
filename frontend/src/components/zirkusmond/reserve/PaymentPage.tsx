@@ -5,6 +5,9 @@ import { reservationDetailQueryOptions } from '#/lib/api.ts'
 import PaymentSection from './components/PaymentSection.tsx'
 import ReservationSummary from './components/ReservationSummary.tsx'
 import SectionCard from '../general/SectionCard.tsx'
+import SectionCardSkeleton from '../general/SectionCardSkeleton.tsx'
+import ContentSection from '../general/ContentSection.tsx'
+import CrossFade from '../general/CrossFade.tsx'
 
 interface PaymentPageProps {
   showId: string
@@ -37,7 +40,7 @@ export default function PaymentPage({
     navigate({
       to: '/payment/failure',
       search: {
-        eventShowId: showId,
+        eventShowId: Number(showId),
       },
     })
   }
@@ -46,19 +49,26 @@ export default function PaymentPage({
     navigate({ to: '/reserve/$showId', params: { showId } })
   }
 
-  if (!reservationQuery.data) {
-    return null
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center gap-8 mx-auto text-white p-1 md:p-8">
+    <ContentSection className="flex flex-col items-center justify-center gap-8">
       <div className="max-w-xl">
-        <SectionCard className="p-12">
-          <ReservationSummary
-            reservation={reservationQuery.data}
-            customTicketPrice={customTicketPrice}
-          />
-        </SectionCard>
+        <CrossFade
+          isLoading={reservationQuery.isPending}
+          skeleton={<SectionCardSkeleton lines={6} className="p-12" />}
+        >
+          {reservationQuery.isError ? (
+            <SectionCard className="p-12">
+              <p>Error loading reservation details. Please try again.</p>
+            </SectionCard>
+          ) : reservationQuery.data ? (
+            <SectionCard className="p-12">
+              <ReservationSummary
+                reservation={reservationQuery.data}
+                customTicketPrice={customTicketPrice}
+              />
+            </SectionCard>
+          ) : null}
+        </CrossFade>
       </div>
       <div className="w-full">
         <SectionCard className="overflow-visible">
@@ -71,6 +81,6 @@ export default function PaymentPage({
           />
         </SectionCard>
       </div>
-    </div>
+    </ContentSection>
   )
 }
