@@ -3,14 +3,14 @@ from typing import Any
 
 from django.db.models import QuerySet
 from django.utils import timezone
-from payments import PaymentStatus
 
 from reservations.models import Guest, Reservation
+from reservations.payments.models import Payment
 
 
-def _payment_rejected(reservation: Reservation) -> bool:
-    payment = reservation.reservationpayment_set.order_by("-created").first()
-    return payment is not None and payment.status == PaymentStatus.REJECTED
+def _payment_failed(reservation: Reservation) -> bool:
+    payment = reservation.payment_set.order_by("-created_at").first()
+    return payment is not None and payment.status == Payment.Status.FAILED
 
 
 def _do_check_in(
@@ -20,9 +20,9 @@ def _do_check_in(
     names: list[str],
     **extra: Any,
 ) -> tuple[dict[str, Any], int]:
-    if _payment_rejected(reservation):
+    if _payment_failed(reservation):
         return {
-            "error": "Payment rejected",
+            "error": "Payment failed",
             "reservation_number": str(ticket_id),
             "guests": names,
         }, 402

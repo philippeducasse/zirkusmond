@@ -177,4 +177,7 @@ class SiteViewsTest(TestCase):
         make_event(show)
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(show, response.context["upcoming_shows"])
+        data = response.json()
+        self.assertIn("upcoming_shows", data)
+        self.assertEqual(len(data["upcoming_shows"]), 1)
+        self.assertEqual(data["upcoming_shows"][0]["title"], "Test Show")

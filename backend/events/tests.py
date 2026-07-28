@@ -96,12 +96,8 @@ class EventModelTest(TestCase):
     def test_admission_time(self) -> None:
         self.assertRegex(self.event.admission_time(), r"\d{2}:\d{2}")
 
-    def test_begin_time(self) -> None:
-        self.assertRegex(self.event.begin_time(), r"\d{2}:\d{2}")
-
-    def test_elaborate_date_str(self) -> None:
-        result = self.event.elaborate_date_str()
-        self.assertIn(".", result)
+    def test_show_time(self) -> None:
+        self.assertRegex(self.event.show_time(), r"\d{2}:\d{2}")
 
     def test_reservation_open_for_future_event(self) -> None:
         self.assertTrue(self.event.reservation_open())
