@@ -9,7 +9,12 @@ interface SectionCardProps {
 
 const SectionCard = ({ children, className }: SectionCardProps) => {
   return (
-    <Card className={cn('text-white bg-black/10 border-5 border-primary border-double p-2 md:p-8', className)}>
+    <Card
+      className={cn(
+        'text-white bg-black/10 border-5 border-primary border-double p-2 md:p-8',
+        className,
+      )}
+    >
       {children}
     </Card>
   )

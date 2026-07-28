@@ -38,7 +38,7 @@ function RouteComponent() {
       <img
         src={show.bannerImage}
         alt={`${show.title} Banner`}
-        className="mx-auto w-full object-cover rounded-xl"
+        className="mx-auto w-full object-cover"
       />
 
       <div className="flex flex-wrap justify-center gap-6 py-8">

@@ -39,20 +39,18 @@ function RouteComponent() {
     <PageContainer>
       <PageHeader>Thank you for your reservation</PageHeader>
 
-      {reservationQuery.isPending ? (
-        <ContentSection className="text-center text-white md:text-xl max-w-3xl mx-auto">
-          <SectionCardSkeleton lines={4} />
-        </ContentSection>
-      ) : reservationQuery.isError ? (
-        <ContentSection className="text-center text-white md:text-xl max-w-3xl mx-auto">
+      <ContentSection
+        className="text-center text-white md:text-xl max-w-3xl mx-auto"
+        isLoading={reservationQuery.isPending}
+        skeleton={<SectionCardSkeleton lines={4} />}
+      >
+        {reservationQuery.isError ? (
           <SectionCard>
             <p>Error loading reservation details. Please contact support.</p>
           </SectionCard>
-        </ContentSection>
-      ) : (
-        <ContentSection className="text-center text-white md:text-xl max-w-3xl mx-auto">
+        ) : reservationQuery.data ? (
           <SectionCard className="space-y-6">
-            <p className="text-pretty">
+            <p>
               A confirmation email has been sent to{' '}
               <span className="font-bold text-primary">
                 {reservationQuery.data.email}
@@ -63,7 +61,7 @@ function RouteComponent() {
 
             {(reservationQuery.data.showTime ||
               reservationQuery.data.admissionTime) && (
-              <p className="text-pretty">
+              <p>
                 We open our gates at{' '}
                 <span className="font-bold text-primary">
                   {reservationQuery.data.admissionTime}
@@ -75,7 +73,7 @@ function RouteComponent() {
               </p>
             )}
 
-            <p className="text-pretty">
+            <p>
               If you have not been to our tent yet, here are{' '}
               <a
                 href="https://www.openstreetmap.org/directions?from=&to=52.54226%2C13.43250"
@@ -87,16 +85,14 @@ function RouteComponent() {
               </a>
             </p>
 
-            <p className="text-2xl text-pretty">
-              See you at Zirkus Mond and have fun!
-            </p>
+            <p className="text-2xl">See you at Zirkus Mond and have fun!</p>
           </SectionCard>
-          <SectionDivider type="flower" />
-          <Button asChild>
-            <Link to="/">Back to Home</Link>
-          </Button>
-        </ContentSection>
-      )}
+        ) : null}
+        <SectionDivider type="flower" />
+        <Button asChild>
+          <Link to="/">Back to Home</Link>
+        </Button>
+      </ContentSection>
     </PageContainer>
   )
 }
