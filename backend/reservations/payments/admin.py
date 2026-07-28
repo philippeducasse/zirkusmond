@@ -17,6 +17,7 @@ from events import services
 from events.forms import EmailTextForm
 from events.services import purge_old_payments
 from reservations.models import Reservation, ReservationPayment
+from reservations.payments.models import Payment
 
 
 def reservation_to_dict(reservation: Reservation) -> dict[str, Any]:
@@ -220,3 +221,100 @@ class ReservationPaymentAdmin(ModelAdmin):
 
 
 admin.site.register(ReservationPayment, ReservationPaymentAdmin)
+
+
+class PaymentStatusFilter(admin.SimpleListFilter):
+    title = "Status"
+    parameter_name = "status"
+
+    def lookups(
+        self, request: HttpRequest, model_admin: admin.ModelAdmin
+    ) -> list[tuple[str, str]]:
+        return [
+            (Payment.Status.PENDING, "Pending"),
+            (Payment.Status.COMPLETED, "Completed"),
+            (Payment.Status.FAILED, "Failed"),
+            (Payment.Status.REFUNDED, "Refunded"),
+        ]
+
+    def queryset(
+        self, request: HttpRequest, queryset: QuerySet[Payment]
+    ) -> QuerySet[Payment]:
+        if self.value():
+            return queryset.filter(status=self.value())
+        return queryset
+
+
+class PaymentEventFilter(admin.SimpleListFilter):
+    title = "Event"
+    parameter_name = "event"
+
+    def lookups(
+        self, request: HttpRequest, model_admin: admin.ModelAdmin
+    ) -> list[tuple[str, str]]:
+        return [
+            ("upcoming", "Upcoming"),
+            ("past", "Past"),
+        ]
+
+    def queryset(
+        self, request: HttpRequest, queryset: QuerySet[Payment]
+    ) -> QuerySet[Payment]:
+        now = timezone.now()
+        if self.value() == "upcoming":
+            return queryset.filter(reservation__event__begin__gte=now)
+        elif self.value() == "past":
+            return queryset.filter(reservation__event__begin__lt=now)
+        return queryset
+
+
+class PaymentAdmin(ModelAdmin):
+    list_display = [
+        "reservation",
+        "status",
+        "payment_method",
+        "ticket_count",
+        "event",
+        "ticket_price",
+        "confirmed_total",
+        "created_at",
+    ]
+    ordering = ["-created_at"]
+    date_hierarchy = "created_at"
+    list_filter = (PaymentStatusFilter, "payment_method", PaymentEventFilter)
+    search_fields = [
+        "reservation__first_name",
+        "reservation__last_name",
+        "reservation__email",
+    ]
+    readonly_fields = ["reservation", "stripe_session_id", "stripe_payment_intent_id"]
+    list_select_related = True
+    actions = ["resend_confirmation_mail", "send_to_reservants"]
+
+    @admin.display(description="Total")
+    def confirmed_total(self, obj: Payment) -> str:
+        if obj.status != Payment.Status.COMPLETED:
+            return "€ 0.00"
+        return f"€ {obj.total:.2f}"
+
+    @admin.action(description="Resend confirmation E-Mail")
+    def resend_confirmation_mail(
+        self, request: HttpRequest, queryset: QuerySet[Payment]
+    ) -> None:
+        for payment in queryset:
+            if payment.reservation:
+                services.send_confirmation_mail(payment.reservation)
+
+    @admin.action(description="Send mail to Reservants")
+    def send_to_reservants(
+        self, request: HttpRequest, queryset: QuerySet[Payment]
+    ) -> HttpResponseRedirect | TemplateResponse:
+        dicts = [
+            reservation_to_dict(payment.reservation)
+            for payment in queryset
+            if payment.reservation
+        ]
+        return send_email_to_reservants(request, dicts, self)
+
+
+admin.site.register(Payment, PaymentAdmin)
