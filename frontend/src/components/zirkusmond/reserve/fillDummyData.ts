@@ -39,7 +39,7 @@ export function fillReservationFormWithDummyData({
 
   setValue('firstName', 'Max')
   setValue('lastName', 'Mustermann')
-  setValue('email', `test+${Date.now()}@example.com`)
+  setValue('email', `ducassephi@hotmail.fr`)
 
   const dummyGuestCount = Math.min(9, Math.max(0, dummyAttendeeCount - 1))
   for (let i = 0; i < dummyGuestCount; i++) {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '#/components/ui/button.tsx'
+import SectionCardSkeleton from '../../general/SectionCardSkeleton.tsx'
 
 interface StripePaymentFormProps {
   reservationId: string
@@ -20,12 +21,12 @@ export default function StripePaymentForm({
   const [isProcessing, setIsProcessing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  if (!stripe || !elements) {
+    return <SectionCardSkeleton lines={5} />
+  }
+
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
-
-    if (!stripe || !elements) {
-      return
-    }
 
     setIsProcessing(true)
     setErrorMessage(null)
