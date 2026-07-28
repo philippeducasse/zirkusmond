@@ -168,7 +168,6 @@ class ReserveAPIViewTest(TestCase):
             "last_name": "Doe",
             "email": "anna@example.com",
             "attendee_count": 1,
-            "payment_method": "paypal",
         }
         data.update(overrides)
         return data
@@ -181,7 +180,7 @@ class ReserveAPIViewTest(TestCase):
         response = self.client.post(self._url(), self._post_data(), format="json")
         self.assertEqual(response.status_code, 201)
 
-    def test_valid_post_creates_reservation_and_payment(self) -> None:
+    def test_valid_post_creates_reservation(self) -> None:
         self.client.post(self._url(), self._post_data(), format="json")
         self.assertEqual(Reservation.objects.count(), 1)
 
@@ -259,9 +258,9 @@ class ReserveAPIViewTest(TestCase):
         response = self.client.post(self._url(), data, format="json")
         self.assertEqual(response.status_code, 400)
 
-    def test_missing_payment_method_returns_400(self) -> None:
+    def test_missing_attendee_count_returns_400(self) -> None:
         data = self._post_data()
-        del data["payment_method"]
+        del data["attendee_count"]
         response = self.client.post(self._url(), data, format="json")
         self.assertEqual(response.status_code, 400)
 

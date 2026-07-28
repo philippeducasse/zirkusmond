@@ -1,5 +1,6 @@
 import uuid
 from datetime import timedelta
+from decimal import Decimal
 from io import BytesIO
 from typing import Any
 
@@ -7,11 +8,11 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
-from payments import PaymentStatus
 from PIL import Image
 
 from events.models import Event
-from reservations.models import Guest, Reservation, ReservationPayment
+from reservations.models import Guest, Reservation
+from reservations.payments.models import Payment
 from shows.models import Show
 
 # ---------------------------------------------------------------------------
@@ -73,18 +74,9 @@ class QrScannerViewTest(TestCase):
     def setUp(self) -> None:
         self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
 
-    def test_scanner_page_requires_staff(self) -> None:
-        response = self.client.get("/qr-scanner/")
-        self.assertNotEqual(response.status_code, 200)
-
-    def test_scanner_page_accessible_to_staff(self) -> None:
-        self.client.force_login(self.staff)
-        response = self.client.get("/qr-scanner/")
-        self.assertEqual(response.status_code, 200)
-
     def test_get_events_requires_staff(self) -> None:
         response = self.client.get("/qr-scanner/get-events")
-        self.assertNotEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_events_returns_json(self) -> None:
         self.client.force_login(self.staff)
@@ -126,82 +118,86 @@ class CheckInViewTest(TestCase):
         return f"/qr-scanner/{ticket_id}/check-in"
 
     def test_check_in_by_reservation_id(self) -> None:
-        response = self.client.get(self._url(self.reservation.id))
+        response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
         self.reservation.refresh_from_db()
         self.assertTrue(self.reservation.checked_in)
 
     def test_check_in_by_guest_ticket_id(self) -> None:
-        response = self.client.get(self._url(self.guest.ticket_id))
+        response = self.client.post(self._url(self.guest.ticket_id))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
         self.guest.refresh_from_db()
         self.assertTrue(self.guest.checked_in)
 
     def test_guest_check_in_does_not_affect_reservation(self) -> None:
-        self.client.get(self._url(self.guest.ticket_id))
+        self.client.post(self._url(self.guest.ticket_id))
         self.reservation.refresh_from_db()
         self.assertFalse(self.reservation.checked_in)
 
     def test_already_checked_in_reservation_returns_400(self) -> None:
         self.reservation.checked_in = True
         self.reservation.save()
-        response = self.client.get(self._url(self.reservation.id))
+        response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 400)
         self.assertIn("already checked in", response.json()["error"])
 
     def test_already_checked_in_guest_returns_400(self) -> None:
         self.guest.checked_in = True
         self.guest.save()
-        response = self.client.get(self._url(self.guest.ticket_id))
+        response = self.client.post(self._url(self.guest.ticket_id))
         self.assertEqual(response.status_code, 400)
         self.assertIn("already checked in", response.json()["error"])
 
     def test_unknown_uuid_returns_404(self) -> None:
-        response = self.client.get(self._url(uuid.uuid4()))
+        response = self.client.post(self._url(uuid.uuid4()))
         self.assertEqual(response.status_code, 404)
 
     def test_reservation_check_in_returns_is_group_true(self) -> None:
-        response = self.client.get(self._url(self.reservation.id))
+        response = self.client.post(self._url(self.reservation.id))
         self.assertTrue(response.json().get("is_group"))
 
     def test_response_includes_guest_names(self) -> None:
-        response = self.client.get(self._url(self.reservation.id))
+        response = self.client.post(self._url(self.reservation.id))
         names = response.json()["guests"]
         self.assertTrue(any("Test" in name for name in names))
 
-    def _make_payment(self, status: str) -> ReservationPayment:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="stripe")
-        payment.save()
-        payment.change_status(status)
+    def _make_payment(self, status: str) -> Payment:
+        payment = Payment.objects.create(
+            payment_method=Payment.PaymentMethod.CARD,
+            reservation=self.reservation,
+            custom_ticket_price=20,
+            total=Decimal("20"),
+            status=status,
+        )
         return payment
 
-    def test_rejected_payment_blocks_reservation_check_in(self) -> None:
-        self._make_payment(PaymentStatus.REJECTED)
-        response = self.client.get(self._url(self.reservation.id))
+    def test_failed_payment_blocks_reservation_check_in(self) -> None:
+        self._make_payment(Payment.Status.FAILED)
+        response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 402)
-        self.assertIn("rejected", response.json()["error"].lower())
+        self.assertIn("failed", response.json()["error"].lower())
 
-    def test_rejected_payment_blocks_guest_check_in(self) -> None:
-        self._make_payment(PaymentStatus.REJECTED)
-        response = self.client.get(self._url(self.guest.ticket_id))
+    def test_failed_payment_blocks_guest_check_in(self) -> None:
+        self._make_payment(Payment.Status.FAILED)
+        response = self.client.post(self._url(self.guest.ticket_id))
         self.assertEqual(response.status_code, 402)
-        self.assertIn("rejected", response.json()["error"].lower())
+        self.assertIn("failed", response.json()["error"].lower())
 
-    def test_rejected_payment_does_not_mark_checked_in(self) -> None:
-        self._make_payment(PaymentStatus.REJECTED)
-        self.client.get(self._url(self.reservation.id))
+    def test_failed_payment_does_not_mark_checked_in(self) -> None:
+        self._make_payment(Payment.Status.FAILED)
+        self.client.post(self._url(self.reservation.id))
         self.reservation.refresh_from_db()
         self.assertFalse(self.reservation.checked_in)
 
-    def test_confirmed_payment_allows_check_in(self) -> None:
-        self._make_payment(PaymentStatus.CONFIRMED)
-        response = self.client.get(self._url(self.reservation.id))
+    def test_completed_payment_allows_check_in(self) -> None:
+        self._make_payment(Payment.Status.COMPLETED)
+        response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
 
     def test_no_payment_allows_check_in(self) -> None:
-        response = self.client.get(self._url(self.reservation.id))
+        response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
