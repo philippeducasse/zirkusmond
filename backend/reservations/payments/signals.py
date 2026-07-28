@@ -3,29 +3,29 @@ from typing import Any
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from payments import PaymentStatus
-from payments.signals import status_changed
 
 from events import services
-from reservations.models import ReservationPayment
+from reservations.payments.models import Payment
 
 logger = logging.getLogger(__name__)
 
 
-@receiver(status_changed)
+@receiver(post_save, sender=Payment)
 def on_payment_status_changed(
-    sender: type[ReservationPayment], instance: ReservationPayment, **kwargs: Any
+    sender: type[Payment], instance: Payment, created: bool, **kwargs: Any
 ) -> None:
-    reservation = getattr(instance, "reservation", None)
-    if not reservation:
-        logger.error("failed to send retrieve reservation %s", instance)
-
+    # Only process if payment has a reservation
+    if not instance.reservation:
+        logger.error("Payment %s has no reservation", instance.pk)
         return
 
+    reservation = instance.reservation
     payment_id = instance.pk
 
-    if instance.status == PaymentStatus.CONFIRMED:
+    # Send confirmation email when payment is completed
+    if instance.status == Payment.Status.COMPLETED:
         try:
             services.send_confirmation_mail(reservation)
             logger.info(
@@ -34,7 +34,8 @@ def on_payment_status_changed(
         except Exception as error:
             logger.error("failed to send confirmation email for payment=%s: %s", payment_id, error)
 
-    elif instance.status == PaymentStatus.REJECTED:
+    # Send failure email when payment fails
+    elif instance.status == Payment.Status.FAILED:
         try:
             send_mail(
                 subject="Payment Failed - Please Try Again",
@@ -50,3 +51,4 @@ def on_payment_status_changed(
             logger.error(
                 "failed to send payment failure email for payment=%s: %s", payment_id, error
             )
+
