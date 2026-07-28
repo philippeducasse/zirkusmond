@@ -1,10 +1,13 @@
-import logging
 import logging.config
 import os
 from pathlib import Path
 
-from django.templatetags.static import static
 from easy_thumbnails.conf import Settings as ThumbnailSettings
+
+from config.settings.logging_config import LOGGING
+from config.settings.rest_framework_config import REST_FRAMEWORK  # noqa: F401
+from config.settings.tinymce_config import TINYMCE_DEFAULT_CONFIG  # noqa: F401
+from config.settings.unfold_config import UNFOLD  # noqa: F401
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # zirkusmond/backend
 
@@ -24,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # third party apps
+    "corsheaders",
     "payments",
     "anymail",
     "easy_thumbnails",
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -121,69 +126,4 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "media")
 
 LOGGING_CONFIG = None
-LOGLEVEL = os.getenv("DJANGO_LOGLEVEL", "debug").upper()
-
-logging.config.dictConfig(
-    {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "console": {
-                "format": "%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s",
-            },
-        },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "formatter": "console",
-            },
-        },
-        "loggers": {
-            "": {
-                "level": LOGLEVEL,
-                "handlers": ["console"],
-            },
-            "django.db.backends": {
-                "level": "WARNING",
-                "handlers": ["console"],
-                "propagate": False,
-            },
-            "django.utils.autoreload": {
-                "level": "WARNING",
-                "handlers": ["console"],
-                "propagate": False,
-            },
-        },
-    }
-)
-
-TINYMCE_DEFAULT_CONFIG = {
-    "height": "320px",
-    "width": "960px",
-    "menubar": "file edit view insert format tools table help",
-    "plugins": "advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code "
-    "fullscreen insertdatetime media table paste code help wordcount spellchecker",
-    "toolbar": "undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft "
-    "aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor "
-    "backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | "
-    "fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | "
-    "a11ycheck ltr rtl | showcomments addcomment code",
-    "custom_undo_redo_levels": 10,
-}
-
-REST_FRAMEWORK = {"DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"]}
-
-UNFOLD = {
-    "SITE_TITLE": "Zirkusmond admin panel",
-    "SITE_HEADER": "Zirkusmond",
-    "SITE_SUBHEADER": "Admin Panel",
-    "SITE_ICON": lambda request: static("media/images/gallery/logo.webp"),
-    "SITE_FAVICONS": [
-        {
-            "rel": "icon",
-            "sizes": "32x32",
-            "type": "image/png",
-            "href": lambda request: static("media/images/gallery/logo.webp"),
-        },
-    ],
-}
+logging.config.dictConfig(LOGGING)
