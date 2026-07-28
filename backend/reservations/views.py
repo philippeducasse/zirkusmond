@@ -16,7 +16,7 @@ from shows.models import Show
 
 @api_view(["POST"])
 @authentication_classes([])
-def reserve_api(request: Request, show_id: int) -> Response:
+def reserve(request: Request, show_id: int) -> Response:
     show = get_object_or_404(Show, pk=show_id)
     serializer = ReservationSerializer(data=request.data)
 
