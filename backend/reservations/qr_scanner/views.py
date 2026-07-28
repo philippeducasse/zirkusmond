@@ -1,19 +1,16 @@
 import uuid
 
-from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import render
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 from .services import check_in_ticket, get_upcoming_events
 
 
-@staff_member_required(login_url="/admin/login/")
-def qr_scanner(request: HttpRequest) -> HttpResponse:
-    return render(request, "qr_scanner.html")
-
-
-@staff_member_required()
-def get_events(request: HttpRequest) -> JsonResponse:
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def get_events(request: Request) -> Response:
     events = [
         {
             "id": e["id"],
@@ -23,10 +20,11 @@ def get_events(request: HttpRequest) -> JsonResponse:
         }
         for e in get_upcoming_events()
     ]
-    return JsonResponse(events, safe=False)
+    return Response(events)
 
 
-@staff_member_required()
-def check_in(request: HttpRequest, reservation_id: uuid.UUID) -> JsonResponse:
+@api_view(["POST"])
+@permission_classes([IsAdminUser])
+def check_in(request: Request, reservation_id: uuid.UUID) -> Response:
     result, status_code = check_in_ticket(reservation_id)
-    return JsonResponse(result, status=status_code)
+    return Response(result, status=status_code)
