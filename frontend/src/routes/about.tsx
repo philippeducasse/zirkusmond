@@ -28,7 +28,7 @@ export const Route = createFileRoute('/about')({
 
 const team = [
   {
-    image: '/images/gallery/MnM.webp',
+    image: '/images/team/MnM.webp',
     name: 'Max & Marlen',
     role: 'Zirkus Directors',
   },
@@ -38,16 +38,16 @@ const team = [
     role: 'Artistic Director',
   },
   {
-    image: '/images/gallery/maria.webp',
+    image: '/images/team/maria.webp',
     name: 'Maria',
     role: 'Head of Productions',
   },
   {
-    image: '/images/gallery/valerio.webp',
+    image: '/images/team/valerio.webp',
     name: 'Valerio',
     role: 'Technician',
   },
-  { image: '/images/gallery/alex.webp', name: 'Alex', role: 'IT' },
+  { image: '/images/team/philo_alex.jpg', name: 'Philo & Alex', role: 'IT' },
 ]
 
 function About() {
