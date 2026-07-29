@@ -14,7 +14,7 @@ python /usr/src/backend/manage.py migrate
 gunicorn config.wsgi --pythonpath /usr/src/backend --user www-data --bind 0.0.0.0:8010 --workers 3 --timeout 240 &
 
 # Start TanStack Start SSR server
-cd /usr/src/frontend && node dist/server/server.js &
+cd /usr/src/frontend && node .output/server/index.mjs & 
 
 nginx -g "daemon off;"
 
