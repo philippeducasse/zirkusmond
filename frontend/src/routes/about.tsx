@@ -62,7 +62,7 @@ function About() {
             src="/images/gallery/img-9.webp"
             alt="Zirkus Mond Image"
           />
-          <div className="p-6">
+          <div className="p-6 md:px-24 md:pb-12">
             <p>
               Der Zirkus Mond, Treffpunkt der Berliner Artistenszene,
               Veranstaltungsort für Zirkus, Theater, Tanz &amp; Konzerte erwuchs
