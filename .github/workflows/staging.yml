@@ -57,12 +57,12 @@ jobs:
           echo "DB_HOST=staging_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
 
-          # Frontend .env
-          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }}" > frontend/.env
-          echo "VITE_API_URL=/api" >> frontend/.env
-
       - name: Build Django image
-        run: docker build -f deploy/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:staging .
+        run: |
+          docker build -f deploy/Dockerfile \
+            --build-arg VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }} \
+            --build-arg VITE_API_URL=/api \
+            -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:staging .
 
       - name: Push to registry
         run: docker push ${{ secrets.DOCKER_USERNAME }}/zirkusmond:staging

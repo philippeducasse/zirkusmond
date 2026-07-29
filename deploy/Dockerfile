@@ -15,6 +15,11 @@ RUN pnpm install --frozen-lockfile
 # Copy source files
 COPY frontend ./
 
+ARG VITE_STRIPE_PUBLISHABLE
+ARG VITE_API_URL
+ENV VITE_STRIPE_PUBLISHABLE=$VITE_STRIPE_PUBLISHABLE
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build TanStack Start app
 RUN pnpm build
 
