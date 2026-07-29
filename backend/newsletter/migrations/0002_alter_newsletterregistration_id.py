@@ -9,8 +9,8 @@ def deduplicate_emails(apps, schema_editor):
     for obj in Model.objects.order_by("id"):
         if obj.email in seen:
             obj.delete()
-    else:
-        seen.add(obj.email)
+        else:
+            seen.add(obj.email)
 
 
 class Migration(migrations.Migration):
