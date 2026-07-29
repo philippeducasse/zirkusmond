@@ -1,18 +1,22 @@
 # ── Stage 1: Frontend build ───────────────────────────────────────────────────
-FROM node:22-slim AS frontend-builder
+FROM node:24-slim AS frontend-builder
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /build/frontend
 
-COPY frontend/package*.json ./
-RUN npm ci
+# Copy package files
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source files
 COPY frontend ./
 
-# tailwind → /build/backend/static/css/tailwind.css
-# vite     → /build/backend/static/media/dist/
-RUN mkdir -p /build/backend/static/css /build/backend/static/media/dist && \
-    npm run tailwind && \
-    npm run build && \
-    cp -r node_modules/@glidejs /build/backend/static/media/dist/
+# Build TanStack Start app
+RUN pnpm build
 
 # ── Stage 2: Python venv ──────────────────────────────────────────────────────
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS python-builder
@@ -27,6 +31,9 @@ FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -37,14 +44,18 @@ WORKDIR /usr/src
 COPY deploy/start-server.sh .
 RUN chmod +x start-server.sh
 
+# Copy Python backend
 COPY --from=python-builder /usr/src/backend/.venv ./backend/.venv
 COPY backend ./backend
-COPY --from=frontend-builder /build/backend/static ./backend/static
+
+# Copy built TanStack Start app
+COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
 
 COPY deploy/nginx.default /etc/nginx/sites-available/default
 RUN mkdir -p /srv/data/static /srv/data/media
 
 ENV PATH="/usr/src/backend/.venv/bin:$PATH"
+ENV NODE_ENV=production
 
 EXPOSE 8000
 
