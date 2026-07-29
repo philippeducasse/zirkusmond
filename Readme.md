@@ -4,7 +4,7 @@
 
 # Zirkusmond
 
-Website and booking platform for Zirkusmond: show listings, ticket reservations, QR-code ticket scanning, venue rentals, and a newsletter, backed by a Django app with a TanstackStart frontend.
+Website and booking platform for Zirkusmond: show listings, ticket reservations, QR-code ticket scanning, venue rentals, and a newsletter, backed by a Django app with a Vue/Vite frontend.
 
 ## Stack
 
@@ -55,5 +55,7 @@ Tests run automatically on every push/PR via the `tests` GitHub Actions workflow
 # cookie popover
 
 # add way for juan to change videos && images
+
+# early bird tickets
 
 # tickets umbuchen
