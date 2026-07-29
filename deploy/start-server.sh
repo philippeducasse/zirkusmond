@@ -10,8 +10,11 @@ cp -r /usr/src/backend/staticfiles/* /srv/data/static/ 2>/dev/null || true
 
 python /usr/src/backend/manage.py migrate
 
-
+# Start Django backend
 gunicorn config.wsgi --pythonpath /usr/src/backend --user www-data --bind 0.0.0.0:8010 --workers 3 --timeout 240 &
+
+# Start TanStack Start SSR server
+cd /usr/src/frontend && node dist/server/server.js &
 
 nginx -g "daemon off;"
 

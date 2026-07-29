@@ -1,39 +1,47 @@
- 
+
 # nginx.default
 
 server {
     listen 8000;
     server_name zirkusmond.de;
 
-    location / {
+    # Django admin
+    location /mondmin/ {
         proxy_pass http://127.0.0.1:8010;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 4600;
+        proxy_connect_timeout 600;
     }
+
+    # API requests to Django backend
+    location /api/ {
+        proxy_pass http://127.0.0.1:8010/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 4600;
+        proxy_connect_timeout 600;
+    }
+
+    # Serve static files from Django
     location /static/ {
         root /srv/data/;
     }
 
-        proxy_read_timeout      4600;
-        proxy_connect_timeout   600;
-
-        #echo "uri $uri";
-        #echo "request uri: $request_uri";
-
-    #    if ($uri ~* static/(.*)) {
-    #        set $smaller_uri $1;
-    #    }
-        #echo "foobar $smaller_uri";
-        # replace static with static_
-
-    #    try_files /srv/data/srv_static $smaller_uri;
-        #if ($request_uri ~* /a/(.*)/(.*)){
-        #    set $tmp /$1/$2;
-        #    rewrite ^ $tmp break;
-        #    }
-    #}
+    # Serve media files
     location /media/ {
         root /srv/data/;
     }
+
+    # Proxy everything else to TanStack Start SSR server
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 4600;
+        proxy_connect_timeout 600;
+    }
+
     client_max_body_size 10M;
 }
