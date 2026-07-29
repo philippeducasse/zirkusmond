@@ -3,16 +3,26 @@
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):
+def deduplicate_emails(apps, schema_editor):
+    Model = apps.get_model("newsletter", "NewsletterRegistration")
+    seen = set()
+    for obj in Model.objects.order_by("id"):
+        if obj.email in seen:
+            obj.delete()
+        else:
+            seen.add(obj.email)
 
+
+class Migration(migrations.Migration):
     dependencies = [
-        ('newsletter', '0002_alter_newsletterregistration_id'),
+        ("newsletter", "0002_alter_newsletterregistration_id"),
     ]
 
     operations = [
+        migrations.RunPython(deduplicate_emails, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='newsletterregistration',
-            name='email',
+            model_name="newsletterregistration",
+            name="email",
             field=models.EmailField(max_length=254, unique=True),
         ),
     ]
