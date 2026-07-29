@@ -49,7 +49,7 @@ COPY --from=python-builder /usr/src/backend/.venv ./backend/.venv
 COPY backend ./backend
 
 # Copy built TanStack Start app
-COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
+COPY --from=frontend-builder /build/frontend/.output ./frontend/.output
 
 COPY deploy/nginx.default /etc/nginx/sites-available/default
 RUN mkdir -p /srv/data/static /srv/data/media
