@@ -1,5 +1,5 @@
 import DynamicForm from '#/components/zirkusmond/form/DynamicForm'
-import { buildGuestFields } from '#/components/zirkusmond/reserve/helper'
+import { buildGuestFields } from '#/components/zirkusmond/reserve/buildFormFields'
 
 interface GuestFormProps {
   guestCount: number

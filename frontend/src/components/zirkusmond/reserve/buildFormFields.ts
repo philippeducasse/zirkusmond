@@ -5,12 +5,20 @@ import type { NumberFieldProps } from '#/components/zirkusmond/form/NumberField'
 import type { SelectFieldProps } from '#/components/zirkusmond/form/SelectField'
 import type { TextFieldProps } from '#/components/zirkusmond/form/TextField'
 
+export enum FieldType {
+  Select = 'select',
+  Number = 'number',
+  Checkbox = 'checkbox',
+  ButtonGroup = 'button-group',
+  Text = 'text',
+}
+
 export type DynamicFieldConfig =
-  | ({ kind: 'select' } & SelectFieldProps)
-  | ({ kind: 'number' } & NumberFieldProps)
-  | ({ kind: 'checkbox' } & CheckboxFieldProps)
-  | ({ kind: 'button-group'; id: string } & ButtonGroupFieldProps)
-  | ({ kind: 'text' } & TextFieldProps)
+  | ({ fieldType: FieldType.Select } & SelectFieldProps)
+  | ({ fieldType: FieldType.Number } & NumberFieldProps)
+  | ({ fieldType: FieldType.Checkbox } & CheckboxFieldProps)
+  | ({ fieldType: FieldType.ButtonGroup; id: string } & ButtonGroupFieldProps)
+  | ({ fieldType: FieldType.Text } & TextFieldProps)
 
 interface BuildTicketFieldsParams {
   show: Show
@@ -29,7 +37,7 @@ export function buildTicketFields({
 }: BuildTicketFieldsParams): DynamicFieldConfig[] {
   return [
     {
-      kind: 'select',
+      fieldType: FieldType.Select,
       id: 'event',
       label: 'Event',
       placeholder: 'Termin wählen',
@@ -41,7 +49,7 @@ export function buildTicketFields({
       })),
     },
     {
-      kind: 'number',
+      fieldType: FieldType.Number,
       id: 'attendee-count',
       label: 'Tickets',
       value: attendeeCount,
@@ -63,7 +71,7 @@ export function buildNewsletterField({
 }: BuildNewsletterFieldParams): DynamicFieldConfig[] {
   return [
     {
-      kind: 'checkbox',
+      fieldType: FieldType.Checkbox,
       id: 'newsletter',
       label: 'I would like to receive the Zirkus Mond newsletter',
       checked: newsletter,
@@ -75,21 +83,21 @@ export function buildNewsletterField({
 export function buildPersonalInfoFields(): DynamicFieldConfig[] {
   return [
     {
-      kind: 'text',
+      fieldType: FieldType.Text,
       id: 'first-name',
       label: 'First name',
       name: 'firstName',
       required: true,
     },
     {
-      kind: 'text',
+      fieldType: FieldType.Text,
       id: 'last-name',
       label: 'Last name',
       name: 'lastName',
       required: true,
     },
     {
-      kind: 'text',
+      fieldType: FieldType.Text,
       id: 'email',
       label: 'Email',
       name: 'email',
@@ -102,14 +110,14 @@ export function buildPersonalInfoFields(): DynamicFieldConfig[] {
 export function buildGuestFields(index: number): DynamicFieldConfig[] {
   return [
     {
-      kind: 'text',
+      fieldType: FieldType.Text,
       id: `guest-${index}-first-name`,
       label: 'First name',
       name: `guest-${index}-first-name`,
       required: true,
     },
     {
-      kind: 'text',
+      fieldType: FieldType.Text,
       id: `guest-${index}-last-name`,
       label: 'Last name',
       name: `guest-${index}-last-name`,
@@ -121,7 +129,7 @@ export function buildGuestFields(index: number): DynamicFieldConfig[] {
 export function buildPaymentMethodField(): DynamicFieldConfig[] {
   return [
     {
-      kind: 'button-group',
+      fieldType: FieldType.ButtonGroup,
       id: 'payment-method',
       name: 'payment-method',
       options: [

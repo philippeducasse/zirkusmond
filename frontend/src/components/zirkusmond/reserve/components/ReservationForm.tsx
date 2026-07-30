@@ -2,7 +2,7 @@ import DynamicForm from '#/components/zirkusmond/form/DynamicForm'
 import {
   buildPersonalInfoFields,
   buildTicketFields,
-} from '#/components/zirkusmond/reserve/helper'
+} from '#/components/zirkusmond/reserve/buildFormFields'
 import type { Show } from '#/interfaces/show'
 
 interface ReservationFormProps {

@@ -3,27 +3,27 @@ import CheckboxField from '#/components/zirkusmond/form/CheckboxField'
 import NumberField from '#/components/zirkusmond/form/NumberField'
 import SelectField from '#/components/zirkusmond/form/SelectField'
 import TextField from '#/components/zirkusmond/form/TextField'
-import type { DynamicFieldConfig } from '#/components/zirkusmond/reserve/helper'
+import { FieldType, type DynamicFieldConf#/components/zirkusmond/reserve/buildFormFieldserve/helper'
 
 interface DynamicFieldProps {
   field: DynamicFieldConfig
 }
 
 export default function DynamicField({ field }: DynamicFieldProps) {
-  switch (field.kind) {
-    case 'select':
+  switch (field.fieldType) {
+    case FieldType.Select:
       return <SelectField {...field} />
 
-    case 'number':
+    case FieldType.Number:
       return <NumberField {...field} />
 
-    case 'checkbox':
+    case FieldType.Checkbox:
       return <CheckboxField {...field} />
 
-    case 'text':
+    case FieldType.Text:
       return <TextField {...field} />
 
-    case 'button-group':
+    case FieldType.ButtonGroup:
       return <ButtonGroupField {...field} />
   }
 }
