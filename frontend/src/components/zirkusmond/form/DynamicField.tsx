@@ -3,7 +3,10 @@ import CheckboxField from '#/components/zirkusmond/form/CheckboxField'
 import NumberField from '#/components/zirkusmond/form/NumberField'
 import SelectField from '#/components/zirkusmond/form/SelectField'
 import TextField from '#/components/zirkusmond/form/TextField'
-import { FieldType, type DynamicFieldConf#/components/zirkusmond/reserve/buildFormFieldserve/helper'
+import {
+  FieldType,
+  type DynamicFieldConfig,
+} from '#/components/zirkusmond/reserve/buildFormFields'
 
 interface DynamicFieldProps {
   field: DynamicFieldConfig
