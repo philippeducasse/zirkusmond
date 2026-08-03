@@ -18,8 +18,6 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart(),
-    // Nitro: universal server toolkit: packages bundled server-code into a deployable unit for specific runtime. in this case, node.
-    // nitro({ preset: 'node-server' }),
     nitro(),
     viteReact(),
   ],

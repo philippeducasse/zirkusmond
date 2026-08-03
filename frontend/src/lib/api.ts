@@ -6,10 +6,11 @@ import { keysToCamelCase, keysToSnakeCase } from '#/lib/utils.ts'
 
 /**
  * On the server (SSR loaders) we talk to Django directly; in the browser
- * requests go through the Vite dev proxy under /api (see vite.config.ts),
- * which also avoids CORS since Django doesn't send CORS headers.
+ * requests go through the /api/$ server route (see routes/api.$.tsx), which
+ * proxies to Django and also avoids CORS since Django doesn't send CORS
+ * headers.
  */
-const SERVER_API_URL = process.env.API_URL ?? 'http://localhost:8000'
+export const SERVER_API_URL = process.env.API_URL ?? 'http://localhost:8000'
 
 export function apiUrl(path: string) {
   return typeof window === 'undefined'
