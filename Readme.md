@@ -9,7 +9,7 @@ Website and booking platform for Zirkusmond: show listings, ticket reservations,
 ## Stack
 
 - **Backend**: Django (`backend/`), managed with [uv](https://docs.astral.sh/uv/), Python 3.12. Key apps: `shows`, `reservations` (incl. payments and QR scanning), `rentals`, `newsletter`, `stats`.
-- **Frontend**: Vue 3 + Vite (`frontend/`), Tailwind CSS.
+- **Frontend**: Tanstack Start + Vite (`frontend/`), Tailwind CSS.
 - **Deploy**: Dockerized, deployed via GitHub Actions to `staging` and `prod` branches (see `deploy/` and `.github/workflows/`).
 
 ## Getting started
