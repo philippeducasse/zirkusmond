@@ -1,5 +1,6 @@
 import type { Show } from '#/interfaces/show'
 import SectionCard from '../general/SectionCard'
+import { SERVER_API_URL } from '#/lib/api.ts'
 
 interface ShowDetailsProps {
   show: Show
@@ -15,7 +16,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
         </div>
         <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-8 sm:gap-12">
           <img
-            src={show.cardImage}
+            src={`${SERVER_API_URL}${show.cardImage}`}
             alt={show.title}
             className="w-full max-w-sm object-cover"
           />
