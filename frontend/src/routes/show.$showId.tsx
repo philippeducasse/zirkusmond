@@ -7,7 +7,7 @@ import { ShowDetails } from '#/components/zirkusmond/show/ShowDetails'
 import { ReserveButton } from '#/components/zirkusmond/show/ReserveButton'
 import TimeDetails from '#/components/zirkusmond/event/TimeDetails'
 import { Button } from '#/components/ui/button.tsx'
-import { ApiError, showQueryOptions } from '#/lib/api.ts'
+import { ApiError, showQueryOptions, SERVER_API_URL } from '#/lib/api.ts'
 
 export const Route = createFileRoute('/show/$showId')({
   // TanStack Query: prefetch the show into the cache during SSR / navigation.
@@ -36,7 +36,7 @@ function RouteComponent() {
   return (
     <PageContainer className="px-4">
       <img
-        src={show.bannerImage}
+        src={`${SERVER_API_URL}${show.bannerImage}`}
         alt={`${show.title} Banner`}
         className="mx-auto w-full object-cover"
       />
