@@ -53,7 +53,7 @@ jobs:
           echo "STRIPE_TEST_HOOK_TOKEN=${{ secrets.STRIPE_TEST_HOOK_TOKEN }}" >> .env
           echo "DB_HOST=staging_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
-          echo "API_URL=https://localhost:8000" >> .env
+          echo "API_URL=http://localhost:8000" >> .env
 
       - name: Build Django image
         run: |
