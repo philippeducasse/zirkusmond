@@ -1,5 +1,6 @@
 import { cn } from '#/lib/utils.ts'
 import SectionCard from './SectionCard'
+import { SERVER_API_URL } from '#/lib/api.ts'
 
 interface TeamMember {
   image: string
@@ -33,7 +34,7 @@ function TeamMemberCard({ member, className }: TeamMemberCardProps) {
       <div className={cn('text-center mb-4', className)}>
         <img
           className="mx-auto aspect-square w-full  object-cover max-w-xs"
-          src={member.image}
+          src={`${SERVER_API_URL}${member.image}`}
           alt={`Photo of ${member.name}`}
         />
         <h3>{member.name}</h3>
