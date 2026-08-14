@@ -18,7 +18,6 @@ import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as QrScannerRouteImport } from './routes/qr-scanner'
 import { Route as RentalsRouteImport } from './routes/rentals'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
-import { Route as MediaSplatRouteImport } from './routes/media.$'
 import { Route as PaymentFailureRouteImport } from './routes/payment.failure'
 import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
 import { Route as ReserveShowIdRouteImport } from './routes/reserve.$showId'
@@ -70,11 +69,6 @@ const ApiSplatRoute = ApiSplatRouteImport.update({
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MediaSplatRoute = MediaSplatRouteImport.update({
-  id: '/media/$',
-  path: '/media/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PaymentFailureRoute = PaymentFailureRouteImport.update({
   id: '/payment/failure',
   path: '/payment/failure',
@@ -111,7 +105,6 @@ export interface FileRoutesByFullPath {
   '/qr-scanner': typeof QrScannerRoute
   '/rentals': typeof RentalsRoute
   '/api/$': typeof ApiSplatRoute
-  '/media/$': typeof MediaSplatRoute
   '/payment/failure': typeof PaymentFailureRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/reserve/$showId': typeof ReserveShowIdRoute
@@ -128,7 +121,6 @@ export interface FileRoutesByTo {
   '/qr-scanner': typeof QrScannerRoute
   '/rentals': typeof RentalsRoute
   '/api/$': typeof ApiSplatRoute
-  '/media/$': typeof MediaSplatRoute
   '/payment/failure': typeof PaymentFailureRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/reserve/$showId': typeof ReserveShowIdRoute
@@ -146,7 +138,6 @@ export interface FileRoutesById {
   '/qr-scanner': typeof QrScannerRoute
   '/rentals': typeof RentalsRoute
   '/api/$': typeof ApiSplatRoute
-  '/media/$': typeof MediaSplatRoute
   '/payment/failure': typeof PaymentFailureRoute
   '/payment/success': typeof PaymentSuccessRoute
   '/reserve/$showId': typeof ReserveShowIdRoute
@@ -165,7 +156,6 @@ export interface FileRouteTypes {
     | '/qr-scanner'
     | '/rentals'
     | '/api/$'
-    | '/media/$'
     | '/payment/failure'
     | '/payment/success'
     | '/reserve/$showId'
@@ -182,7 +172,6 @@ export interface FileRouteTypes {
     | '/qr-scanner'
     | '/rentals'
     | '/api/$'
-    | '/media/$'
     | '/payment/failure'
     | '/payment/success'
     | '/reserve/$showId'
@@ -199,7 +188,6 @@ export interface FileRouteTypes {
     | '/qr-scanner'
     | '/rentals'
     | '/api/$'
-    | '/media/$'
     | '/payment/failure'
     | '/payment/success'
     | '/reserve/$showId'
@@ -217,7 +205,6 @@ export interface RootRouteChildren {
   QrScannerRoute: typeof QrScannerRoute
   RentalsRoute: typeof RentalsRoute
   ApiSplatRoute: typeof ApiSplatRoute
-  MediaSplatRoute: typeof MediaSplatRoute
   PaymentFailureRoute: typeof PaymentFailureRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   ReserveShowIdRoute: typeof ReserveShowIdRoute
@@ -290,13 +277,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/media/$': {
-      id: '/media/$'
-      path: '/media/$'
-      fullPath: '/media/$'
-      preLoaderRoute: typeof MediaSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/payment/failure': {
       id: '/payment/failure'
       path: '/payment/failure'
@@ -345,7 +325,6 @@ const rootRouteChildren: RootRouteChildren = {
   QrScannerRoute: QrScannerRoute,
   RentalsRoute: RentalsRoute,
   ApiSplatRoute: ApiSplatRoute,
-  MediaSplatRoute: MediaSplatRoute,
   PaymentFailureRoute: PaymentFailureRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
   ReserveShowIdRoute: ReserveShowIdRoute,
