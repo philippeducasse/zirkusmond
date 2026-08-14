@@ -5,18 +5,15 @@ on:
     branches:
       - staging
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v5
 
       - name: Set up Python
         run: uv python install 3.12
@@ -31,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -56,7 +53,7 @@ jobs:
           echo "STRIPE_TEST_HOOK_TOKEN=${{ secrets.STRIPE_TEST_HOOK_TOKEN }}" >> .env
           echo "DB_HOST=staging_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
-          echo "API_URL=testing.zirkusmond.de" >> .env
+          echo "API_URL=https://localhost:8000" >> .env
 
       - name: Build Django image
         run: |
