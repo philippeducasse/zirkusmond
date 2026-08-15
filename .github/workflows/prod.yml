@@ -56,8 +56,8 @@ jobs:
           echo "DB_HOST=prod_postgres" >> .env
 
           # Frontend .env
-          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" > frontend/.env
-          echo "VITE_API_URL=/api" >> frontend/.env
+          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" > .env
+          echo "VITE_API_URL=/api" >> .env
 
       - name: Build Django image
         run: docker build -f deploy/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest .
