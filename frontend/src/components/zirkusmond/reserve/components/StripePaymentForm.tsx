@@ -3,6 +3,8 @@ import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '#/components/ui/button.tsx'
 import SectionCardSkeleton from '../../general/SectionCardSkeleton.tsx'
 
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+
 interface StripePaymentFormProps {
   reservationId: string
   onSuccess: () => void
@@ -35,7 +37,7 @@ export default function StripePaymentForm({
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${import.meta.env.VITE_API_URL}/payments/return/stripe?reservationId=${reservationId}`,
+          return_url: `${API_URL}/payments/return/stripe?reservationId=${reservationId}`,
           payment_method_data: {
             billing_details: {
               // hardcode the billing details. cant reliably display the country drop down, so have to pass this info to stripe manually.

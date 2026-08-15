@@ -54,6 +54,7 @@ jobs:
           echo "DB_HOST=staging_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
           echo "API_URL=http://localhost:8010" >> .env
+          echo "FRONTEND_URL=https://testing.zirkusmond.de" >> .env
 
           echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }}" >> .env
           echo "VITE_API_URL=https://testing.zirkusmond.de/api" >> .env
@@ -62,6 +63,7 @@ jobs:
         run: |
           docker build -f deploy/Dockerfile \
             --build-arg VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }} \
+            --build-arg VITE_API_URL=https://testing.zirkusmond.de/api \
             -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:staging .
 
       - name: Push to registry
