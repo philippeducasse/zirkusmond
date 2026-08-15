@@ -104,17 +104,17 @@ export default function ReservationPage({ show }: ReservationPageProps) {
   return (
     <div className="flex items-center justify-center max-w-7xl mx-auto text-white p-1 md:p-8">
       <form onSubmit={handleSubmit} id="reservation-form">
-        {import.meta.env.DEV && (
-          <div className="flex justify-end mb-2">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleFillDummyData}
-            >
-              Fill test data
-            </Button>
-          </div>
-        )}
+        {/* {import.meta.env.DEV && ( */}
+        <div className="flex justify-end mb-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleFillDummyData}
+          >
+            Fill test data
+          </Button>
+        </div>
+        {/* )} */}
         <SectionCard>
           <ReservationForm
             show={show}

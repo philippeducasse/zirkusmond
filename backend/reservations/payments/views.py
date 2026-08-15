@@ -141,6 +141,8 @@ class StripeWebhookView(APIView):
     authentication_classes = []
 
     def post(self, request: Request) -> Response | JsonResponse:
+        stripe.api_key = settings.STRIPE_TOKEN
+
         payload = request.body
         sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
 
@@ -148,63 +150,87 @@ class StripeWebhookView(APIView):
             event: stripe.Event = stripe.Webhook.construct_event(
                 payload, sig_header, settings.STRIPE_HOOK_TOKEN
             )
-        except ValueError:
+        except ValueError as e:
+            logger.error("stripe_webhook: invalid payload: %s", e)
             return Response({"error": "Invalid payload"}, status=status.HTTP_400_BAD_REQUEST)
-        except stripe.error.SignatureVerificationError:
+        except stripe.error.SignatureVerificationError as e:
+            logger.error("stripe_webhook: invalid signature: %s", e)
             return Response({"error": "Invalid signature"}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            logger.error("stripe_webhook: unexpected error constructing event: %s", e)
+            return Response(
+                {"error": "Internal error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-        if event["type"] == "payment_intent.succeeded":
-            intent = event["data"]["object"]
-            payment_intent_id = intent["id"]
+        try:
+            if (
+                event["type"] == "payment_intent.succeeded"
+                # or event["type"] == "checkout.session.completed"
+            ):
+                intent = event["data"]["object"]
+                payment_intent_id = intent["id"]
 
-            try:
-                payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
-                payment.status = Payment.Status.COMPLETED
-                payment.save()
-                logger.info(
-                    "payment_completed: payment=%s intent=%s", payment.id, payment_intent_id
-                )
-            except Payment.DoesNotExist:
-                logger.warning(
-                    "payment_intent.succeeded: payment not found for %s", payment_intent_id
-                )
-                return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+                try:
+                    payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+                    payment.status = Payment.Status.COMPLETED
+                    payment.save()
+                    logger.info(
+                        "payment_completed: payment=%s intent=%s", payment.id, payment_intent_id
+                    )
+                except Payment.DoesNotExist:
+                    logger.warning(
+                        "payment_intent.succeeded: payment not found for %s", payment_intent_id
+                    )
+                    return Response(
+                        {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
+                    )
 
-        elif event["type"] in ("payment_intent.payment_failed", "payment_intent.canceled"):
-            intent = event["data"]["object"]
-            payment_intent_id = intent["id"]
+            elif event["type"] in ("payment_intent.payment_failed", "payment_intent.canceled"):
+                intent = event["data"]["object"]
+                payment_intent_id = intent["id"]
 
-            try:
-                payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
-                payment.status = Payment.Status.FAILED
-                payment.save()
-                logger.info(
-                    "payment_failed: payment=%s intent=%s event=%s",
-                    payment.id,
-                    payment_intent_id,
-                    event["type"],
-                )
-            except Payment.DoesNotExist:
-                logger.warning(
-                    "%s: payment not found for %s", event["type"], payment_intent_id
-                )
-                return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+                try:
+                    payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+                    payment.status = Payment.Status.FAILED
+                    payment.save()
+                    logger.info(
+                        "payment_failed: payment=%s intent=%s event=%s",
+                        payment.id,
+                        payment_intent_id,
+                        event["type"],
+                    )
+                except Payment.DoesNotExist:
+                    logger.warning("%s: payment not found for %s", event["type"], payment_intent_id)
+                    return Response(
+                        {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
+                    )
 
-        elif event["type"] == "charge.refunded":
-            charge = event["data"]["object"]
-            payment_intent_id = charge.get("payment_intent")
+            elif event["type"] == "charge.refunded":
+                charge = event["data"]["object"]
+                payment_intent_id = charge.get("payment_intent")
 
-            try:
-                payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
-                payment.status = Payment.Status.REFUNDED
-                payment.save()
-                logger.info(
-                    "payment_refunded: payment=%s intent=%s", payment.id, payment_intent_id
-                )
-            except Payment.DoesNotExist:
-                logger.warning(
-                    "charge.refunded: payment not found for %s", payment_intent_id
-                )
-                return Response({"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND)
+                try:
+                    payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+                    payment.status = Payment.Status.REFUNDED
+                    payment.save()
+                    logger.info(
+                        "payment_refunded: payment=%s intent=%s", payment.id, payment_intent_id
+                    )
+                except Payment.DoesNotExist:
+                    logger.warning("charge.refunded: payment not found for %s", payment_intent_id)
+                    return Response(
+                        {"error": "Payment not found"}, status=status.HTTP_404_NOT_FOUND
+                    )
+
+        except Exception as e:
+            logger.error(
+                "stripe_webhook: error processing event type=%s: %s",
+                event.get("type"),
+                e,
+                exc_info=True,
+            )
+            return Response(
+                {"error": "Internal error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return JsonResponse({"status": "ok"})
