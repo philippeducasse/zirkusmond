@@ -55,7 +55,7 @@ jobs:
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
           echo "API_URL=http://localhost:8010" >> .env
 
-          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }}" > .env
+          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }}" >> .env
           echo "VITE_API_URL=https://testing.zirkusmond.de/api" >> .env
 
       - name: Build Django image
