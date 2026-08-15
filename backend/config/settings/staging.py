@@ -3,9 +3,7 @@ import os
 from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = [
-    "testing.zirkusmond.de",
-]
+ALLOWED_HOSTS = ["testing.zirkusmond.de", "localhost"]
 
 PAYMENT_USES_SSL = True
 
