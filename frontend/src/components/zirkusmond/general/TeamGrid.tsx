@@ -30,7 +30,7 @@ interface TeamMemberCardProps {
 
 function TeamMemberCard({ member, className }: TeamMemberCardProps) {
   return (
-    <SectionCard className="p-0!">
+    <SectionCard className="p-0! min-w-60">
       <div className={cn('text-center mb-4', className)}>
         <img
           className="mx-auto aspect-square w-full  object-cover max-w-xs"

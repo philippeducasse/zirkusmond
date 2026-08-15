@@ -21,12 +21,12 @@ export default function StripePaymentForm({
   const [isProcessing, setIsProcessing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  if (!stripe || !elements) {
-    return <SectionCardSkeleton lines={5} />
-  }
-
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    if (!stripe || !elements) {
+      return
+    }
 
     setIsProcessing(true)
     setErrorMessage(null)
@@ -69,6 +69,10 @@ export default function StripePaymentForm({
     }
   }
 
+  if (!stripe || !elements) {
+    return <SectionCardSkeleton lines={5} />
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
       <div className="mb-6 [&_iframe]:outline-none">
@@ -93,7 +97,7 @@ export default function StripePaymentForm({
         <Button type="button" variant="secondary" onClick={onCancel}>
           Back
         </Button>
-        <Button type="submit" disabled={!stripe || isProcessing}>
+        <Button type="submit" disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Pay Now'}
         </Button>
       </div>

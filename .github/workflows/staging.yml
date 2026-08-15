@@ -55,6 +55,9 @@ jobs:
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
           echo "API_URL=http://localhost:8010" >> .env
 
+          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }}" > frontend/.env
+          echo "VITE_API_URL=https://testing.zirkusmond.de/api" >> frontend/.env
+
       - name: Build Django image
         run: |
           docker build -f deploy/Dockerfile \
