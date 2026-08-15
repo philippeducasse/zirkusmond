@@ -22,7 +22,7 @@ export default function EventsSection({
     <ContentSection>
       <PageHeader>Upcoming Shows</PageHeader>
 
-      <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 px-6">
+      <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 md:px-6 px-0">
         {shows.map((show) => (
           <Link
             key={show.id}

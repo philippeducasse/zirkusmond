@@ -59,7 +59,9 @@ export default function StripePaymentForm({
       if (error) {
         setErrorMessage(error.message ?? 'An error occurred')
         setIsProcessing(false)
-        onError()
+        if (error.type !== 'validation_error') {
+          onError()
+        }
       } else {
         onSuccess()
       }
