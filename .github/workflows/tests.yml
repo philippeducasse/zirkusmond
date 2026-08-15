@@ -7,11 +7,8 @@ on:
       - staging
   pull_request:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-  test:
+  backend-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,3 +25,21 @@ jobs:
 
       - name: Run tests
         run: cd backend && uv run pytest
+
+  frontend-typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Install dependencies
+        run: cd frontend && pnpm install
+
+      - name: TypeScript type check
+        run: cd frontend && pnpm exec tsc --noEmit

@@ -106,7 +106,11 @@ export default function ReservationPage({ show }: ReservationPageProps) {
       <form onSubmit={handleSubmit} id="reservation-form">
         {import.meta.env.DEV && (
           <div className="flex justify-end mb-2">
-            <Button type="button" variant="secondary" onClick={handleFillDummyData}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleFillDummyData}
+            >
               Fill test data
             </Button>
           </div>
