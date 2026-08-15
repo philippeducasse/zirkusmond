@@ -9,7 +9,7 @@ import { NAV_ITEMS } from './navbar/nav-items.ts'
 export default function Navbar() {
   const { fixed, sentinelRef, scrollThreshold } = useNavbar()
   return (
-    <>
+    <div className="max-w-dvw">
       <div
         ref={sentinelRef}
         aria-hidden
@@ -28,6 +28,6 @@ export default function Navbar() {
         <DesktopNav items={NAV_ITEMS} />
         <MobileNav items={NAV_ITEMS} />
       </header>
-    </>
+    </div>
   )
 }

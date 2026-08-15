@@ -6,6 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
+    "postinstall": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide --strategy url baseLocale",
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
     "build": "vite build",
