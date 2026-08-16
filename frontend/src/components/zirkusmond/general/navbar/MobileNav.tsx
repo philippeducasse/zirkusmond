@@ -60,7 +60,7 @@ export default function MobileNav({ items }: MobileNavProps) {
               <SheetClose key={item.href} asChild>
                 <Link
                   to={item.href}
-                  className="text-xl sm:text-2xl text-primary"
+                  className="text-xl sm:text-2xl text-primary hover:underline"
                 >
                   {item.label}
                 </Link>
