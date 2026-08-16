@@ -23,9 +23,13 @@ export default function ContentSection({
   duration,
 }: ContentSectionProps) {
   return (
-    <section className={cn('island-shell rounded-2xl p-4 sm:p-6 md:p-10', className)}>
+    <section className={cn('island-shell rounded-2xl p-2 md:p-10', className)}>
       {isLoading !== undefined && skeleton ? (
-        <CrossFade isLoading={isLoading} skeleton={skeleton} duration={duration}>
+        <CrossFade
+          isLoading={isLoading}
+          skeleton={skeleton}
+          duration={duration}
+        >
           {children}
         </CrossFade>
       ) : (
