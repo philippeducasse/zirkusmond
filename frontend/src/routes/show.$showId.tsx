@@ -8,6 +8,7 @@ import { ReserveButton } from '#/components/zirkusmond/show/ReserveButton'
 import TimeDetails from '#/components/zirkusmond/event/TimeDetails'
 import { Button } from '#/components/ui/button.tsx'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
+import NotFound from '#/components/zirkusmond/general/NotFound'
 
 export const Route = createFileRoute('/show/$showId')({
   // TanStack Query: prefetch the show into the cache during SSR / navigation.
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/show/$showId')({
     meta: loaderData ? [{ title: `Zirkus Mond - ${loaderData.title}` }] : [],
   }),
   component: RouteComponent,
+  notFoundComponent: () => <NotFound entityName="Show" />,
 })
 
 function RouteComponent() {
@@ -32,7 +34,6 @@ function RouteComponent() {
   // TanStack Query: same key as the loader, so this reads from the cache the
   // loader filled instead of fetching again.
   const { data: show } = useSuspenseQuery(showQueryOptions(showId))
-
   return (
     <PageContainer className="px-4">
       <img

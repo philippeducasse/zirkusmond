@@ -9,6 +9,7 @@ import type { QueryClient } from '@tanstack/react-query'
 
 import { getLocale } from '#/paraglide/runtime'
 import Navbar from '#/components/zirkusmond/general/Navbar'
+import NotFound from '#/components/zirkusmond/general/NotFound'
 
 import appCss from '../styles.css?url'
 import Footer from '#/components/zirkusmond/general/Footer'
@@ -53,6 +54,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: () => <NotFound />,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
