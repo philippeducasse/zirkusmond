@@ -9,6 +9,7 @@ import ReservationForm from './components/ReservationForm.tsx'
 import NewsletterForm from './components/NewsletterForm.tsx'
 import SlidingScale from './components/SlidingScale.tsx'
 import SectionCard from '../general/SectionCard.tsx'
+import NavigationButtonWrapper from '../general/NavigationButtonWrapper.tsx'
 
 interface ReservationPageProps {
   show: Show
@@ -154,18 +155,18 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             </div>
           )}
 
-          <div className=" flex justify-between mt-8 text-center">
-            <Button type="button" variant="secondary" onClick={handleBack}>
-              Back to Show
-            </Button>
+          <NavigationButtonWrapper>
             <Button
               type="submit"
               disabled={isProcessing}
-              className="min-w-[200px]"
+              className="sm:min-w-[200px]"
             >
               {isProcessing ? 'Processing...' : 'Proceed to Payment'}
             </Button>
-          </div>
+            <Button type="button" variant="secondary" onClick={handleBack}>
+              Back to Show
+            </Button>
+          </NavigationButtonWrapper>
         </SectionCard>
       </form>
     </div>

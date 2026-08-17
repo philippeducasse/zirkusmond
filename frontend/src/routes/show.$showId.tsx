@@ -9,6 +9,7 @@ import TimeDetails from '#/components/zirkusmond/event/TimeDetails'
 import { Button } from '#/components/ui/button.tsx'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
 import NotFound from '#/components/zirkusmond/general/NotFound'
+import NavigationButtonWrapper from '#/components/zirkusmond/general/NavigationButtonWrapper'
 
 export const Route = createFileRoute('/show/$showId')({
   // TanStack Query: prefetch the show into the cache during SSR / navigation.
@@ -59,13 +60,12 @@ function RouteComponent() {
       <SectionDivider type="flower" />
 
       <ShowDetails show={show} />
-
-      <div className="my-12 flex flex-col sm:flex-row-reverse gap-6 justify-evenly">
+      <NavigationButtonWrapper>
         <ReserveButton show={show} />
         <Button variant={'secondary'} asChild>
           <Link to="/">Home</Link>
         </Button>
-      </div>
+      </NavigationButtonWrapper>
     </PageContainer>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '#/components/ui/button.tsx'
 import SectionCardSkeleton from '../../general/SectionCardSkeleton.tsx'
+import NavigationButtonWrapper from '../../general/NavigationButtonWrapper.tsx'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
@@ -97,14 +98,14 @@ export default function StripePaymentForm({
           {errorMessage}
         </div>
       )}
-      <div className="mt-8 flex items-center justify-between">
+      <NavigationButtonWrapper>
         <Button type="button" variant="secondary" onClick={onCancel}>
           Back
         </Button>
         <Button type="submit" disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Pay Now'}
         </Button>
-      </div>
+      </NavigationButtonWrapper>
     </form>
   )
 }
