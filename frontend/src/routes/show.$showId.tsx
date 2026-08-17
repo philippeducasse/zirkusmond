@@ -35,7 +35,7 @@ function RouteComponent() {
   // loader filled instead of fetching again.
   const { data: show } = useSuspenseQuery(showQueryOptions(showId))
   return (
-    <PageContainer className="px-4">
+    <PageContainer className="px-0 md:px-4">
       <img
         src={show.bannerImage}
         alt={`${show.title} Banner`}
@@ -60,11 +60,11 @@ function RouteComponent() {
 
       <ShowDetails show={show} />
 
-      <div className="my-12 flex justify-evenly">
+      <div className="my-12 flex flex-col sm:flex-row-reverse gap-6 justify-evenly">
+        <ReserveButton show={show} />
         <Button variant={'secondary'} asChild>
           <Link to="/">Home</Link>
         </Button>
-        <ReserveButton show={show} />
       </div>
     </PageContainer>
   )
