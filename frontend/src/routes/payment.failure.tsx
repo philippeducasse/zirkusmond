@@ -40,7 +40,7 @@ function RouteComponent() {
 
       <ContentSection className="text-center text-white max-w-2xl mx-auto">
         <SectionCard className="space-y-6">
-          <h4>Sorry, something went wrong!</h4>
+          <h4 className="font-semibold">Sorry, something went wrong!</h4>
           {eventShowId && (
             <Button asChild>
               <Link
