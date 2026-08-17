@@ -35,7 +35,7 @@ export default function MobileNav({ items }: MobileNavProps) {
       </SheetTrigger>
       <SheetContent
         showCloseButton={false}
-        className="border-l-2 border-primary bg-[url(/images/general/bg_pattern.webp)] bg-repeat w-full"
+        className="border-l-2 border-primary bg-[url(/images/general/bg_pattern.webp)] bg-repeat w-full max-w-dvw"
       >
         <SheetHeader className="flex flex-row justify-between">
           <SheetTitle className="text-primary text-2xl max-w-1/2">
