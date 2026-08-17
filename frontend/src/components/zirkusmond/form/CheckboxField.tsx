@@ -17,9 +17,12 @@ export default function CheckboxField({
   return (
     <Field
       orientation="horizontal"
-      className="my-4 sm:my-6 flex p-3 sm:p-4 items-center px-6"
+      className="my-4 sm:my-6 flex p-4 sm:p-4 items-center max-w-62 sm:max-w-md md:max-w-lg"
     >
-      <FieldLabel htmlFor={id} className="text-base sm:text-lg md:text-xl">
+      <FieldLabel
+        htmlFor={id}
+        className="text-base sm:text-lg md:text-xl w-min flex-none"
+      >
         {label}
       </FieldLabel>
       <Checkbox
