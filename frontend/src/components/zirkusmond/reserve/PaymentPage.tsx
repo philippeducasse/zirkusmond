@@ -54,14 +54,14 @@ export default function PaymentPage({
       <div className="max-w-xl">
         <CrossFade
           isLoading={reservationQuery.isPending}
-          skeleton={<SectionCardSkeleton lines={6} className="p-12" />}
+          skeleton={<SectionCardSkeleton lines={6} className="p-6 sm:p-12" />}
         >
           {reservationQuery.isError ? (
-            <SectionCard className="p-12">
+            <SectionCard className="p-6 sm:p-12">
               <p>Error loading reservation details. Please try again.</p>
             </SectionCard>
           ) : reservationQuery.data ? (
-            <SectionCard className="p-12">
+            <SectionCard className="p-6 sm:p-12">
               <ReservationSummary
                 reservation={reservationQuery.data}
                 customTicketPrice={customTicketPrice}
