@@ -38,7 +38,7 @@ export default function EventsSection({
         ))}
       </div>
       {(showAllEventsLink || showHomeLink) && (
-        <div className="flex justify-center pt-24">
+        <div className="flex justify-center pt-12 md:pt-24">
           <Button asChild>
             {showAllEventsLink ? (
               <Link to="/events">Alle Events ansehen</Link>

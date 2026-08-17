@@ -9,7 +9,7 @@ import { NAV_ITEMS } from './navbar/nav-items.ts'
 export default function Navbar() {
   const { fixed, sentinelRef, scrollThreshold } = useNavbar()
   return (
-    <div className="max-w-dvw overflow-hidden">
+    <div>
       <div
         ref={sentinelRef}
         aria-hidden
@@ -18,7 +18,7 @@ export default function Navbar() {
       />
       <header
         className={cn(
-          'fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-between border-b-[3px] border-primary px-6 backface-hidden transition-all delay-200 duration-[600ms] md:px-12 lg:px-24',
+          'fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-between overflow-hidden border-b-[3px] border-primary px-6 backface-hidden transition-all delay-200 duration-[600ms] md:px-12 lg:px-24',
           fixed
             ? 'visible bg-[url(/images/general/bg_pattern.webp)] opacity-100'
             : 'invisible opacity-0',

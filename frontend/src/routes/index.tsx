@@ -42,7 +42,7 @@ function App() {
       <Hero />
       <PageContainer className="pt-0">
         <EventsSection shows={data.upcomingShows} showAllEventsLink />
-        <GallerySection />
+        {/* <GallerySection /> */}
         <ContactSection />
       </PageContainer>
     </>
