@@ -5,13 +5,15 @@ import { Button } from '#/components/ui/button'
 const locales = ['en', 'de'] as const
 type Locale = (typeof locales)[number]
 
-export default function LocaleSwitcher() {
+export default function LocaleSwitcher({ isMobile }: { isMobile?: boolean }) {
   const { i18n } = useTranslation()
   const currentLocale = i18n.language
 
   const changeLanguage = (locale: Locale) => {
     i18n.changeLanguage(locale)
   }
+
+  console.log({ isMobile })
 
   return (
     <div className="flex items-center gap-1">
@@ -22,7 +24,7 @@ export default function LocaleSwitcher() {
           <Button
             key={locale}
             variant={'outline'}
-            size={'xs'}
+            size={isMobile ? 'default' : 'xs'}
             aria-pressed={isActive}
             onClick={() => changeLanguage(locale)}
             className={cn(

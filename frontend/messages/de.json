@@ -103,5 +103,8 @@
   "sliding_scale_price_per_ticket": "Preis pro Ticket:",
   "sliding_scale_solidarity": "Solidarität",
   "sliding_scale_standard": "Standard",
-  "sliding_scale_support": "Unterstützung"
+  "sliding_scale_support": "Unterstützung",
+
+  "event_card_show_less": "Weniger anzeigen",
+  "event_card_show_all_dates": "Alle Termine anzeigen"
 }

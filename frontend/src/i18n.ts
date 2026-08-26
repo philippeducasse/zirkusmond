@@ -13,6 +13,7 @@ i18n
       en: { translation: en },
       de: { translation: de },
     },
+    lng: 'de',
     fallbackLng: 'de',
     supportedLngs: ['en', 'de'],
     detection: {

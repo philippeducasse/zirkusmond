@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import {
   Card,
@@ -21,6 +22,7 @@ const EventCard = ({
   eventImageUrl,
   eventDates,
 }: EventCardProps) => {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const visibleDates = eventDates.slice(0, 3)
   const hiddenDates = eventDates.slice(3)
@@ -74,7 +76,7 @@ const EventCard = ({
                 setExpanded((prev) => !prev)
               }}
             >
-              {expanded ? 'Show less' : 'Show all dates'}
+              {expanded ? t('event_card_show_less') : t('event_card_show_all_dates')}
               <ChevronDown
                 className={cn(
                   'transition-transform duration-300',

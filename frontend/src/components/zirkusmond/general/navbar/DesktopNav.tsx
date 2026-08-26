@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import {
   NavigationMenu,
@@ -18,6 +19,8 @@ const linkClassName =
   'w-fit rounded-none text-primary bg-transparent p-0 text-xl md:text-2xl hover:bg-transparent focus:bg-transparent'
 
 export default function DesktopNav({ items }: DesktopNavProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="hidden items-center gap-6 md:flex">
       <NavigationMenu viewport={false} className="max-w-none">
@@ -26,9 +29,9 @@ export default function DesktopNav({ items }: DesktopNavProps) {
             <NavigationMenuItem key={item.href}>
               <NavigationMenuLink asChild className={linkClassName}>
                 {item.external ? (
-                  <a href={item.href}>{item.label}</a>
+                  <a href={item.href}>{t(item.labelKey)}</a>
                 ) : (
-                  <Link to={item.href}>{item.label}</Link>
+                  <Link to={item.href}>{t(item.labelKey)}</Link>
                 )}
               </NavigationMenuLink>
             </NavigationMenuItem>
