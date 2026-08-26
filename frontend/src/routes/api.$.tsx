@@ -1,3 +1,11 @@
+/**
+ * Dev-only API proxy route.
+ *
+ * In production, nginx routes /api/* directly to Django. In development we need
+ * this TanStack Start route to proxy browser requests to Django, since nginx
+ * isn't running locally.
+ *
+ */
 import { createFileRoute } from '@tanstack/react-router'
 
 import { SERVER_API_URL } from '#/lib/api.ts'
