@@ -13,8 +13,6 @@ export default function LocaleSwitcher({ isMobile }: { isMobile?: boolean }) {
     i18n.changeLanguage(locale)
   }
 
-  console.log({ isMobile })
-
   return (
     <div className="flex items-center gap-1">
       {locales.map((locale) => {
