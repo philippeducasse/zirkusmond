@@ -8,7 +8,6 @@ WORKDIR /build/frontend
 
 # Copy package files
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
-COPY frontend/project.inlang ./project.inlang
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
