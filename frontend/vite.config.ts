@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
-import { paraglideVitePlugin } from '@inlang/paraglide-js'
 import { nitro } from 'nitro/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 
@@ -19,11 +18,6 @@ const config = defineConfig({
   },
   plugins: [
     devtools(),
-    paraglideVitePlugin({
-      project: './project.inlang',
-      outdir: './src/paraglide',
-      strategy: ['url', 'baseLocale'],
-    }),
     tailwindcss(),
     tanstackStart(),
     nitro(),

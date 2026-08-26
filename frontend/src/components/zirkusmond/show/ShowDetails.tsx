@@ -1,17 +1,18 @@
 import type { Show } from '#/interfaces/show'
 import SectionCard from '../general/SectionCard'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 interface ShowDetailsProps {
   show: Show
 }
 
 export function ShowDetails({ show }: ShowDetailsProps) {
+  const { t } = useTranslation()
   return (
     <SectionCard>
       <div className="flex flex-col text-base sm:text-lg lg:text-2xl">
         <div>
-          <h3 className="mt-6 sm:mt-8 mb-3 sm:mb-4">{m.show_about()}</h3>
+          <h3 className="mt-6 sm:mt-8 mb-3 sm:mb-4">{t('show_about')}</h3>
           <div dangerouslySetInnerHTML={{ __html: show.description }} />
         </div>
         <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-8 sm:gap-12">
@@ -21,7 +22,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
             className="w-full max-w-sm object-cover"
           />
           <div className="flex flex-col lg:mt-12">
-            <h3 className="mt-3 sm:mt-4 mb-3 sm:mb-4">{m.show_cast()}</h3>
+            <h3 className="mt-3 sm:mt-4 mb-3 sm:mb-4">{t('show_cast')}</h3>
             <div dangerouslySetInnerHTML={{ __html: show.cast }} />
           </div>
         </div>
@@ -33,7 +34,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
               target="_blank"
               rel="noreferrer"
             >
-              {m.show_trailer()}
+              {t('show_trailer')}
             </a>
           )}
           {show.websiteLink && (
@@ -43,7 +44,7 @@ export function ShowDetails({ show }: ShowDetailsProps) {
               target="_blank"
               rel="noreferrer"
             >
-              {m.show_website()}
+              {t('show_website')}
             </a>
           )}
         </div>

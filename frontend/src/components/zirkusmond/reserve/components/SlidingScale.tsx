@@ -1,5 +1,6 @@
 import { Slider } from '#/components/ui/slider.tsx'
 import type { Show } from '#/interfaces/show'
+import { useTranslation } from 'react-i18next'
 
 interface PriceLabelProps {
   label: string
@@ -33,6 +34,8 @@ export default function SlidingScale({
   customPrice,
   setCustomPrice,
 }: SlidingScaleProps) {
+  const { t } = useTranslation()
+
   if (!show.baseTicketPrice) return null
 
   const minPrice = show.minTicketPrice ?? show.baseTicketPrice - 10
@@ -40,15 +43,13 @@ export default function SlidingScale({
 
   return (
     <div className="my-4 sm:my-6">
-      <h4 className="mb-2 sm:mb-3 text-primary">Choose Your Price</h4>
-      <p className="my-4 sm:my-6">
-        We offer sliding scale pricing to make our shows accessible. Pay what
-        feels right for you! Your generosity directly supports the artists and
-        sustains our community.
-      </p>
+      <h4 className="mb-2 sm:mb-3 text-primary text-center">
+        {t('sliding_scale_title')}
+      </h4>
+      <p className="my-4 sm:my-6">{t('sliding_scale_description')}</p>
       <div className="mb-6 sm:mb-8 flex items-center justify-center gap-3 sm:gap-4 p-4 sm:p-5">
         <span className="text-lg sm:text-xl md:text-2xl font-semibold text-white/80">
-          Price per Ticket:
+          {t('sliding_scale_price_per_ticket')}
         </span>
         <span className="text-xl md:text-3xl font-bold text-primary">
           {customPrice}
@@ -63,13 +64,21 @@ export default function SlidingScale({
         step={1}
       />
       <div className="mt-4 sm:mt-5 flex justify-between text-xs sm:text-sm md:text-base text-white/80 font-medium px-2 sm:px-4">
-        <PriceLabel label="Solidarity" price={minPrice} alignment="start" />
         <PriceLabel
-          label="Standard"
+          label={t('sliding_scale_solidarity')}
+          price={minPrice}
+          alignment="start"
+        />
+        <PriceLabel
+          label={t('sliding_scale_standard')}
           price={show.baseTicketPrice}
           alignment="center"
         />
-        <PriceLabel label="Support" price={maxPrice} alignment="end" />
+        <PriceLabel
+          label={t('sliding_scale_support')}
+          price={maxPrice}
+          alignment="end"
+        />
       </div>
     </div>
   )

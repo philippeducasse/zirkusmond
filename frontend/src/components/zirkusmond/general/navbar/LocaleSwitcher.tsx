@@ -1,14 +1,17 @@
-// Locale switcher refs:
-// - Paraglide docs: https://inlang.com/m/gerre34r/library-inlang-paraglideJs
-// - Router example: https://github.com/TanStack/router/tree/main/examples/react/i18n-paraglide#switching-locale
-import { getLocale, locales, setLocale } from '#/paraglide/runtime'
+import { useTranslation } from 'react-i18next'
 import { cn } from '#/lib/utils.ts'
 import { Button } from '#/components/ui/button'
 
+const locales = ['en', 'de'] as const
 type Locale = (typeof locales)[number]
 
 export default function LocaleSwitcher() {
-  const currentLocale = getLocale()
+  const { i18n } = useTranslation()
+  const currentLocale = i18n.language
+
+  const changeLanguage = (locale: Locale) => {
+    i18n.changeLanguage(locale)
+  }
 
   return (
     <div className="flex items-center gap-1">
@@ -21,7 +24,7 @@ export default function LocaleSwitcher() {
             variant={'outline'}
             size={'xs'}
             aria-pressed={isActive}
-            onClick={() => setLocale(locale as Locale)}
+            onClick={() => changeLanguage(locale)}
             className={cn(
               isActive
                 ? 'border-primary bg-black/5 text-primary shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)]'

@@ -1,14 +1,15 @@
 import type { CheckInSuccess as CheckInSuccessData } from '#/interfaces/qr-scanner.ts'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 interface CheckInSuccessProps {
   data: CheckInSuccessData
 }
 
 export function CheckInSuccess({ data }: CheckInSuccessProps) {
+  const { t } = useTranslation()
   return (
     <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-      <h2 className="font-bold text-green-800 text-6xl mb-2">{m.qr_checked_in()}</h2>
+      <h2 className="font-bold text-green-800 text-6xl mb-2">{t('qr_checked_in')}</h2>
       <div className="flex flex-col items-center">
         <svg
           className="w-28 h-28 mx-auto text-green-500 mb-4"
@@ -23,19 +24,19 @@ export function CheckInSuccess({ data }: CheckInSuccessProps) {
           {data.isGroup ? (
             <>
               <p className="text-6xl">
-                <strong>{m.qr_tickets()}:</strong> {data.guests.length}
+                <strong>{t('qr_tickets')}:</strong> {data.guests.length}
               </p>
               <p className="text-5xl">
-                <strong>{m.qr_guests()}:</strong> {data.guests.join(', ')}
+                <strong>{t('qr_guests')}:</strong> {data.guests.join(', ')}
               </p>
             </>
           ) : (
             <p className="text-5xl">
-              <strong>{m.qr_guest()}:</strong> {data.guests[0]}
+              <strong>{t('qr_guest')}:</strong> {data.guests[0]}
             </p>
           )}
           <p className="text-5xl">
-            <strong>{m.qr_reservation_id()}:</strong> {data.reservationNumber}
+            <strong>{t('qr_reservation_id')}:</strong> {data.reservationNumber}
           </p>
         </div>
       </div>

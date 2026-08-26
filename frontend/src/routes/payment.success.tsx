@@ -9,7 +9,7 @@ import { Button } from '#/components/ui/button'
 import SectionCard from '#/components/zirkusmond/general/SectionCard'
 import SectionCardSkeleton from '#/components/zirkusmond/general/SectionCardSkeleton'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 interface PaymentSuccessSearch {
   reservationId: string
@@ -30,6 +30,7 @@ export const Route = createFileRoute('/payment/success')({
 })
 
 function RouteComponent() {
+  const { t } = useTranslation()
   const { reservationId } = Route.useSearch()
 
   const reservationQuery = useQuery(
@@ -38,7 +39,7 @@ function RouteComponent() {
 
   return (
     <PageContainer>
-      <PageHeader>{m.page_payment_success_title()}</PageHeader>
+      <PageHeader>{t('page_payment_success_title')}</PageHeader>
 
       <ContentSection
         className="text-center text-white md:text-xl max-w-3xl mx-auto"
@@ -47,18 +48,18 @@ function RouteComponent() {
       >
         {reservationQuery.isError ? (
           <SectionCard>
-            <p>{m.page_payment_success_error()}</p>
+            <p>{t('page_payment_success_error')}</p>
           </SectionCard>
         ) : reservationQuery.data ? (
           <SectionCard className="space-y-6">
             <p>
-              {m.page_payment_success_confirmation({ email: reservationQuery.data.email })}
+              {t('page_payment_success_confirmation', { email: reservationQuery.data.email })}
             </p>
 
             {(reservationQuery.data.showTime ||
               reservationQuery.data.admissionTime) && (
               <p>
-                {m.page_payment_success_timing({
+                {t('page_payment_success_timing', {
                   admissionTime: reservationQuery.data.admissionTime,
                   showTime: reservationQuery.data.showTime
                 })}
@@ -66,23 +67,23 @@ function RouteComponent() {
             )}
 
             <p>
-              {m.page_payment_success_directions()}{' '}
+              {t('page_payment_success_directions')}{' '}
               <a
                 href="https://www.openstreetmap.org/directions?from=&to=52.54226%2C13.43250"
                 className="text-primary hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {m.page_payment_success_directions_link()}
+                {t('page_payment_success_directions_link')}
               </a>
             </p>
 
-            <p className="text-2xl">{m.page_payment_success_see_you()}</p>
+            <p className="text-2xl">{t('page_payment_success_see_you')}</p>
           </SectionCard>
         ) : null}
         <SectionDivider type="flower" />
         <Button asChild>
-          <Link to="/">{m.button_back_to_home()}</Link>
+          <Link to="/">{t('button_back_to_home')}</Link>
         </Button>
       </ContentSection>
     </PageContainer>

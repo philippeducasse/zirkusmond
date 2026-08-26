@@ -1,4 +1,4 @@
-import * as m from '#/paraglide/messages'
+import i18n from '#/i18n'
 
 export interface NavItem {
   label: string
@@ -8,7 +8,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: m.nav_events(), href: '/events' },
-  { label: m.nav_about(), href: '/about' },
-  { label: m.nav_contact(), href: '/contact' },
+  { label: i18n.t('nav_events'), href: '/events' },
+  { label: i18n.t('nav_about'), href: '/about' },
+  { label: i18n.t('nav_contact'), href: '/contact' },
 ]

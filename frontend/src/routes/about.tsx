@@ -6,7 +6,7 @@ import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import TeamGrid from '#/components/zirkusmond/general/TeamGrid'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import SectionCard from '#/components/zirkusmond/general/SectionCard'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
@@ -27,34 +27,36 @@ export const Route = createFileRoute('/about')({
   component: About,
 })
 
-const team = [
-  {
-    image: '/images/team/MnM.webp',
-    name: 'Max & Marlen',
-    role: m.role_zirkus_directors(),
-  },
-  {
-    image: '/images/gallery/img-6.webp',
-    name: 'Juan',
-    role: m.role_artistic_director(),
-  },
-  {
-    image: '/images/team/maria.webp',
-    name: 'Maria',
-    role: m.role_head_of_productions(),
-  },
-  {
-    image: '/images/team/valerio.webp',
-    name: 'Valerio',
-    role: m.role_technician(),
-  },
-  { image: '/images/team/philo_alex.jpg', name: 'Philo & Alex', role: m.role_it() },
-]
-
 function About() {
+  const { t } = useTranslation()
+
+  const team = [
+    {
+      image: '/images/team/MnM.webp',
+      name: 'Max & Marlen',
+      role: t('role_zirkus_directors'),
+    },
+    {
+      image: '/images/gallery/img-6.webp',
+      name: 'Juan',
+      role: t('role_artistic_director'),
+    },
+    {
+      image: '/images/team/maria.webp',
+      name: 'Maria',
+      role: t('role_head_of_productions'),
+    },
+    {
+      image: '/images/team/valerio.webp',
+      name: 'Valerio',
+      role: t('role_technician'),
+    },
+    { image: '/images/team/philo_alex.jpg', name: 'Philo & Alex', role: t('role_it') },
+  ]
+
   return (
     <PageContainer>
-      <PageHeader>{m.page_about_title()}</PageHeader>
+      <PageHeader>{t('page_about_title')}</PageHeader>
 
       <ContentSection>
         <SectionCard className="p-0!">
@@ -65,17 +67,17 @@ function About() {
           />
           <div className="p-6 md:px-24 md:pb-12">
             <p>
-              {m.page_about_content_p1()}
+              {t('page_about_content_p1')}
             </p>
             <p>
-              {m.page_about_content_p2()}
+              {t('page_about_content_p2')}
             </p>
           </div>
         </SectionCard>
       </ContentSection>
 
       <SectionDivider type="kite" margin="small" className="mb-10" />
-      <PageHeader className="mt-12 sm:mt-16">{m.page_about_team()}</PageHeader>
+      <PageHeader className="mt-12 sm:mt-16">{t('page_about_team')}</PageHeader>
       <TeamGrid members={team} />
     </PageContainer>
   )

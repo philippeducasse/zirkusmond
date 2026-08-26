@@ -4,7 +4,7 @@ import type { CheckboxFieldProps } from '#/components/zirkusmond/form/CheckboxFi
 import type { NumberFieldProps } from '#/components/zirkusmond/form/NumberField'
 import type { SelectFieldProps } from '#/components/zirkusmond/form/SelectField'
 import type { TextFieldProps } from '#/components/zirkusmond/form/TextField'
-import * as m from '#/paraglide/messages'
+import i18n from '#/i18n'
 
 export enum FieldType {
   Select = 'select',
@@ -40,8 +40,8 @@ export function buildTicketFields({
     {
       fieldType: FieldType.Select,
       id: 'event',
-      label: m.form_event(),
-      placeholder: m.form_event_placeholder(),
+      label: i18n.t('form_event'),
+      placeholder: i18n.t('form_event_placeholder'),
       value: selectedEventId,
       onChange: setSelectedEventId,
       options: show.upcomingEvents.map((event: ShowEvent) => ({
@@ -52,7 +52,7 @@ export function buildTicketFields({
     {
       fieldType: FieldType.Number,
       id: 'attendee-count',
-      label: m.form_tickets(),
+      label: i18n.t('form_tickets'),
       value: attendeeCount,
       onChange: (count) => setAttendeeCount(Math.min(10, Math.max(1, count))),
       min: 1,
@@ -74,7 +74,7 @@ export function buildNewsletterField({
     {
       fieldType: FieldType.Checkbox,
       id: 'newsletter',
-      label: m.form_newsletter(),
+      label: i18n.t('form_newsletter'),
       checked: newsletter,
       onChange: setNewsletter,
     },
@@ -86,21 +86,21 @@ export function buildPersonalInfoFields(): DynamicFieldConfig[] {
     {
       fieldType: FieldType.Text,
       id: 'first-name',
-      label: m.form_first_name(),
+      label: i18n.t('form_first_name'),
       name: 'firstName',
       required: true,
     },
     {
       fieldType: FieldType.Text,
       id: 'last-name',
-      label: m.form_last_name(),
+      label: i18n.t('form_last_name'),
       name: 'lastName',
       required: true,
     },
     {
       fieldType: FieldType.Text,
       id: 'email',
-      label: m.form_email(),
+      label: i18n.t('form_email'),
       name: 'email',
       type: 'email',
       required: true,
@@ -113,14 +113,14 @@ export function buildGuestFields(index: number): DynamicFieldConfig[] {
     {
       fieldType: FieldType.Text,
       id: `guest-${index}-first-name`,
-      label: m.form_first_name(),
+      label: i18n.t('form_first_name'),
       name: `guest-${index}-first-name`,
       required: true,
     },
     {
       fieldType: FieldType.Text,
       id: `guest-${index}-last-name`,
-      label: m.form_last_name(),
+      label: i18n.t('form_last_name'),
       name: `guest-${index}-last-name`,
       required: true,
     },

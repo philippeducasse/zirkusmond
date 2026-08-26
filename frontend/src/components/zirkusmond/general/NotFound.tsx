@@ -5,27 +5,28 @@ import PageHeader from '#/components/zirkusmond/general/PageHeader'
 import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import SectionCard from '#/components/zirkusmond/general/SectionCard'
 import { Button } from '#/components/ui/button.tsx'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 interface NotFoundProps {
   entityName?: string
 }
 
 export default function NotFound({ entityName = 'Page' }: NotFoundProps) {
+  const { t } = useTranslation()
   return (
     <PageContainer className="flex flex-col items-center gap-6 px-4 text-center">
-      <PageHeader>{m.not_found_title({ entity: entityName })}</PageHeader>
+      <PageHeader>{t('not_found_title', { entity: entityName })}</PageHeader>
       <ContentSection>
         <SectionCard>
           <p>
-            {m.not_found_message({ entity: entityName.toLowerCase() })}
+            {t('not_found_message', { entity: entityName.toLowerCase() })}
           </p>
           <Button
             variant={'secondary'}
             asChild
             className=" w-full md:w-1/2 mx-auto mt-10"
           >
-            <Link to="/">{m.common_home()}</Link>
+            <Link to="/">{t('common_home')}</Link>
           </Button>
         </SectionCard>
       </ContentSection>

@@ -7,7 +7,7 @@ import {
 } from '#/components/ui/carousel.tsx'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import ContentSection from '../general/ContentSection'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 const GALLERY_IMAGES = Array.from(
   { length: 10 },
@@ -15,6 +15,7 @@ const GALLERY_IMAGES = Array.from(
 )
 
 export default function GallerySection() {
+  const { t } = useTranslation()
   return (
     <ContentSection>
       {/* TODO: prepend a video slide once media/video/video.mp4 exists */}
@@ -24,7 +25,7 @@ export default function GallerySection() {
             <CarouselItem key={src}>
               <img
                 src={src}
-                alt={m.gallery_image({ number: i + 1 })}
+                alt={t('gallery_image', { number: i + 1 })}
                 className="aspect-video w-full object-cover"
               />
             </CarouselItem>

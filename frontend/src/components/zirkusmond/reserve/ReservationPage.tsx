@@ -10,13 +10,14 @@ import NewsletterForm from './components/NewsletterForm.tsx'
 import SlidingScale from './components/SlidingScale.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 import NavigationButtonWrapper from '../general/NavigationButtonWrapper.tsx'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 interface ReservationPageProps {
   show: Show
 }
 
 export default function ReservationPage({ show }: ReservationPageProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [selectedEventId, setSelectedEventId] = useState(
     show.upcomingEvents[0]?.id ?? '',
@@ -78,12 +79,12 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             })
           } catch (err) {
             setIsProcessing(false)
-            setError(err instanceof Error ? err.message : m.reservation_error_generic())
+            setError(err instanceof Error ? err.message : t('reservation_error_generic'))
           }
         },
         onError: (err) => {
           setIsProcessing(false)
-          setError(err instanceof Error ? err.message : m.reservation_error_generic())
+          setError(err instanceof Error ? err.message : t('reservation_error_generic'))
         },
       },
     )
@@ -113,7 +114,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             variant="secondary"
             onClick={handleFillDummyData}
           >
-            {m.button_fill_test_data()}
+            {t('button_fill_test_data')}
           </Button>
         </div>
         {/* )} */}
@@ -142,7 +143,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
 
           <div className="my-3 sm:my-4 text-center">
             <h4>
-              {m.reservation_total_price()}:{' '}
+              {t('reservation_total_price')}:{' '}
               <span className="font-bold">
                 {(attendeeCount * customPrice).toFixed(2)}
               </span>{' '}
@@ -162,10 +163,10 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               disabled={isProcessing}
               className="sm:min-w-[200px]"
             >
-              {isProcessing ? m.button_processing() : m.button_proceed_to_payment()}
+              {isProcessing ? t('button_processing') : t('button_proceed_to_payment')}
             </Button>
             <Button type="button" variant="secondary" onClick={handleBack}>
-              {m.button_back_to_show()}
+              {t('button_back_to_show')}
             </Button>
           </NavigationButtonWrapper>
         </SectionCard>

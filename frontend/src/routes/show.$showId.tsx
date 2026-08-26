@@ -10,7 +10,7 @@ import { Button } from '#/components/ui/button.tsx'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
 import NotFound from '#/components/zirkusmond/general/NotFound'
 import NavigationButtonWrapper from '#/components/zirkusmond/general/NavigationButtonWrapper'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/show/$showId')({
   // TanStack Query: prefetch the show into the cache during SSR / navigation.
@@ -32,6 +32,7 @@ export const Route = createFileRoute('/show/$showId')({
 })
 
 function RouteComponent() {
+  const { t } = useTranslation()
   const { showId } = Route.useParams()
   // TanStack Query: same key as the loader, so this reads from the cache the
   // loader filled instead of fetching again.
@@ -64,7 +65,7 @@ function RouteComponent() {
       <NavigationButtonWrapper>
         <ReserveButton show={show} />
         <Button variant={'secondary'} asChild>
-          <Link to="/">{m.common_home()}</Link>
+          <Link to="/">{t('common_home')}</Link>
         </Button>
       </NavigationButtonWrapper>
     </PageContainer>

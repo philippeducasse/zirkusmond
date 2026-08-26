@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router'
 
 import SectionDivider from './SectionDivider'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 const Footer = () => {
+  const { t } = useTranslation()
   return (
     <>
       <SectionDivider type="moon" margin={'small'} />
@@ -13,22 +14,22 @@ const Footer = () => {
             to="/impressum"
             className="text-base sm:text-lg md:text-xl underline"
           >
-            {m.footer_impressum()}
+            {t('footer_impressum')}
           </Link>
           <Link
             to="/datenschutz"
             className="text-base sm:text-lg md:text-xl underline"
           >
-            {m.footer_datenschutz()}
+            {t('footer_datenschutz')}
           </Link>
         </div>
         <div className="flex flex-col md:flex-row align-middle justify-centertext-sm sm:text-base">
           <p className="px-4 lg:w-1/3 text-sm">
-            {m.footer_address()}
+            {t('footer_address')}
           </p>
-          <p className="px-4 lg:w-1/3 text-sm">{m.footer_director()}</p>
+          <p className="px-4 lg:w-1/3 text-sm">{t('footer_director')}</p>
           <p className="px-4 lg:w-1/3 text-sm">
-            {m.footer_tax_info()}
+            {t('footer_tax_info')}
           </p>
         </div>
       </div>

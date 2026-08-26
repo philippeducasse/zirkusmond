@@ -6,7 +6,7 @@ import { Button } from '#/components/ui/button.tsx'
 import type { ShowCard } from '#/interfaces/show.ts'
 import PageHeader from '../general/PageHeader'
 import ContentSection from '../general/ContentSection'
-import * as m from '#/paraglide/messages'
+import { useTranslation } from 'react-i18next'
 
 interface EventsSectionProps {
   shows: ShowCard[]
@@ -19,9 +19,10 @@ export default function EventsSection({
   showAllEventsLink = false,
   showHomeLink = false,
 }: EventsSectionProps) {
+  const { t } = useTranslation()
   return (
     <ContentSection>
-      <PageHeader>{m.page_events_title()}</PageHeader>
+      <PageHeader>{t('page_events_title')}</PageHeader>
 
       <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 md:px-6 px-0">
         {shows.map((show) => (
@@ -42,9 +43,9 @@ export default function EventsSection({
         <div className="flex justify-center pt-12 md:pt-24">
           <Button asChild>
             {showAllEventsLink ? (
-              <Link to="/events">{m.button_all_events()}</Link>
+              <Link to="/events">{t('button_all_events')}</Link>
             ) : (
-              <Link to="/">{m.button_back_to_home()}</Link>
+              <Link to="/">{t('button_back_to_home')}</Link>
             )}
           </Button>
         </div>

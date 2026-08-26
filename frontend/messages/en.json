@@ -96,5 +96,12 @@
   "not_found_title": "{entity} not found",
   "not_found_message": "This {entity} doesn't exist or is no longer available.",
 
-  "gallery_image": "Gallery image {number}"
+  "gallery_image": "Gallery image {number}",
+
+  "sliding_scale_title": "Choose Your Price",
+  "sliding_scale_description": "We offer sliding scale pricing to make our shows accessible. Pay what feels right for you! Your generosity directly supports the artists and sustains our community.",
+  "sliding_scale_price_per_ticket": "Price per Ticket:",
+  "sliding_scale_solidarity": "Solidarity",
+  "sliding_scale_standard": "Standard",
+  "sliding_scale_support": "Support"
 }
