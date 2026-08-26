@@ -10,6 +10,7 @@ import { Button } from '#/components/ui/button.tsx'
 import { ApiError, showQueryOptions } from '#/lib/api.ts'
 import NotFound from '#/components/zirkusmond/general/NotFound'
 import NavigationButtonWrapper from '#/components/zirkusmond/general/NavigationButtonWrapper'
+import * as m from '#/paraglide/messages'
 
 export const Route = createFileRoute('/show/$showId')({
   // TanStack Query: prefetch the show into the cache during SSR / navigation.
@@ -63,7 +64,7 @@ function RouteComponent() {
       <NavigationButtonWrapper>
         <ReserveButton show={show} />
         <Button variant={'secondary'} asChild>
-          <Link to="/">Home</Link>
+          <Link to="/">{m.common_home()}</Link>
         </Button>
       </NavigationButtonWrapper>
     </PageContainer>

@@ -1,9 +1,100 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "home_page": "Home page",
-  "about_page": "About page",
-  "example_message": "Welcome to your i18n app.",
+
+  "nav_events": "Events",
+  "nav_about": "About",
+  "nav_contact": "Contact",
+
+  "footer_impressum": "Imprint",
+  "footer_datenschutz": "Privacy Policy",
+  "footer_address": "Lilli-Henoch-Str. Office at: Kultstätte 58 GmbH Körtestraße 38 10967 Berlin",
+  "footer_director": "Managing Director Max Mohr",
+  "footer_tax_info": "Tax No.: 37 / 406 / 50011 Tax ID: DE65 812 397 023 VAT ID: DE319431419",
+
+  "form_first_name": "First name",
+  "form_last_name": "Last name",
+  "form_email": "Email",
+  "form_event": "Event",
+  "form_event_placeholder": "Select date",
+  "form_tickets": "Tickets",
+  "form_newsletter": "I would like to receive the Zirkus Mond newsletter",
+  "form_guest_number": "Guest {number}",
+
+  "button_back_to_home": "Back to Home",
+  "button_back_to_show": "Back to Show",
+  "button_proceed_to_payment": "Proceed to Payment",
+  "button_processing": "Processing...",
+  "button_fill_test_data": "Fill test data",
+  "button_all_events": "View all events",
+
+  "page_about_title": "Welcome to the Moon",
+  "page_about_team": "Meet the Team",
+  "page_about_content_p1": "Zirkus Mond, meeting point of the Berlin artist scene, venue for circus, theater, dance & concerts, emerged in 2018 from the activities of the Children of the Moon, a fluid collective of international artists, dancers & performers who had been operating in Berlin's cultural underground for over 10 years, periodically filling vacant buildings, wastelands, or public spaces with love and life. Now, in the celestial habitat Zirkus Mond, there are 2 self-produced shows and 2 guest events every month, with each show being unique due to changing artists and concepts.",
+  "page_about_content_p2": "The gates of our circus tent are open to all who wish to visit, perform in, and help shape a place of community, creativity, and love of life.",
+
+  "role_zirkus_directors": "Zirkus Directors",
+  "role_artistic_director": "Artistic Director",
+  "role_head_of_productions": "Head of Productions",
+  "role_technician": "Technician",
+  "role_it": "IT",
+
+  "page_events_title": "Upcoming Shows",
+
+  "page_payment_success_title": "Thank you for your reservation",
+  "page_payment_success_confirmation": "A confirmation email has been sent to {email}. Please check your spam folder as well. We look forward to seeing you!",
+  "page_payment_success_timing": "We open our gates at {admissionTime}, the show will start at {showTime}",
+  "page_payment_success_directions": "If you have not been to our tent yet, here are",
+  "page_payment_success_directions_link": "directions",
+  "page_payment_success_see_you": "See you at Zirkus Mond and have fun!",
+  "page_payment_success_error": "Error loading reservation details. Please contact support.",
+
+  "page_payment_failure_title": "Payment Failed",
+  "page_payment_failure_heading": "Sorry, something went wrong!",
+  "page_payment_failure_try_again": "Try again?",
+  "page_payment_failure_contact": "If you think this has been a mistake on our side, please email:",
+  "page_payment_failure_mention_id": "and mention your ID:",
+
+  "reservation_total_price": "Total Price",
+  "reservation_error_generic": "An error occurred",
+
+  "qr_checked_in": "Checked In",
+  "qr_tickets": "Tickets",
+  "qr_guests": "Guests",
+  "qr_guest": "Guest",
+  "qr_reservation_id": "Reservation ID",
+
+  "error_generic": "An error occurred",
+
   "language_label": "Language",
-  "current_locale": "Current locale: {locale}",
-  "learn_router": "Learn Paraglide JS"
+
+  "common_home": "Home",
+  "common_link": "Link",
+  "common_submit": "Submit",
+
+  "page_contact_title": "Contact Us",
+  "page_contact_reservations": "Direct matters concerning reservations",
+  "page_contact_donate": "Donate via PayPal",
+  "page_contact_find_us": "Find us",
+  "page_contact_mailing_list": "Mailing List",
+  "page_contact_mailing_description": "Want to be notified about new Shows? Hear what's going on on the moon? Not be forgotten or left out? Become part of our magical Mailing List!",
+  "page_contact_telegram": "You can also join our Telegram",
+  "page_contact_channel": "channel",
+  "page_contact_telegram_join": "!",
+
+  "page_rentals_title": "Rentals",
+  "page_rentals_heading": "Rent our Zirkus stuff!!",
+  "page_rentals_description": "Very very cheap, very very nice.",
+
+  "show_about": "About the show:",
+  "show_cast": "Cast:",
+  "show_trailer": "Trailer",
+  "show_website": "Company's website",
+  "show_admission": "Admission:",
+  "show_reserve": "Reserve",
+  "show_buy_tickets": "Buy Tickets",
+
+  "not_found_title": "{entity} not found",
+  "not_found_message": "This {entity} doesn't exist or is no longer available.",
+
+  "gallery_image": "Gallery image {number}"
 }

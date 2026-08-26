@@ -5,6 +5,7 @@ import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import PageHeader from '#/components/zirkusmond/general/PageHeader'
 import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import { MOCK_RENTAL_OBJECTS } from '#/interfaces/rentals'
+import * as m from '#/paraglide/messages'
 
 export const Route = createFileRoute('/rentals')({
   head: () => ({
@@ -23,12 +24,12 @@ export const Route = createFileRoute('/rentals')({
 function RouteComponent() {
   return (
     <PageContainer className="px-4">
-      <PageHeader>Rentals</PageHeader>
+      <PageHeader>{m.page_rentals_title()}</PageHeader>
 
       <ContentSection className="mb-6 sm:mb-8">
-        <h3 className="text-center">Rent our Zirkus stuff!!</h3>
+        <h3 className="text-center">{m.page_rentals_heading()}</h3>
         <p className="py-6 sm:py-8 text-center">
-          Very very cheap, very very nice.
+          {m.page_rentals_description()}
         </p>
       </ContentSection>
 
@@ -46,7 +47,7 @@ function RouteComponent() {
               rel="noreferrer"
               className="text-center text-lg sm:text-xl md:text-2xl font-bold underline text-(--sea-ink)"
             >
-              Link
+              {m.common_link()}
             </a>
           </ContentSection>
         ))}

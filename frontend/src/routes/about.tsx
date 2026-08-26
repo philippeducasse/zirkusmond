@@ -6,6 +6,7 @@ import ContentSection from '#/components/zirkusmond/general/ContentSection'
 import TeamGrid from '#/components/zirkusmond/general/TeamGrid'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import SectionCard from '#/components/zirkusmond/general/SectionCard'
+import * as m from '#/paraglide/messages'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
@@ -30,30 +31,30 @@ const team = [
   {
     image: '/images/team/MnM.webp',
     name: 'Max & Marlen',
-    role: 'Zirkus Directors',
+    role: m.role_zirkus_directors(),
   },
   {
     image: '/images/gallery/img-6.webp',
     name: 'Juan',
-    role: 'Artistic Director',
+    role: m.role_artistic_director(),
   },
   {
     image: '/images/team/maria.webp',
     name: 'Maria',
-    role: 'Head of Productions',
+    role: m.role_head_of_productions(),
   },
   {
     image: '/images/team/valerio.webp',
     name: 'Valerio',
-    role: 'Technician',
+    role: m.role_technician(),
   },
-  { image: '/images/team/philo_alex.jpg', name: 'Philo & Alex', role: 'IT' },
+  { image: '/images/team/philo_alex.jpg', name: 'Philo & Alex', role: m.role_it() },
 ]
 
 function About() {
   return (
     <PageContainer>
-      <PageHeader>Welcome to the Moon</PageHeader>
+      <PageHeader>{m.page_about_title()}</PageHeader>
 
       <ContentSection>
         <SectionCard className="p-0!">
@@ -64,29 +65,17 @@ function About() {
           />
           <div className="p-6 md:px-24 md:pb-12">
             <p>
-              Der Zirkus Mond, Treffpunkt der Berliner Artistenszene,
-              Veranstaltungsort für Zirkus, Theater, Tanz &amp; Konzerte erwuchs
-              2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden
-              Kollektiv internationaler ArtistInnen, TänzerInnen &amp;
-              KünstlerInnen, die zuvor über 10 Jahre im kulturellen Untergrund
-              Berlins agierten und in unregelmäßigen Abständen leer stehende
-              Gebäude, Brachflächen oder auch öffentliche Plätze mit Liebe und
-              Leben füllten. Nun gibt es im Himmelskörper-Habitat Zirkus Mond
-              jeden Monat 2 eigenproduzierte Shows und 2 Gastveranstaltungen,
-              wobei durch wechselnde ArtistInnen und Konzepte jede Show ein
-              Unikat ist.
+              {m.page_about_content_p1()}
             </p>
             <p>
-              Die Pforten unseres Zirkuszeltes stehen offen für alle, die Lust
-              haben, einen Ort der Gemeinschaft, des Schaffens und der Liebe zum
-              Leben zu besuchen, zu bespielen und mitzugestalten.
+              {m.page_about_content_p2()}
             </p>
           </div>
         </SectionCard>
       </ContentSection>
 
       <SectionDivider type="kite" margin="small" className="mb-10" />
-      <PageHeader className="mt-12 sm:mt-16">Meet the Team</PageHeader>
+      <PageHeader className="mt-12 sm:mt-16">{m.page_about_team()}</PageHeader>
       <TeamGrid members={team} />
     </PageContainer>
   )

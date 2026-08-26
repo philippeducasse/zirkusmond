@@ -6,6 +6,7 @@ import { Button } from '#/components/ui/button.tsx'
 import type { ShowCard } from '#/interfaces/show.ts'
 import PageHeader from '../general/PageHeader'
 import ContentSection from '../general/ContentSection'
+import * as m from '#/paraglide/messages'
 
 interface EventsSectionProps {
   shows: ShowCard[]
@@ -20,7 +21,7 @@ export default function EventsSection({
 }: EventsSectionProps) {
   return (
     <ContentSection>
-      <PageHeader>Upcoming Shows</PageHeader>
+      <PageHeader>{m.page_events_title()}</PageHeader>
 
       <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 md:px-6 px-0">
         {shows.map((show) => (
@@ -41,9 +42,9 @@ export default function EventsSection({
         <div className="flex justify-center pt-12 md:pt-24">
           <Button asChild>
             {showAllEventsLink ? (
-              <Link to="/events">Alle Events ansehen</Link>
+              <Link to="/events">{m.button_all_events()}</Link>
             ) : (
-              <Link to="/">Zurück zur Startseite</Link>
+              <Link to="/">{m.button_back_to_home()}</Link>
             )}
           </Button>
         </div>

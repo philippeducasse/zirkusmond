@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import ContactSection from '#/components/zirkusmond/home/ContactSection'
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
-import PageHeader from '#/components/zirkusmond/general/PageHeader'
 
 export const Route = createFileRoute('/contact')({
   head: () => ({
@@ -13,7 +12,6 @@ export const Route = createFileRoute('/contact')({
 function RouteComponent() {
   return (
     <PageContainer>
-      <PageHeader>Contact</PageHeader>
       <ContactSection />
     </PageContainer>
   )

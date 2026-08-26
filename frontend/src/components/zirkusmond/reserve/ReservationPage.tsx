@@ -10,6 +10,7 @@ import NewsletterForm from './components/NewsletterForm.tsx'
 import SlidingScale from './components/SlidingScale.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 import NavigationButtonWrapper from '../general/NavigationButtonWrapper.tsx'
+import * as m from '#/paraglide/messages'
 
 interface ReservationPageProps {
   show: Show
@@ -77,12 +78,12 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             })
           } catch (err) {
             setIsProcessing(false)
-            setError(err instanceof Error ? err.message : 'An error occurred')
+            setError(err instanceof Error ? err.message : m.reservation_error_generic())
           }
         },
         onError: (err) => {
           setIsProcessing(false)
-          setError(err instanceof Error ? err.message : 'An error occurred')
+          setError(err instanceof Error ? err.message : m.reservation_error_generic())
         },
       },
     )
@@ -112,7 +113,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             variant="secondary"
             onClick={handleFillDummyData}
           >
-            Fill test data
+            {m.button_fill_test_data()}
           </Button>
         </div>
         {/* )} */}
@@ -141,7 +142,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
 
           <div className="my-3 sm:my-4 text-center">
             <h4>
-              Total Price:{' '}
+              {m.reservation_total_price()}:{' '}
               <span className="font-bold">
                 {(attendeeCount * customPrice).toFixed(2)}
               </span>{' '}
@@ -161,10 +162,10 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               disabled={isProcessing}
               className="sm:min-w-[200px]"
             >
-              {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+              {isProcessing ? m.button_processing() : m.button_proceed_to_payment()}
             </Button>
             <Button type="button" variant="secondary" onClick={handleBack}>
-              Back to Show
+              {m.button_back_to_show()}
             </Button>
           </NavigationButtonWrapper>
         </SectionCard>

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
+import * as m from '#/paraglide/messages'
 
 export function ReserveButton({ show }: { show: Show }) {
   if (show.thirdPartyReservation && show.thirdPartyReservationLink) {
@@ -12,7 +13,7 @@ export function ReserveButton({ show }: { show: Show }) {
           target="_blank"
           rel="noreferrer"
         >
-          Zur Reservierung
+          {m.show_reserve()}
         </a>
       </Button>
     )
@@ -20,7 +21,7 @@ export function ReserveButton({ show }: { show: Show }) {
   return (
     <Button asChild>
       <Link to="/reserve/$showId" params={{ showId: String(show.id) }}>
-        {show.baseTicketPrice ? 'Tickets Kaufen' : 'Zur Reservierung'}
+        {show.baseTicketPrice ? m.show_buy_tickets() : m.show_reserve()}
       </Link>
     </Button>
   )

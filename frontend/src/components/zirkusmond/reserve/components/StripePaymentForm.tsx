@@ -99,11 +99,11 @@ export default function StripePaymentForm({
         </div>
       )}
       <NavigationButtonWrapper>
-        <Button type="button" variant="secondary" onClick={onCancel}>
-          Back
-        </Button>
         <Button type="submit" disabled={isProcessing}>
           {isProcessing ? 'Processing...' : 'Pay Now'}
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Back
         </Button>
       </NavigationButtonWrapper>
     </form>

@@ -1,3 +1,5 @@
+import * as m from '#/paraglide/messages'
+
 export interface NavItem {
   label: string
   href: string
@@ -6,7 +8,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Events', href: '/events' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
+  { label: m.nav_events(), href: '/events' },
+  { label: m.nav_about(), href: '/about' },
+  { label: m.nav_contact(), href: '/contact' },
 ]

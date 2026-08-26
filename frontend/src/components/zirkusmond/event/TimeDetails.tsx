@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription } from '#/components/ui/card.tsx'
+import * as m from '#/paraglide/messages'
 
 interface TimeDetailsProps {
   date: string
@@ -13,7 +14,7 @@ export default function TimeDetails({ date, admissionTime }: TimeDetailsProps) {
           {date}
         </CardDescription>
         <p className="font-semibold">
-          Admission: {admissionTime}
+          {m.show_admission()} {admissionTime}
         </p>
       </CardContent>
     </Card>

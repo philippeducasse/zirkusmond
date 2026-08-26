@@ -9,6 +9,7 @@ import { Button } from '#/components/ui/button'
 import SectionCard from '#/components/zirkusmond/general/SectionCard'
 import SectionCardSkeleton from '#/components/zirkusmond/general/SectionCardSkeleton'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
+import * as m from '#/paraglide/messages'
 
 interface PaymentSuccessSearch {
   reservationId: string
@@ -37,7 +38,7 @@ function RouteComponent() {
 
   return (
     <PageContainer>
-      <PageHeader>Thank you for your reservation</PageHeader>
+      <PageHeader>{m.page_payment_success_title()}</PageHeader>
 
       <ContentSection
         className="text-center text-white md:text-xl max-w-3xl mx-auto"
@@ -46,51 +47,42 @@ function RouteComponent() {
       >
         {reservationQuery.isError ? (
           <SectionCard>
-            <p>Error loading reservation details. Please contact support.</p>
+            <p>{m.page_payment_success_error()}</p>
           </SectionCard>
         ) : reservationQuery.data ? (
           <SectionCard className="space-y-6">
             <p>
-              A confirmation email has been sent to{' '}
-              <span className="font-bold text-primary">
-                {reservationQuery.data.email}
-              </span>
-              . Please check your spam folder as well. We look forward to seeing
-              you!
+              {m.page_payment_success_confirmation({ email: reservationQuery.data.email })}
             </p>
 
             {(reservationQuery.data.showTime ||
               reservationQuery.data.admissionTime) && (
               <p>
-                We open our gates at{' '}
-                <span className="font-bold text-primary">
-                  {reservationQuery.data.admissionTime}
-                </span>
-                , the show will start at{' '}
-                <span className="font-bold text-primary">
-                  {reservationQuery.data.showTime}
-                </span>
+                {m.page_payment_success_timing({
+                  admissionTime: reservationQuery.data.admissionTime,
+                  showTime: reservationQuery.data.showTime
+                })}
               </p>
             )}
 
             <p>
-              If you have not been to our tent yet, here are{' '}
+              {m.page_payment_success_directions()}{' '}
               <a
                 href="https://www.openstreetmap.org/directions?from=&to=52.54226%2C13.43250"
                 className="text-primary hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                directions
+                {m.page_payment_success_directions_link()}
               </a>
             </p>
 
-            <p className="text-2xl">See you at Zirkus Mond and have fun!</p>
+            <p className="text-2xl">{m.page_payment_success_see_you()}</p>
           </SectionCard>
         ) : null}
         <SectionDivider type="flower" />
         <Button asChild>
-          <Link to="/">Back to Home</Link>
+          <Link to="/">{m.button_back_to_home()}</Link>
         </Button>
       </ContentSection>
     </PageContainer>

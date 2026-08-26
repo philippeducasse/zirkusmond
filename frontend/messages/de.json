@@ -1,9 +1,100 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "home_page": "Startseite",
-  "about_page": "Über uns",
-  "example_message": "Willkommen in deiner i18n-App.",
+
+  "nav_events": "Shows",
+  "nav_about": "Über uns",
+  "nav_contact": "Kontakt",
+
+  "footer_impressum": "Impressum",
+  "footer_datenschutz": "Datenschutz",
+  "footer_address": "Lilli-Henoch-Str. Office at: Kultstätte 58 GmbH Körtestraße 38 10967 Berlin",
+  "footer_director": "Geschäftsführer Max Mohr",
+  "footer_tax_info": "Steuer-Nr.: 37 / 406 / 50011 Steuer-ID: DE65 812 397 023 USt-IdNr: DE319431419",
+
+  "form_first_name": "Vorname",
+  "form_last_name": "Nachname",
+  "form_email": "E-Mail",
+  "form_event": "Event",
+  "form_event_placeholder": "Termin wählen",
+  "form_tickets": "Tickets",
+  "form_newsletter": "Ich möchte den Zirkus Mond Newsletter erhalten",
+  "form_guest_number": "Gast {number}",
+
+  "button_back_to_home": "Zurück zur Startseite",
+  "button_back_to_show": "Zurück zur Show",
+  "button_proceed_to_payment": "Zur Zahlung",
+  "button_processing": "Verarbeite...",
+  "button_fill_test_data": "Testdaten einfügen",
+  "button_all_events": "Alle Events ansehen",
+
+  "page_about_title": "Willkommen auf dem Mond",
+  "page_about_team": "Lerne das Team kennen",
+  "page_about_content_p1": "Der Zirkus Mond, Treffpunkt der Berliner Artistenszene, Veranstaltungsort für Zirkus, Theater, Tanz & Konzerte erwuchs 2018 aus den Umtrieben der Kinder Des Mondes, einem fluiden Kollektiv internationaler ArtistInnen, TänzerInnen & KünstlerInnen, die zuvor über 10 Jahre im kulturellen Untergrund Berlins agierten und in unregelmäßigen Abständen leer stehende Gebäude, Brachflächen oder auch öffentliche Plätze mit Liebe und Leben füllten. Nun gibt es im Himmelskörper-Habitat Zirkus Mond jeden Monat 2 eigenproduzierte Shows und 2 Gastveranstaltungen, wobei durch wechselnde ArtistInnen und Konzepte jede Show ein Unikat ist.",
+  "page_about_content_p2": "Die Pforten unseres Zirkuszeltes stehen offen für alle, die Lust haben, einen Ort der Gemeinschaft, des Schaffens und der Liebe zum Leben zu besuchen, zu bespielen und mitzugestalten.",
+
+  "role_zirkus_directors": "Zirkus Leitung",
+  "role_artistic_director": "Künstlerische Leitung",
+  "role_head_of_productions": "Produktionsleitung",
+  "role_technician": "Techniker",
+  "role_it": "IT",
+
+  "page_events_title": "Kommende Shows",
+
+  "page_payment_success_title": "Vielen Dank für deine Reservierung",
+  "page_payment_success_confirmation": "Eine Bestätigungs-E-Mail wurde an {email} gesendet. Bitte überprüfe auch deinen Spam-Ordner. Wir freuen uns darauf, dich zu sehen!",
+  "page_payment_success_timing": "Wir öffnen unsere Tore um {admissionTime}, die Show beginnt um {showTime}",
+  "page_payment_success_directions": "Falls du noch nicht in unserem Zelt warst, hier sind die",
+  "page_payment_success_directions_link": "Wegbeschreibung",
+  "page_payment_success_see_you": "Bis bald im Zirkus Mond und viel Spaß!",
+  "page_payment_success_error": "Fehler beim Laden der Reservierungsdetails. Bitte kontaktiere den Support.",
+
+  "page_payment_failure_title": "Zahlung fehlgeschlagen",
+  "page_payment_failure_heading": "Entschuldigung, etwas ist schief gelaufen!",
+  "page_payment_failure_try_again": "Erneut versuchen?",
+  "page_payment_failure_contact": "Wenn du denkst, dass dies ein Fehler unsererseits war, sende bitte eine E-Mail an:",
+  "page_payment_failure_mention_id": "und erwähne deine ID:",
+
+  "reservation_total_price": "Gesamtpreis",
+  "reservation_error_generic": "Ein Fehler ist aufgetreten",
+
+  "qr_checked_in": "Eingecheckt",
+  "qr_tickets": "Tickets",
+  "qr_guests": "Gäste",
+  "qr_guest": "Gast",
+  "qr_reservation_id": "Reservierungs-ID",
+
+  "error_generic": "Ein Fehler ist aufgetreten",
+
   "language_label": "Sprache",
-  "current_locale": "Aktuelle Sprache: {locale}",
-  "learn_router": "Paraglide JS lernen"
+
+  "common_home": "Startseite",
+  "common_link": "Link",
+  "common_submit": "Absenden",
+
+  "page_contact_title": "Kontaktiere uns",
+  "page_contact_reservations": "Anfragen zu Reservierungen",
+  "page_contact_donate": "Per PayPal spenden",
+  "page_contact_find_us": "Finde uns",
+  "page_contact_mailing_list": "Mailingliste",
+  "page_contact_mailing_description": "Möchtest du über neue Shows informiert werden? Erfahren, was auf dem Mond los ist? Nicht vergessen oder ausgeschlossen werden? Werde Teil unserer magischen Mailingliste!",
+  "page_contact_telegram": "Du kannst auch unserem Telegram",
+  "page_contact_channel": "Kanal",
+  "page_contact_telegram_join": "beitreten!",
+
+  "page_rentals_title": "Vermietung",
+  "page_rentals_heading": "Miete unsere Zirkussachen!!",
+  "page_rentals_description": "Sehr sehr günstig, sehr sehr schön.",
+
+  "show_about": "Über die Show:",
+  "show_cast": "Besetzung:",
+  "show_trailer": "Trailer",
+  "show_website": "Website der Kompanie",
+  "show_admission": "Einlass:",
+  "show_reserve": "Zur Reservierung",
+  "show_buy_tickets": "Tickets kaufen",
+
+  "not_found_title": "{entity} nicht gefunden",
+  "not_found_message": "Diese {entity} existiert nicht oder ist nicht mehr verfügbar.",
+
+  "gallery_image": "Galeriebild {number}"
 }
