@@ -15,7 +15,6 @@ const config = defineConfig({
       // deploy/nginx.default). Locally there's no nginx, so proxy it to
       // Django directly instead.
       '/media': process.env.API_URL ?? 'http://localhost:8000',
-      '/api': process.env.API_URL ?? 'http://localhost:8000',
     },
   },
   plugins: [
