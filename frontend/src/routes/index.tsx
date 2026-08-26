@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import EventsSection from '#/components/zirkusmond/home/EventsSection'
-import GallerySection from '#/components/zirkusmond/home/GallerySection'
+// import GallerySection from '#/components/zirkusmond/home/GallerySection'
 import Hero from '#/components/zirkusmond/home/Hero'
 import { homepageQueryOptions } from '#/lib/api.ts'
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
