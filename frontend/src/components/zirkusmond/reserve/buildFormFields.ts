@@ -81,7 +81,10 @@ export function buildNewsletterField({
   ]
 }
 
-export function buildPersonalInfoFields(): DynamicFieldConfig[] {
+export function buildPersonalInfoFields(
+  fieldErrors: Record<string, string> = {},
+  clearFieldError: (id: string) => void = () => {},
+): DynamicFieldConfig[] {
   return [
     {
       fieldType: FieldType.Text,
@@ -89,6 +92,8 @@ export function buildPersonalInfoFields(): DynamicFieldConfig[] {
       label: i18n.t('form_first_name'),
       name: 'firstName',
       required: true,
+      error: fieldErrors['first-name'],
+      onChange: () => clearFieldError('first-name'),
     },
     {
       fieldType: FieldType.Text,
@@ -96,6 +101,8 @@ export function buildPersonalInfoFields(): DynamicFieldConfig[] {
       label: i18n.t('form_last_name'),
       name: 'lastName',
       required: true,
+      error: fieldErrors['last-name'],
+      onChange: () => clearFieldError('last-name'),
     },
     {
       fieldType: FieldType.Text,
@@ -104,11 +111,17 @@ export function buildPersonalInfoFields(): DynamicFieldConfig[] {
       name: 'email',
       type: 'email',
       required: true,
+      error: fieldErrors['email'],
+      onChange: () => clearFieldError('email'),
     },
   ]
 }
 
-export function buildGuestFields(index: number): DynamicFieldConfig[] {
+export function buildGuestFields(
+  fieldErrors: Record<string, string>,
+  clearFieldError: (id: string) => void,
+  index: number,
+): DynamicFieldConfig[] {
   return [
     {
       fieldType: FieldType.Text,
@@ -116,6 +129,8 @@ export function buildGuestFields(index: number): DynamicFieldConfig[] {
       label: i18n.t('form_first_name'),
       name: `guest-${index}-first-name`,
       required: true,
+      error: fieldErrors[`guest-${index}-first-name`],
+      onChange: () => clearFieldError(`guest-${index}-first-name`),
     },
     {
       fieldType: FieldType.Text,
@@ -123,6 +138,8 @@ export function buildGuestFields(index: number): DynamicFieldConfig[] {
       label: i18n.t('form_last_name'),
       name: `guest-${index}-last-name`,
       required: true,
+      error: fieldErrors[`guest-${index}-last-name`],
+      onChange: () => clearFieldError(`guest-${index}-last-name`),
     },
   ]
 }

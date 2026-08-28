@@ -1,4 +1,4 @@
-import { Field, FieldLabel } from '#/components/ui/field.tsx'
+import { Field, FieldError, FieldLabel } from '#/components/ui/field.tsx'
 import { Input } from '#/components/ui/input.tsx'
 
 export interface TextFieldProps {
@@ -7,6 +7,8 @@ export interface TextFieldProps {
   name?: string
   type?: string
   required?: boolean
+  error?: string
+  onChange?: () => void
 }
 
 export default function TextField({
@@ -15,6 +17,8 @@ export default function TextField({
   name,
   type = 'text',
   required = false,
+  error,
+  onChange,
 }: TextFieldProps) {
   return (
     <Field>
@@ -26,8 +30,11 @@ export default function TextField({
         name={name ?? id}
         type={type}
         required={required}
+        aria-invalid={!!error}
+        onChange={onChange}
         className="h-10 sm:h-11 text-base! sm:text-lg! text-white"
       />
+      {error && <FieldError>{error}</FieldError>}
     </Field>
   )
 }

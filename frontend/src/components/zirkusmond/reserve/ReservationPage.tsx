@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
@@ -11,6 +11,7 @@ import SlidingScale from './components/SlidingScale.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 import NavigationButtonWrapper from '../general/NavigationButtonWrapper.tsx'
 import { useTranslation } from 'react-i18next'
+import { clearFieldError, validateReservationForm } from './validateForm.ts'
 
 interface ReservationPageProps {
   show: Show
@@ -28,11 +29,16 @@ export default function ReservationPage({ show }: ReservationPageProps) {
   )
   const [newsletter, setNewsletter] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [isProcessing, setIsProcessing] = useState(false)
 
   const guestCount = Math.min(9, Math.max(0, attendeeCount - 1))
 
   const mutation = useCreateReservation()
+
+  function handleClearFieldError(id: string) {
+    setFieldErrors((prev) => clearFieldError(prev, id))
+  }
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -40,7 +46,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
     setIsProcessing(true)
 
     const formData = new FormData(e.currentTarget)
-    const guests = []
+    const guests: { firstName: string; lastName: string }[] = []
 
     for (let i = 0; i < guestCount; i++) {
       guests.push({
@@ -48,17 +54,30 @@ export default function ReservationPage({ show }: ReservationPageProps) {
         lastName: formData.get(`guest-${i}-last-name`) as string,
       })
     }
+    const guestFormData = {
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      email: formData.get('email') as string,
+      guests,
+    }
+
+    const errors = validateReservationForm(guestFormData, guestCount, t)
+    setFieldErrors(errors)
+
+    const firstErrorId = Object.keys(errors)[0]
+    if (firstErrorId) {
+      setIsProcessing(false)
+      document.getElementById(firstErrorId)?.focus()
+      return
+    }
 
     mutation.mutate(
       {
+        ...guestFormData,
         showId: String(show.id),
         eventId: selectedEventId,
-        firstName: formData.get('firstName') as string,
-        lastName: formData.get('lastName') as string,
-        email: formData.get('email') as string,
         newsletter,
         attendeeCount,
-        guests,
         customTicketPrice: customPrice,
       },
       {
@@ -79,12 +98,18 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             })
           } catch (err) {
             setIsProcessing(false)
-            setError(err instanceof Error ? err.message : t('reservation_error_generic'))
+            setError(
+              err instanceof Error
+                ? err.message
+                : t('reservation_error_generic'),
+            )
           }
         },
         onError: (err) => {
           setIsProcessing(false)
-          setError(err instanceof Error ? err.message : t('reservation_error_generic'))
+          setError(
+            err instanceof Error ? err.message : t('reservation_error_generic'),
+          )
         },
       },
     )
@@ -106,18 +131,18 @@ export default function ReservationPage({ show }: ReservationPageProps) {
 
   return (
     <div className="flex items-center justify-center max-w-7xl mx-auto text-white p-1 md:p-8">
-      <form onSubmit={handleSubmit} id="reservation-form">
-        {/* {import.meta.env.DEV && ( */}
-        <div className="flex justify-end mb-2">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleFillDummyData}
-          >
-            {t('button_fill_test_data')}
-          </Button>
-        </div>
-        {/* )} */}
+      <form onSubmit={handleSubmit} id="reservation-form" noValidate>
+        {import.meta.env.DEV && (
+          <div className="flex justify-end mb-2">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleFillDummyData}
+            >
+              {t('button_fill_test_data')}
+            </Button>
+          </div>
+        )}
         <SectionCard>
           <ReservationForm
             show={show}
@@ -125,9 +150,15 @@ export default function ReservationPage({ show }: ReservationPageProps) {
             setSelectedEventId={setSelectedEventId}
             attendeeCount={attendeeCount}
             setAttendeeCount={setAttendeeCount}
+            fieldErrors={fieldErrors}
+            clearFieldError={handleClearFieldError}
           />
 
-          <GuestForm guestCount={guestCount} />
+          <GuestForm
+            guestCount={guestCount}
+            fieldErrors={fieldErrors}
+            clearFieldError={handleClearFieldError}
+          />
           <NewsletterForm
             newsletter={newsletter}
             setNewsletter={setNewsletter}
@@ -152,8 +183,8 @@ export default function ReservationPage({ show }: ReservationPageProps) {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 border bg-white/20 border-red-500 rounded text-xl text-red-200">
-              {error}
+            <div className="mb-4 p-3 bg-white/10 border-2 border-destructive text-red/30 text-xl">
+              <p className="text-red-300 text-center">{error}</p>
             </div>
           )}
 
@@ -163,7 +194,9 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               disabled={isProcessing}
               className="sm:min-w-[200px]"
             >
-              {isProcessing ? t('button_processing') : t('button_proceed_to_payment')}
+              {isProcessing
+                ? t('button_processing')
+                : t('button_proceed_to_payment')}
             </Button>
             <Button type="button" variant="secondary" onClick={handleBack}>
               {t('button_back_to_show')}

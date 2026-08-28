@@ -11,6 +11,8 @@ interface ReservationFormProps {
   setSelectedEventId: (id: string) => void
   attendeeCount: number
   setAttendeeCount: (count: number) => void
+  fieldErrors: Record<string, string>
+  clearFieldError: (id: string) => void
 }
 
 export default function ReservationForm({
@@ -19,6 +21,8 @@ export default function ReservationForm({
   setSelectedEventId,
   attendeeCount,
   setAttendeeCount,
+  fieldErrors,
+  clearFieldError,
 }: ReservationFormProps) {
   const ticketFields = buildTicketFields({
     show,
@@ -27,7 +31,7 @@ export default function ReservationForm({
     attendeeCount,
     setAttendeeCount,
   })
-  const personalInfoFields = buildPersonalInfoFields()
+  const personalInfoFields = buildPersonalInfoFields(fieldErrors, clearFieldError)
 
   return (
     <div className="w-full flex flex-col justify-center mx-auto gap-4 my-8">
