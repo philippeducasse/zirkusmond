@@ -1,16 +1,20 @@
-import { useState } from 'react'
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { Button } from '#/components/ui/button.tsx'
-import SectionCardSkeleton from '../../general/SectionCardSkeleton.tsx'
-import NavigationButtonWrapper from '../../general/NavigationButtonWrapper.tsx'
+import { useState } from "react";
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { Button } from "#/components/ui/button.tsx";
+import SectionCardSkeleton from "../../general/SectionCardSkeleton.tsx";
+import NavigationButtonWrapper from "../../general/NavigationButtonWrapper.tsx";
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 interface StripePaymentFormProps {
-  reservationId: string
-  onSuccess: () => void
-  onError: () => void
-  onCancel: () => void
+  reservationId: string;
+  onSuccess: () => void;
+  onError: () => void;
+  onCancel: () => void;
 }
 
 export default function StripePaymentForm({
@@ -19,20 +23,20 @@ export default function StripePaymentForm({
   onError,
   onCancel,
 }: StripePaymentFormProps) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault()
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (!stripe || !elements) {
-      return
+      return;
     }
 
-    setIsProcessing(true)
-    setErrorMessage(null)
+    setIsProcessing(true);
+    setErrorMessage(null);
 
     try {
       const { error } = await stripe.confirmPayment({
@@ -44,38 +48,38 @@ export default function StripePaymentForm({
               // hardcode the billing details. cant reliably display the country drop down, so have to pass this info to stripe manually.
               // shouldnt affect payment success
               address: {
-                country: 'DE',
-                postal_code: '00000',
-                line1: 'N/A',
+                country: "DE",
+                postal_code: "00000",
+                line1: "N/A",
                 line2: null,
-                city: 'N/A',
+                city: "N/A",
                 state: null,
               },
             },
           },
         },
-        redirect: 'if_required',
-      })
+        redirect: "if_required",
+      });
 
       if (error) {
-        setErrorMessage(error.message ?? 'An error occurred')
-        setIsProcessing(false)
-        if (error.type !== 'validation_error') {
-          onError()
+        setErrorMessage(error.message ?? "An error occurred");
+        setIsProcessing(false);
+        if (error.type !== "validation_error") {
+          onError();
         }
       } else {
-        onSuccess()
+        onSuccess();
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'An error occurred'
-      setErrorMessage(message)
-      setIsProcessing(false)
-      onError()
+      const message = err instanceof Error ? err.message : "An error occurred";
+      setErrorMessage(message);
+      setIsProcessing(false);
+      onError();
     }
-  }
+  };
 
   if (!stripe || !elements) {
-    return <SectionCardSkeleton lines={5} />
+    return <SectionCardSkeleton lines={5} />;
   }
 
   return (
@@ -83,10 +87,10 @@ export default function StripePaymentForm({
       <div className="mb-6 [&_iframe]:outline-none">
         <PaymentElement
           options={{
-            layout: 'tabs',
+            layout: "tabs",
             fields: {
               billingDetails: {
-                address: 'never',
+                address: "never",
               },
             },
           }}
@@ -100,12 +104,12 @@ export default function StripePaymentForm({
       )}
       <NavigationButtonWrapper>
         <Button type="submit" disabled={isProcessing}>
-          {isProcessing ? 'Processing...' : 'Pay Now'}
+          {isProcessing ? "Processing..." : "Pay Now"}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel}>
           Back
         </Button>
       </NavigationButtonWrapper>
     </form>
-  )
+  );
 }

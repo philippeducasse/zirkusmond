@@ -2,56 +2,27 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import type { QueryClient } from '@tanstack/react-query'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import type { QueryClient } from "@tanstack/react-query";
 
-import '#/i18n'
-import { useTranslation } from 'react-i18next'
-import Navbar from '#/components/zirkusmond/general/Navbar'
-import NotFound from '#/components/zirkusmond/general/NotFound'
+import "#/i18n";
+import { useTranslation } from "react-i18next";
+import Navbar from "#/components/zirkusmond/general/Navbar";
+import NotFound from "#/components/zirkusmond/general/NotFound";
 
-import appCss from '../styles.css?url'
-import Footer from '#/components/zirkusmond/general/Footer'
+import appCss from "../styles.css?url";
+import Footer from "#/components/zirkusmond/general/Footer";
 
 // Types the router context created in router.tsx, so every route loader gets
 // a typed `context.queryClient` for prefetching TanStack Query data.
 interface RouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
-export const Route = createRootRouteWithContext<RouterContext>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Zirkusmond',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-      {
-        rel: 'icon',
-        href: '/images/logos/logo.webp',
-      },
-    ],
-  }),
-  shellComponent: RootDocument,
-  notFoundComponent: () => <NotFound />,
-})
-
-function RootDocument({ children }: { children: React.ReactNode }) {
-  const { i18n } = useTranslation()
+const RootDocument = ({ children }: { children: React.ReactNode }) => {
+  const { i18n } = useTranslation();
 
   return (
     <html lang={i18n.language} suppressHydrationWarning>
@@ -63,11 +34,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <main className="flex-1">{children}</main>
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: "bottom-right",
           }}
           plugins={[
             {
-              name: 'Tanstack Router',
+              name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
           ]}
@@ -76,5 +47,34 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
-}
+  );
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  head: () => ({
+    meta: [
+      {
+        charSet: "utf-8",
+      },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: "Zirkusmond",
+      },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+      {
+        rel: "icon",
+        href: "/images/logos/logo.webp",
+      },
+    ],
+  }),
+  shellComponent: RootDocument,
+  notFoundComponent: () => <NotFound />,
+});

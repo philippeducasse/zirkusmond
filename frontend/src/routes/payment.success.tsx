@@ -1,51 +1,46 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
-import PageContainer from '#/components/zirkusmond/general/PageContainer'
-import PageHeader from '#/components/zirkusmond/general/PageHeader'
-import ContentSection from '#/components/zirkusmond/general/ContentSection'
-import { reservationDetailQueryOptions } from '#/lib/api'
-import { Button } from '#/components/ui/button'
-import SectionCard from '#/components/zirkusmond/general/SectionCard'
-import SectionCardSkeleton from '#/components/zirkusmond/general/SectionCardSkeleton'
-import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
-import { useTranslation } from 'react-i18next'
-import { clearDraft } from '#/components/zirkusmond/reserve/reservationDraft'
+import PageContainer from "#/components/zirkusmond/general/PageContainer";
+import PageHeader from "#/components/zirkusmond/general/PageHeader";
+import ContentSection from "#/components/zirkusmond/general/ContentSection";
+import { reservationDetailQueryOptions } from "#/lib/api";
+import { Button } from "#/components/ui/button";
+import SectionCard from "#/components/zirkusmond/general/SectionCard";
+import SectionCardSkeleton from "#/components/zirkusmond/general/SectionCardSkeleton";
+import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
+import { useTranslation } from "react-i18next";
+import { clearDraft } from "#/components/zirkusmond/reserve/reservationDraft";
 
 interface PaymentSuccessSearch {
-  reservationId: string
+  reservationId: string;
 }
 
-function validatePaymentSuccessSearch(
+const validatePaymentSuccessSearch = (
   search: Record<string, unknown>,
-): PaymentSuccessSearch {
+): PaymentSuccessSearch => {
   return {
     reservationId:
-      typeof search.reservationId === 'string' ? search.reservationId : '',
-  }
-}
+      typeof search.reservationId === "string" ? search.reservationId : "",
+  };
+};
 
-export const Route = createFileRoute('/payment/success')({
-  validateSearch: validatePaymentSuccessSearch,
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  const { t } = useTranslation()
-  const { reservationId } = Route.useSearch()
+const RouteComponent = () => {
+  const { t } = useTranslation();
+  const { reservationId } = Route.useSearch();
 
   const reservationQuery = useQuery(
     reservationDetailQueryOptions(reservationId),
-  )
+  );
 
   useEffect(() => {
-    clearDraft()
-  }, [])
+    clearDraft();
+  }, []);
 
   return (
     <PageContainer>
-      <PageHeader>{t('page_payment_success_title')}</PageHeader>
+      <PageHeader>{t("page_payment_success_title")}</PageHeader>
 
       <ContentSection
         className="text-center text-white md:text-xl max-w-3xl mx-auto"
@@ -54,12 +49,12 @@ function RouteComponent() {
       >
         {reservationQuery.isError ? (
           <SectionCard>
-            <p>{t('page_payment_success_error')}</p>
+            <p>{t("page_payment_success_error")}</p>
           </SectionCard>
         ) : reservationQuery.data ? (
           <SectionCard className="space-y-6">
             <p>
-              {t('page_payment_success_confirmation', {
+              {t("page_payment_success_confirmation", {
                 email: reservationQuery.data.email,
               })}
             </p>
@@ -67,7 +62,7 @@ function RouteComponent() {
             {(reservationQuery.data.showTime ||
               reservationQuery.data.admissionTime) && (
               <p>
-                {t('page_payment_success_timing', {
+                {t("page_payment_success_timing", {
                   admissionTime: reservationQuery.data.admissionTime,
                   showTime: reservationQuery.data.showTime,
                 })}
@@ -75,25 +70,30 @@ function RouteComponent() {
             )}
 
             <p>
-              {t('page_payment_success_directions')}{' '}
+              {t("page_payment_success_directions")}{" "}
               <a
                 href="https://www.openstreetmap.org/directions?from=&to=52.54226%2C13.43250"
                 className="text-primary hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {t('page_payment_success_directions_link')}
+                {t("page_payment_success_directions_link")}
               </a>
             </p>
 
-            <p className="text-2xl">{t('page_payment_success_see_you')}</p>
+            <p className="text-2xl">{t("page_payment_success_see_you")}</p>
           </SectionCard>
         ) : null}
         <SectionDivider type="flower" />
         <Button asChild>
-          <Link to="/">{t('button_back_to_home')}</Link>
+          <Link to="/">{t("button_back_to_home")}</Link>
         </Button>
       </ContentSection>
     </PageContainer>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/payment/success")({
+  validateSearch: validatePaymentSuccessSearch,
+  component: RouteComponent,
+});

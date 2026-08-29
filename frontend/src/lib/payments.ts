@@ -1,25 +1,25 @@
-import { postJson } from '#/lib/api.ts'
-import { useMutation } from '@tanstack/react-query'
+import { postJson } from "#/lib/api.ts";
+import { useMutation } from "@tanstack/react-query";
 
 interface CreateReservationRequest {
-  eventId: string
-  firstName: string
-  lastName: string
-  email: string
-  newsletter: boolean
-  attendeeCount: number
-  customPrice?: number
-  guests: Array<{ firstName: string; lastName: string }>
+  eventId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  newsletter: boolean;
+  attendeeCount: number;
+  customPrice?: number;
+  guests: Array<{ firstName: string; lastName: string }>;
 }
 
 interface CreateReservationResponse {
-  reservationId: string
+  reservationId: string;
 }
 
-export async function createReservation(
+export const createReservation = async (
   showId: string,
   data: CreateReservationRequest,
-): Promise<CreateReservationResponse> {
+): Promise<CreateReservationResponse> => {
   return postJson(`/reservation/${showId}`, {
     event_id: data.eventId,
     first_name: data.firstName,
@@ -32,36 +32,36 @@ export async function createReservation(
       first_name: g.firstName,
       last_name: g.lastName,
     })),
-  })
-}
+  });
+};
 
 interface CreatePaymentIntentResponse {
-  id: string
-  clientSecret: string
+  id: string;
+  clientSecret: string;
 }
 
-export async function createPaymentIntent(
+export const createPaymentIntent = async (
   reservationId: string,
   customTicketPrice: number,
-): Promise<CreatePaymentIntentResponse> {
+): Promise<CreatePaymentIntentResponse> => {
   return postJson(`/payments/${reservationId}/intent`, {
     customTicketPrice,
-  })
-}
+  });
+};
 
 interface CreateReservationParams {
-  showId: string
-  eventId: string
-  firstName: string
-  lastName: string
-  email: string
-  newsletter: boolean
-  attendeeCount: number
-  guests: Array<{ firstName: string; lastName: string }>
-  customTicketPrice: number
+  showId: string;
+  eventId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  newsletter: boolean;
+  attendeeCount: number;
+  guests: Array<{ firstName: string; lastName: string }>;
+  customTicketPrice: number;
 }
 
-export function useCreateReservation() {
+export const useCreateReservation = () => {
   return useMutation({
     mutationFn: (params: CreateReservationParams) =>
       createReservation(params.showId, {
@@ -74,16 +74,16 @@ export function useCreateReservation() {
         customPrice: params.customTicketPrice,
         guests: params.guests,
       }),
-  })
-}
+  });
+};
 
-export function useCreatePaymentIntent(
+export const useCreatePaymentIntent = (
   reservationId: string,
   customTicketPrice: number,
-) {
+) => {
   const mutation = useMutation({
     mutationFn: () => createPaymentIntent(reservationId, customTicketPrice),
-  })
-  console.log({ mutation })
-  return mutation.data?.clientSecret
-}
+  });
+  console.log({ mutation });
+  return mutation.data?.clientSecret;
+};

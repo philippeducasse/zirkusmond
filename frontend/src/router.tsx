@@ -1,12 +1,12 @@
-import { createRouter as createTanStackRouter } from '@tanstack/react-router'
-import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
-import { QueryClient } from '@tanstack/react-query'
-import { routeTree } from './routeTree.gen'
+import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { QueryClient } from "@tanstack/react-query";
+import { routeTree } from "./routeTree.gen";
 
-export function getRouter() {
+export const getRouter = () => {
   // Single QueryClient per request (SSR) / per app (browser). It holds the
   // TanStack Query cache that loaders write to and components read from.
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient();
 
   const router = createTanStackRouter({
     routeTree,
@@ -14,9 +14,9 @@ export function getRouter() {
     // (typed in the RouterContext interface in routes/__root.tsx).
     context: { queryClient },
     scrollRestoration: true,
-    defaultPreload: 'intent',
+    defaultPreload: "intent",
     defaultPreloadStaleTime: 0,
-  })
+  });
 
   // Bridges TanStack Router SSR and TanStack Query: queries fetched in loaders
   // on the server are dehydrated into the HTML and rehydrated in the browser,
@@ -24,13 +24,13 @@ export function getRouter() {
   setupRouterSsrQueryIntegration({
     router,
     queryClient,
-  })
+  });
 
-  return router
-}
+  return router;
+};
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
-    router: ReturnType<typeof getRouter>
+    router: ReturnType<typeof getRouter>;
   }
 }

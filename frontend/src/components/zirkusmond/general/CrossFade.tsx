@@ -1,11 +1,12 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { cn } from '#/lib/utils.ts'
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { cn } from "#/lib/utils.ts";
 
 interface CrossFadeProps {
-  isLoading: boolean
-  skeleton: ReactNode
-  children: ReactNode
-  duration?: number
+  isLoading: boolean;
+  skeleton: ReactNode;
+  children: ReactNode;
+  duration?: number;
 }
 
 const CrossFade = ({
@@ -14,24 +15,24 @@ const CrossFade = ({
   children,
   duration = 300,
 }: CrossFadeProps) => {
-  const [showSkeleton, setShowSkeleton] = useState(isLoading)
+  const [showSkeleton, setShowSkeleton] = useState(isLoading);
 
   useEffect(() => {
     if (isLoading) {
-      setShowSkeleton(true)
-      return
+      setShowSkeleton(true);
+      return;
     }
-    const timer = setTimeout(() => setShowSkeleton(false), duration)
-    return () => clearTimeout(timer)
-  }, [isLoading, duration])
+    const timer = setTimeout(() => setShowSkeleton(false), duration);
+    return () => clearTimeout(timer);
+  }, [isLoading, duration]);
 
   return (
     <div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
       {showSkeleton && (
         <div
           className={cn(
-            'transition-opacity',
-            isLoading ? 'opacity-100' : 'opacity-0',
+            "transition-opacity",
+            isLoading ? "opacity-100" : "opacity-0",
           )}
           style={{ transitionDuration: `${duration}ms` }}
         >
@@ -47,7 +48,7 @@ const CrossFade = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CrossFade
+export default CrossFade;

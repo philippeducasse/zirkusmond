@@ -1,38 +1,38 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions } from "@tanstack/react-query";
 
 import type {
   CheckInResponse,
   QRScannerEvent,
-} from '#/interfaces/qr-scanner.ts'
-import { apiUrl } from '#/lib/api.ts'
-import { keysToCamelCase } from '#/lib/utils.ts'
+} from "#/interfaces/qr-scanner.ts";
+import { apiUrl } from "#/lib/api.ts";
+import { keysToCamelCase } from "#/lib/utils.ts";
 
-async function fetchJsonWithAuth<T>(path: string): Promise<T> {
+const fetchJsonWithAuth = async <T>(path: string): Promise<T> => {
   const res = await fetch(apiUrl(path), {
-    credentials: 'include',
-  })
+    credentials: "include",
+  });
   if (!res.ok) {
-    throw new Error(`API request to ${path} failed with status ${res.status}`)
+    throw new Error(`API request to ${path} failed with status ${res.status}`);
   }
-  const data = await res.json()
-  return keysToCamelCase<T>(data)
-}
+  const data = await res.json();
+  return keysToCamelCase<T>(data);
+};
 
 export const qrScannerEventsQueryOptions = queryOptions({
-  queryKey: ['qr-scanner-events'],
-  queryFn: () => fetchJsonWithAuth<QRScannerEvent[]>('/qr-scanner/get-events'),
-})
+  queryKey: ["qr-scanner-events"],
+  queryFn: () => fetchJsonWithAuth<QRScannerEvent[]>("/qr-scanner/get-events"),
+});
 
-export async function checkInTicket(
+export const checkInTicket = async (
   ticketUuid: string,
-): Promise<CheckInResponse> {
+): Promise<CheckInResponse> => {
   const res = await fetch(apiUrl(`/qr-scanner/${ticketUuid}/check-in`), {
-    method: 'POST',
-    credentials: 'include',
-  })
+    method: "POST",
+    credentials: "include",
+  });
   if (!res.ok) {
-    throw new Error(`Check-in request failed with status ${res.status}`)
+    throw new Error(`Check-in request failed with status ${res.status}`);
   }
-  const data = await res.json()
-  return keysToCamelCase<CheckInResponse>(data)
-}
+  const data = await res.json();
+  return keysToCamelCase<CheckInResponse>(data);
+};

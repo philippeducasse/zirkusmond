@@ -1,36 +1,36 @@
-import { cn } from '#/lib/utils.ts'
-import SectionCard from './SectionCard'
+import { cn } from "#/lib/utils.ts";
+import SectionCard from "./SectionCard";
 
 interface TeamMember {
-  image: string
-  name: string
-  role: string
+  image: string;
+  name: string;
+  role: string;
 }
 
 interface TeamGridProps {
-  members: TeamMember[]
-  className?: string
+  members: TeamMember[];
+  className?: string;
 }
 
-export default function TeamGrid({ members, className }: TeamGridProps) {
+const TeamGrid = ({ members, className }: TeamGridProps) => {
   return (
-    <div className={cn('flex flex-wrap justify-center gap-6', className)}>
+    <div className={cn("flex flex-wrap justify-center gap-6", className)}>
       {members.map((member) => (
         <TeamMemberCard key={member.name} member={member} />
       ))}
     </div>
-  )
-}
+  );
+};
 
 interface TeamMemberCardProps {
-  member: TeamMember
-  className?: string
+  member: TeamMember;
+  className?: string;
 }
 
-function TeamMemberCard({ member, className }: TeamMemberCardProps) {
+const TeamMemberCard = ({ member, className }: TeamMemberCardProps) => {
   return (
     <SectionCard className="p-0! min-w-60">
-      <div className={cn('text-center mb-4', className)}>
+      <div className={cn("text-center mb-4", className)}>
         <img
           className="mx-auto aspect-square w-full  object-cover max-w-xs"
           src={member.image}
@@ -40,7 +40,8 @@ function TeamMemberCard({ member, className }: TeamMemberCardProps) {
         <p>{member.role}</p>
       </div>
     </SectionCard>
-  )
-}
+  );
+};
 
-export type { TeamMember }
+export default TeamGrid;
+export type { TeamMember };

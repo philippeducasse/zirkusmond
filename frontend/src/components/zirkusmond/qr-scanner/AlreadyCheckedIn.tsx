@@ -1,10 +1,10 @@
-import type { CheckInAlreadyCheckedIn } from '#/interfaces/qr-scanner.ts'
+import type { CheckInAlreadyCheckedIn } from "#/interfaces/qr-scanner.ts";
 
 interface AlreadyCheckedInProps {
-  data: CheckInAlreadyCheckedIn
+  data: CheckInAlreadyCheckedIn;
 }
 
-export function AlreadyCheckedIn({ data }: AlreadyCheckedInProps) {
+export const AlreadyCheckedIn = ({ data }: AlreadyCheckedInProps) => {
   return (
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
       <h2 className="font-bold text-yellow-800 text-6xl mb-2">
@@ -29,10 +29,10 @@ export function AlreadyCheckedIn({ data }: AlreadyCheckedInProps) {
             <strong>Reservation ID:</strong> {data.reservationNumber}
           </p>
           <p className="text-5xl">
-            <strong>Guests:</strong> {data.guests.join(', ')}
+            <strong>Guests:</strong> {data.guests.join(", ")}
           </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

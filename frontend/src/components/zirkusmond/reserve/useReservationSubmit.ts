@@ -1,67 +1,67 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
-import type { Show } from '#/interfaces/show.ts'
-import { useCreateReservation, createPaymentIntent } from '#/lib/payments.ts'
-import { clearFieldError, validateReservationForm } from './validateForm.ts'
-import { extractGuestFormData, saveDraft } from './reservationDraft.ts'
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import type { Show } from "#/interfaces/show.ts";
+import { useCreateReservation, createPaymentIntent } from "#/lib/payments.ts";
+import { clearFieldError, validateReservationForm } from "./validateForm.ts";
+import { extractGuestFormData, saveDraft } from "./reservationDraft.ts";
 
 interface UseReservationSubmitParams {
-  show: Show
-  selectedEventId: string
-  attendeeCount: number
-  customPrice: number
-  newsletter: boolean
-  guestCount: number
+  show: Show;
+  selectedEventId: string;
+  attendeeCount: number;
+  customPrice: number;
+  newsletter: boolean;
+  guestCount: number;
 }
 
-export function useReservationSubmit({
+export const useReservationSubmit = ({
   show,
   selectedEventId,
   attendeeCount,
   customPrice,
   newsletter,
   guestCount,
-}: UseReservationSubmitParams) {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const mutation = useCreateReservation()
+}: UseReservationSubmitParams) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const mutation = useCreateReservation();
 
-  const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  function handleClearFieldError(id: string) {
-    setFieldErrors((prev) => clearFieldError(prev, id))
-  }
+  const handleClearFieldError = (id: string) => {
+    setFieldErrors((prev) => clearFieldError(prev, id));
+  };
 
-  function handleFormChange(e: React.ChangeEvent<HTMLFormElement>) {
-    const formData = new FormData(e.currentTarget)
-    const guestFormData = extractGuestFormData(formData, guestCount)
+  const handleFormChange = (e: React.ChangeEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const guestFormData = extractGuestFormData(formData, guestCount);
     saveDraft({
       attendeeCount,
       customPrice,
       newsletter,
       ...guestFormData,
-    })
-  }
+    });
+  };
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
-    setIsProcessing(true)
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setIsProcessing(true);
 
-    const formData = new FormData(e.currentTarget)
-    const guestFormData = extractGuestFormData(formData, guestCount)
+    const formData = new FormData(e.currentTarget);
+    const guestFormData = extractGuestFormData(formData, guestCount);
 
-    const errors = validateReservationForm(guestFormData, guestCount, t)
-    setFieldErrors(errors)
+    const errors = validateReservationForm(guestFormData, guestCount, t);
+    setFieldErrors(errors);
 
-    const firstErrorId = Object.keys(errors)[0]
+    const firstErrorId = Object.keys(errors)[0];
     if (firstErrorId) {
-      setIsProcessing(false)
-      document.getElementById(firstErrorId)?.focus()
-      return
+      setIsProcessing(false);
+      document.getElementById(firstErrorId)?.focus();
+      return;
     }
 
     mutation.mutate(
@@ -79,34 +79,34 @@ export function useReservationSubmit({
             const paymentIntent = await createPaymentIntent(
               data.reservationId,
               customPrice,
-            )
+            );
             navigate({
-              to: '/reserve/$showId/payment',
+              to: "/reserve/$showId/payment",
               params: { showId: String(show.id) },
               search: {
                 reservationId: data.reservationId,
                 customTicketPrice: customPrice,
                 clientSecret: paymentIntent.clientSecret,
               },
-            })
+            });
           } catch (err) {
-            setIsProcessing(false)
+            setIsProcessing(false);
             setError(
               err instanceof Error
                 ? err.message
-                : t('reservation_error_generic'),
-            )
+                : t("reservation_error_generic"),
+            );
           }
         },
         onError: (err) => {
-          setIsProcessing(false)
+          setIsProcessing(false);
           setError(
-            err instanceof Error ? err.message : t('reservation_error_generic'),
-          )
+            err instanceof Error ? err.message : t("reservation_error_generic"),
+          );
         },
       },
-    )
-  }
+    );
+  };
 
   return {
     handleSubmit,
@@ -115,5 +115,5 @@ export function useReservationSubmit({
     error,
     fieldErrors,
     isProcessing,
-  }
-}
+  };
+};

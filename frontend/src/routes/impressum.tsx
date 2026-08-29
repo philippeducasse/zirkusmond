@@ -1,15 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import PageContainer from '#/components/zirkusmond/general/PageContainer'
+import PageContainer from "#/components/zirkusmond/general/PageContainer";
 
-export const Route = createFileRoute('/impressum')({
-  head: () => ({
-    meta: [{ title: 'Zirkus Mond - Impressum' }],
-  }),
-  component: RouteComponent,
-})
-
-function RouteComponent() {
+const RouteComponent = () => {
   return (
     <PageContainer className="text-center lg:text-lg">
       <h2 className="mb-5 text-white">Impressum</h2>
@@ -39,5 +32,12 @@ function RouteComponent() {
         Handelsregister-Nr.: HRB 164783B
       </p>
     </PageContainer>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/impressum")({
+  head: () => ({
+    meta: [{ title: "Zirkus Mond - Impressum" }],
+  }),
+  component: RouteComponent,
+});

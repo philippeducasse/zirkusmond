@@ -1,19 +1,19 @@
-import { useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
-import { reservationDetailQueryOptions } from '#/lib/api.ts'
-import PaymentSection from './components/PaymentSection.tsx'
-import ReservationSummary from './components/ReservationSummary.tsx'
-import SectionCard from '../general/SectionCard.tsx'
-import SectionCardSkeleton from '../general/SectionCardSkeleton.tsx'
-import ContentSection from '../general/ContentSection.tsx'
-import CrossFade from '../general/CrossFade.tsx'
+import { reservationDetailQueryOptions } from "#/lib/api.ts";
+import PaymentSection from "./components/PaymentSection.tsx";
+import ReservationSummary from "./components/ReservationSummary.tsx";
+import SectionCard from "../general/SectionCard.tsx";
+import SectionCardSkeleton from "../general/SectionCardSkeleton.tsx";
+import ContentSection from "../general/ContentSection.tsx";
+import CrossFade from "../general/CrossFade.tsx";
 
 interface PaymentPageProps {
-  showId: string
-  reservationId: string
-  customTicketPrice: number
-  clientSecret: string
+  showId: string;
+  reservationId: string;
+  customTicketPrice: number;
+  clientSecret: string;
 }
 
 export default function PaymentPage({
@@ -22,32 +22,32 @@ export default function PaymentPage({
   customTicketPrice,
   clientSecret,
 }: PaymentPageProps) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const reservationQuery = useQuery(
     reservationDetailQueryOptions(reservationId),
-  )
+  );
 
-  function handlePaymentSuccess() {
+  const handlePaymentSuccess = () => {
     navigate({
-      to: '/payment/success',
+      to: "/payment/success",
       search: {
         reservationId,
       },
-    })
-  }
+    });
+  };
 
-  function handlePaymentError() {
+  const handlePaymentError = () => {
     navigate({
-      to: '/payment/failure',
+      to: "/payment/failure",
       search: {
         eventShowId: Number(showId),
       },
-    })
-  }
+    });
+  };
 
-  function handlePaymentCancel() {
-    navigate({ to: '/reserve/$showId', params: { showId } })
-  }
+  const handlePaymentCancel = () => {
+    navigate({ to: "/reserve/$showId", params: { showId } });
+  };
 
   return (
     <ContentSection className="flex flex-col items-center justify-center gap-8">
@@ -82,5 +82,5 @@ export default function PaymentPage({
         </SectionCard>
       </div>
     </ContentSection>
-  )
+  );
 }

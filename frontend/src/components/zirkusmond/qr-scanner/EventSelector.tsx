@@ -1,17 +1,17 @@
-import type { QRScannerEvent } from '#/interfaces/qr-scanner.ts'
-import { Button } from '#/components/ui/button.tsx'
+import type { QRScannerEvent } from "#/interfaces/qr-scanner.ts";
+import { Button } from "#/components/ui/button.tsx";
 
 interface EventSelectorProps {
-  events: QRScannerEvent[]
-  selectedEvent: QRScannerEvent | null
-  onSelectEvent: (event: QRScannerEvent | null) => void
+  events: QRScannerEvent[];
+  selectedEvent: QRScannerEvent | null;
+  onSelectEvent: (event: QRScannerEvent | null) => void;
 }
 
-export function EventSelector({
+export const EventSelector = ({
   events,
   selectedEvent,
   onSelectEvent,
-}: EventSelectorProps) {
+}: EventSelectorProps) => {
   if (selectedEvent) {
     return (
       <div className="mb-6">
@@ -27,7 +27,7 @@ export function EventSelector({
           Select another event
         </Button>
       </div>
-    )
+    );
   }
   return (
     <div className="p-4 mb-6">
@@ -35,9 +35,9 @@ export function EventSelector({
       <select
         value=""
         onChange={(e) => {
-          const selectedId = Number(e.target.value)
-          const event = events.find((ev) => ev.id === selectedId)
-          onSelectEvent(event ?? null)
+          const selectedId = Number(e.target.value);
+          const event = events.find((ev) => ev.id === selectedId);
+          onSelectEvent(event ?? null);
         }}
         className="w-full px-4 py-3 text-xl border rounded-lg"
       >
@@ -49,5 +49,5 @@ export function EventSelector({
         ))}
       </select>
     </div>
-  )
-}
+  );
+};

@@ -1,37 +1,23 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
-import PageContainer from '#/components/zirkusmond/general/PageContainer'
-import PageHeader from '#/components/zirkusmond/general/PageHeader'
-import ContentSection from '#/components/zirkusmond/general/ContentSection'
-import { MOCK_RENTAL_OBJECTS } from '#/interfaces/rentals'
-import { useTranslation } from 'react-i18next'
+import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
+import PageContainer from "#/components/zirkusmond/general/PageContainer";
+import PageHeader from "#/components/zirkusmond/general/PageHeader";
+import ContentSection from "#/components/zirkusmond/general/ContentSection";
+import { MOCK_RENTAL_OBJECTS } from "#/interfaces/rentals";
+import { useTranslation } from "react-i18next";
 
-export const Route = createFileRoute('/rentals')({
-  head: () => ({
-    meta: [
-      { title: 'Zirkus Mond – Zirkuszelt & Equipment mieten' },
-      {
-        name: 'description',
-        content:
-          'Miete Zirkuszelt, Bühne und Equipment von Zirkus Mond Berlin – die alternative Eventlocation und Kulturraum für dein Event.',
-      },
-    ],
-  }),
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  const { t } = useTranslation()
+const RouteComponent = () => {
+  const { t } = useTranslation();
 
   return (
     <PageContainer className="px-4">
-      <PageHeader>{t('page_rentals_title')}</PageHeader>
+      <PageHeader>{t("page_rentals_title")}</PageHeader>
 
       <ContentSection className="mb-6 sm:mb-8">
-        <h3 className="text-center">{t('page_rentals_heading')}</h3>
+        <h3 className="text-center">{t("page_rentals_heading")}</h3>
         <p className="py-6 sm:py-8 text-center">
-          {t('page_rentals_description')}
+          {t("page_rentals_description")}
         </p>
       </ContentSection>
 
@@ -49,7 +35,7 @@ function RouteComponent() {
               rel="noreferrer"
               className="text-center text-lg sm:text-xl md:text-2xl font-bold underline text-(--sea-ink)"
             >
-              {t('common_link')}
+              {t("common_link")}
             </a>
           </ContentSection>
         ))}
@@ -57,5 +43,19 @@ function RouteComponent() {
 
       <SectionDivider type="flower" />
     </PageContainer>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/rentals")({
+  head: () => ({
+    meta: [
+      { title: "Zirkus Mond – Zirkuszelt & Equipment mieten" },
+      {
+        name: "description",
+        content:
+          "Miete Zirkuszelt, Bühne und Equipment von Zirkus Mond Berlin – die alternative Eventlocation und Kulturraum für dein Event.",
+      },
+    ],
+  }),
+  component: RouteComponent,
+});

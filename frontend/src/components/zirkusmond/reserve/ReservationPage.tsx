@@ -1,48 +1,48 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { Button } from '#/components/ui/button.tsx'
-import type { Show } from '#/interfaces/show.ts'
-import { fillReservationFormWithDummyData } from './fillDummyData.ts'
-import GuestForm from './components/GuestForm.tsx'
-import ReservationForm from './components/ReservationForm.tsx'
-import NewsletterForm from './components/NewsletterForm.tsx'
-import SlidingScale from './components/SlidingScale.tsx'
-import SectionCard from '../general/SectionCard.tsx'
-import NavigationButtonWrapper from '../general/NavigationButtonWrapper.tsx'
-import { useTranslation } from 'react-i18next'
-import { loadDraft, useFormStorage } from './reservationDraft.ts'
-import { useReservationSubmit } from './useReservationSubmit.ts'
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Button } from "#/components/ui/button.tsx";
+import type { Show } from "#/interfaces/show.ts";
+import { fillReservationFormWithDummyData } from "./fillDummyData.ts";
+import GuestForm from "./components/GuestForm.tsx";
+import ReservationForm from "./components/ReservationForm.tsx";
+import NewsletterForm from "./components/NewsletterForm.tsx";
+import SlidingScale from "./components/SlidingScale.tsx";
+import SectionCard from "../general/SectionCard.tsx";
+import NavigationButtonWrapper from "../general/NavigationButtonWrapper.tsx";
+import { useTranslation } from "react-i18next";
+import { loadDraft, useFormStorage } from "./reservationDraft.ts";
+import { useReservationSubmit } from "./useReservationSubmit.ts";
 
 interface ReservationPageProps {
-  show: Show
+  show: Show;
 }
 
 export default function ReservationPage({ show }: ReservationPageProps) {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Initialise formInputs from sessionStorage if they exist
-  const savedInputs = loadDraft()
-  useFormStorage(savedInputs)
+  const savedInputs = loadDraft();
+  useFormStorage(savedInputs);
 
   const [selectedEventId, setSelectedEventId] = useState(
     show.upcomingEvents[0]?.id,
-  )
+  );
   const [attendeeCount, setAttendeeCount] = useState(
     () => savedInputs?.attendeeCount ?? 1,
-  )
+  );
   const [customPrice, setCustomPrice] = useState(
     () =>
       savedInputs?.customPrice ??
       show.baseTicketPrice ??
       show.reservationPrice ??
       15,
-  )
+  );
   const [newsletter, setNewsletter] = useState(
     () => savedInputs?.newsletter ?? false,
-  )
+  );
 
-  const guestCount = Math.min(9, Math.max(0, attendeeCount - 1))
+  const guestCount = Math.min(9, Math.max(0, attendeeCount - 1));
 
   const {
     handleSubmit,
@@ -58,21 +58,21 @@ export default function ReservationPage({ show }: ReservationPageProps) {
     customPrice,
     newsletter,
     guestCount,
-  })
+  });
 
-  function handleBack() {
-    navigate({ to: '/show/$showId', params: { showId: String(show.id) } })
-  }
+  const handleBack = () => {
+    navigate({ to: "/show/$showId", params: { showId: String(show.id) } });
+  };
 
-  function handleFillDummyData() {
+  const handleFillDummyData = () => {
     fillReservationFormWithDummyData({
       show,
       setSelectedEventId,
       setAttendeeCount,
       setNewsletter,
       setCustomPrice,
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex items-center justify-center max-w-7xl mx-auto text-white p-1 md:p-8">
@@ -89,7 +89,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               variant="secondary"
               onClick={handleFillDummyData}
             >
-              {t('button_fill_test_data')}
+              {t("button_fill_test_data")}
             </Button>
           </div>
         )}
@@ -124,10 +124,10 @@ export default function ReservationPage({ show }: ReservationPageProps) {
 
           <div className="my-3 sm:my-4 text-center">
             <h4>
-              {t('reservation_total_price')}:{' '}
+              {t("reservation_total_price")}:{" "}
               <span className="font-bold">
                 {(attendeeCount * customPrice).toFixed(2)}
-              </span>{' '}
+              </span>{" "}
               €
             </h4>
           </div>
@@ -145,15 +145,15 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               className="sm:min-w-[200px]"
             >
               {isProcessing
-                ? t('button_processing')
-                : t('button_proceed_to_payment')}
+                ? t("button_processing")
+                : t("button_proceed_to_payment")}
             </Button>
             <Button type="button" variant="secondary" onClick={handleBack}>
-              {t('button_back_to_show')}
+              {t("button_back_to_show")}
             </Button>
           </NavigationButtonWrapper>
         </SectionCard>
       </form>
     </div>
-  )
+  );
 }
