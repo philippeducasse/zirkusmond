@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('rentals', '0002_alter_rentalobject_description'),
+        ("rentals", "0002_alter_rentalobject_description"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='rentalobject',
-            name='id',
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+            model_name="rentalobject",
+            name="id",
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
     ]

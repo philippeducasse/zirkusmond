@@ -5,7 +5,6 @@ from io import BytesIO
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -212,9 +211,7 @@ class CreatePaymentIntentViewTest(TestCase):
     def test_creates_payment_intent(self, mock_create: MagicMock) -> None:
         mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
 
-        response = self.client.post(
-            self._url(), {"custom_ticket_price": 20}, format="json"
-        )
+        response = self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
 
         self.assertEqual(response.status_code, 201)
         self.assertIn("id", response.data)
@@ -224,9 +221,7 @@ class CreatePaymentIntentViewTest(TestCase):
     def test_creates_payment_record(self, mock_create: MagicMock) -> None:
         mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
 
-        self.client.post(
-            self._url(), {"custom_ticket_price": 20}, format="json"
-        )
+        self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
 
         self.assertEqual(Payment.objects.count(), 1)
         payment = Payment.objects.first()
@@ -237,9 +232,7 @@ class CreatePaymentIntentViewTest(TestCase):
     def test_payment_intent_amount_is_total_in_cents(self, mock_create: MagicMock) -> None:
         mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
 
-        self.client.post(
-            self._url(), {"custom_ticket_price": 20}, format="json"
-        )
+        self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
 
         # Should be called with amount in cents (20 EUR = 2000 cents)
         mock_create.assert_called_once()
@@ -249,9 +242,7 @@ class CreatePaymentIntentViewTest(TestCase):
 
     @patch("stripe.PaymentIntent.create")
     def test_invalid_price_returns_400(self, mock_create: MagicMock) -> None:
-        response = self.client.post(
-            self._url(), {"custom_ticket_price": 5}, format="json"
-        )
+        response = self.client.post(self._url(), {"custom_ticket_price": 5}, format="json")
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("error", response.data)
@@ -266,10 +257,9 @@ class CreatePaymentIntentViewTest(TestCase):
 
     def test_nonexistent_reservation_returns_404(self) -> None:
         import uuid
+
         response = self.client.post(
-            f"/payments/{uuid.uuid4()}/intent",
-            {"custom_ticket_price": 20},
-            format="json"
+            f"/payments/{uuid.uuid4()}/intent", {"custom_ticket_price": 20}, format="json"
         )
         self.assertEqual(response.status_code, 404)
 
@@ -297,12 +287,7 @@ class StripeWebhookViewTest(TestCase):
     def _construct_event(self, event_type: str, payment_intent_id: str, **kwargs: Any) -> dict:
         return {
             "type": event_type,
-            "data": {
-                "object": {
-                    "id": payment_intent_id,
-                    **kwargs
-                }
-            },
+            "data": {"object": {"id": payment_intent_id, **kwargs}},
         }
 
     @patch("stripe.Webhook.construct_event")
@@ -315,7 +300,7 @@ class StripeWebhookViewTest(TestCase):
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="test_sig"
+            HTTP_STRIPE_SIGNATURE="test_sig",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -332,7 +317,7 @@ class StripeWebhookViewTest(TestCase):
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="test_sig"
+            HTTP_STRIPE_SIGNATURE="test_sig",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -349,7 +334,7 @@ class StripeWebhookViewTest(TestCase):
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="test_sig"
+            HTTP_STRIPE_SIGNATURE="test_sig",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -360,18 +345,14 @@ class StripeWebhookViewTest(TestCase):
     def test_charge_refunded_marks_refunded(self, mock_construct: MagicMock) -> None:
         mock_construct.return_value = {
             "type": "charge.refunded",
-            "data": {
-                "object": {
-                    "payment_intent": "pi_test_123"
-                }
-            },
+            "data": {"object": {"payment_intent": "pi_test_123"}},
         }
 
         response = self.client.post(
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="test_sig"
+            HTTP_STRIPE_SIGNATURE="test_sig",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -388,7 +369,7 @@ class StripeWebhookViewTest(TestCase):
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="test_sig"
+            HTTP_STRIPE_SIGNATURE="test_sig",
         )
 
         self.assertEqual(response.status_code, 404)
@@ -396,6 +377,7 @@ class StripeWebhookViewTest(TestCase):
     @patch("stripe.Webhook.construct_event")
     def test_invalid_signature_returns_401(self, mock_construct: MagicMock) -> None:
         import stripe
+
         mock_construct.side_effect = stripe.error.SignatureVerificationError(
             "Invalid signature", "sig"
         )
@@ -404,7 +386,7 @@ class StripeWebhookViewTest(TestCase):
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="bad_sig"
+            HTTP_STRIPE_SIGNATURE="bad_sig",
         )
 
         self.assertEqual(response.status_code, 401)
@@ -417,7 +399,7 @@ class StripeWebhookViewTest(TestCase):
             self.URL,
             data=_json.dumps({}),
             content_type="application/json",
-            HTTP_STRIPE_SIGNATURE="test_sig"
+            HTTP_STRIPE_SIGNATURE="test_sig",
         )
 
         self.assertEqual(response.status_code, 400)
@@ -449,8 +431,7 @@ class StripeReturnViewTest(TestCase):
         mock_retrieve.return_value = MagicMock(status="succeeded")
 
         response = self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -462,8 +443,7 @@ class StripeReturnViewTest(TestCase):
         mock_retrieve.return_value = MagicMock(status="failed")
 
         response = self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.assertEqual(response.status_code, 302)
@@ -472,18 +452,13 @@ class StripeReturnViewTest(TestCase):
     @patch("stripe.PaymentIntent.retrieve")
     def test_updates_payment_method_card(self, mock_retrieve: MagicMock) -> None:
         mock_charge = MagicMock()
-        mock_charge.payment_method_details = MagicMock(
-            type="card",
-            card=MagicMock(wallet=None)
-        )
+        mock_charge.payment_method_details = MagicMock(type="card", card=MagicMock(wallet=None))
         mock_retrieve.return_value = MagicMock(
-            status="succeeded",
-            get=lambda key: mock_charge if key == "latest_charge" else None
+            status="succeeded", get=lambda key: mock_charge if key == "latest_charge" else None
         )
 
         self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.payment.refresh_from_db()
@@ -493,17 +468,14 @@ class StripeReturnViewTest(TestCase):
     def test_updates_payment_method_apple_pay(self, mock_retrieve: MagicMock) -> None:
         mock_charge = MagicMock()
         mock_charge.payment_method_details = MagicMock(
-            type="card",
-            card=MagicMock(wallet=MagicMock(type="apple_pay"))
+            type="card", card=MagicMock(wallet=MagicMock(type="apple_pay"))
         )
         mock_retrieve.return_value = MagicMock(
-            status="succeeded",
-            get=lambda key: mock_charge if key == "latest_charge" else None
+            status="succeeded", get=lambda key: mock_charge if key == "latest_charge" else None
         )
 
         self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.payment.refresh_from_db()
@@ -513,17 +485,14 @@ class StripeReturnViewTest(TestCase):
     def test_updates_payment_method_google_pay(self, mock_retrieve: MagicMock) -> None:
         mock_charge = MagicMock()
         mock_charge.payment_method_details = MagicMock(
-            type="card",
-            card=MagicMock(wallet=MagicMock(type="google_pay"))
+            type="card", card=MagicMock(wallet=MagicMock(type="google_pay"))
         )
         mock_retrieve.return_value = MagicMock(
-            status="succeeded",
-            get=lambda key: mock_charge if key == "latest_charge" else None
+            status="succeeded", get=lambda key: mock_charge if key == "latest_charge" else None
         )
 
         self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.payment.refresh_from_db()
@@ -534,32 +503,24 @@ class StripeReturnViewTest(TestCase):
         mock_charge = MagicMock()
         mock_charge.payment_method_details = MagicMock(type="paypal")
         mock_retrieve.return_value = MagicMock(
-            status="succeeded",
-            get=lambda key: mock_charge if key == "latest_charge" else None
+            status="succeeded", get=lambda key: mock_charge if key == "latest_charge" else None
         )
 
         self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.payment.refresh_from_db()
         self.assertEqual(self.payment.payment_method, Payment.PaymentMethod.PAYPAL)
 
     def test_missing_payment_intent_redirects_to_failure(self) -> None:
-        response = self.client.get(
-            self.URL,
-            {"reservationId": str(self.reservation.id)}
-        )
+        response = self.client.get(self.URL, {"reservationId": str(self.reservation.id)})
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("payment/failure", response.url)
 
     def test_missing_reservation_id_redirects_to_failure(self) -> None:
-        response = self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123"}
-        )
+        response = self.client.get(self.URL, {"payment_intent": "pi_test_123"})
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("payment/failure", response.url)
@@ -567,11 +528,11 @@ class StripeReturnViewTest(TestCase):
     @patch("stripe.PaymentIntent.retrieve")
     def test_stripe_error_redirects_to_failure(self, mock_retrieve: MagicMock) -> None:
         import stripe
+
         mock_retrieve.side_effect = stripe.error.StripeError("Error")
 
         response = self.client.get(
-            self.URL,
-            {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
+            self.URL, {"payment_intent": "pi_test_123", "reservationId": str(self.reservation.id)}
         )
 
         self.assertEqual(response.status_code, 302)

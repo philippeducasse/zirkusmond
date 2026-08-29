@@ -123,9 +123,7 @@ class ReservationPaymentStatusFilter(admin.SimpleListFilter):
     title = "Status"
     parameter_name = "status"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin
-    ) -> list[tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
         return [
             (PaymentStatus.WAITING, "Waiting"),
             (PaymentStatus.CONFIRMED, "Confirmed"),
@@ -146,9 +144,7 @@ class ReservationPaymentEventFilter(admin.SimpleListFilter):
     title = "Event"
     parameter_name = "event"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin
-    ) -> list[tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
         return [
             ("upcoming", "Upcoming"),
             ("past", "Past"),
@@ -227,9 +223,7 @@ class PaymentStatusFilter(admin.SimpleListFilter):
     title = "Status"
     parameter_name = "status"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin
-    ) -> list[tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
         return [
             (Payment.Status.PENDING, "Pending"),
             (Payment.Status.COMPLETED, "Completed"),
@@ -237,9 +231,7 @@ class PaymentStatusFilter(admin.SimpleListFilter):
             (Payment.Status.REFUNDED, "Refunded"),
         ]
 
-    def queryset(
-        self, request: HttpRequest, queryset: QuerySet[Payment]
-    ) -> QuerySet[Payment]:
+    def queryset(self, request: HttpRequest, queryset: QuerySet[Payment]) -> QuerySet[Payment]:
         if self.value():
             return queryset.filter(status=self.value())
         return queryset
@@ -249,17 +241,13 @@ class PaymentEventFilter(admin.SimpleListFilter):
     title = "Event"
     parameter_name = "event"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin
-    ) -> list[tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
         return [
             ("upcoming", "Upcoming"),
             ("past", "Past"),
         ]
 
-    def queryset(
-        self, request: HttpRequest, queryset: QuerySet[Payment]
-    ) -> QuerySet[Payment]:
+    def queryset(self, request: HttpRequest, queryset: QuerySet[Payment]) -> QuerySet[Payment]:
         now = timezone.now()
         if self.value() == "upcoming":
             return queryset.filter(reservation__event__begin__gte=now)
@@ -298,9 +286,7 @@ class PaymentAdmin(ModelAdmin):
         return f"€ {obj.total:.2f}"
 
     @admin.action(description="Resend confirmation E-Mail")
-    def resend_confirmation_mail(
-        self, request: HttpRequest, queryset: QuerySet[Payment]
-    ) -> None:
+    def resend_confirmation_mail(self, request: HttpRequest, queryset: QuerySet[Payment]) -> None:
         for payment in queryset:
             if payment.reservation:
                 services.send_confirmation_mail(payment.reservation)
@@ -310,9 +296,7 @@ class PaymentAdmin(ModelAdmin):
         self, request: HttpRequest, queryset: QuerySet[Payment]
     ) -> HttpResponseRedirect | TemplateResponse:
         dicts = [
-            reservation_to_dict(payment.reservation)
-            for payment in queryset
-            if payment.reservation
+            reservation_to_dict(payment.reservation) for payment in queryset if payment.reservation
         ]
         return send_email_to_reservants(request, dicts, self)
 

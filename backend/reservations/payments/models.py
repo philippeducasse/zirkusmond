@@ -114,7 +114,9 @@ class Payment(models.Model):
         REFUNDED = "refunded"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices, null=True, blank=True)
+    payment_method = models.CharField(
+        max_length=20, choices=PaymentMethod.choices, null=True, blank=True
+    )
     reservation = models.ForeignKey(
         "reservations.Reservation", null=True, on_delete=models.SET_NULL
     )

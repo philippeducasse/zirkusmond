@@ -51,4 +51,3 @@ def on_payment_status_changed(
             logger.error(
                 "failed to send payment failure email for payment=%s: %s", payment_id, error
             )
-

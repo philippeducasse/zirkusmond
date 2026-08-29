@@ -21,9 +21,7 @@ class ReservationStatusFilter(admin.SimpleListFilter):
     title = "event status"
     parameter_name = "event_status"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin
-    ) -> list[tuple[str, str]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
         return [
             ("upcoming", "Upcoming"),
             ("past", "Past"),
@@ -95,7 +93,9 @@ class ReservationAdmin(ModelAdmin):
     checked_in.boolean = True
 
     @admin.action(description="Resend Reservation confirmation mail")
-    def resend_confirmation_mail(self, request: HttpRequest, queryset: QuerySet[Reservation]) -> None:
+    def resend_confirmation_mail(
+        self, request: HttpRequest, queryset: QuerySet[Reservation]
+    ) -> None:
         for reservation in queryset:
             services.send_confirmation_mail(reservation)
 

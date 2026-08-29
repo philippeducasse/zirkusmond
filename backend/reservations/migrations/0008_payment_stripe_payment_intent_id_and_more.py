@@ -4,20 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0007_rename_stripe_payment_intent_id_payment_stripe_session_id_and_more'),
+        ("reservations", "0007_rename_stripe_payment_intent_id_payment_stripe_session_id_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='payment',
-            name='stripe_payment_intent_id',
+            model_name="payment",
+            name="stripe_payment_intent_id",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='reservationpayment',
-            name='custom_ticket_price',
-            field=models.PositiveIntegerField(blank=True, help_text='Custom price selected by user (sliding scale)', null=True),
+            model_name="reservationpayment",
+            name="custom_ticket_price",
+            field=models.PositiveIntegerField(
+                blank=True, help_text="Custom price selected by user (sliding scale)", null=True
+            ),
         ),
     ]

@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('events', '0019_pastevent_upcomingevent'),
+        ("events", "0019_pastevent_upcomingevent"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='event',
-            options={'ordering': ['admission'], 'verbose_name_plural': 'all events'},
+            name="event",
+            options={"ordering": ["admission"], "verbose_name_plural": "all events"},
         ),
     ]

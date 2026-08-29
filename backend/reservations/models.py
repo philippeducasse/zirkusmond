@@ -37,4 +37,4 @@ class Guest(models.Model):
         return f"Guest: {self.first_name}, {self.last_name}"
 
 
-from reservations.payments.models import Payment, ReservationPayment  # noqa: F401
+from reservations.payments.models import Payment, ReservationPayment  # noqa: E402, F401

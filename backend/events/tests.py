@@ -347,14 +347,16 @@ class PurgeOldPaymentsViewTest(TestCase):
     def test_post_dry_run_redirects(self) -> None:
         self.client.force_login(self.staff)
         response = self.client.post(
-            "/mondmin/reservations/reservationpayment/purge-old-payments/", {"dry_run": True, "confirmed_only": False}
+            "/mondmin/reservations/reservationpayment/purge-old-payments/",
+            {"dry_run": True, "confirmed_only": False},
         )
         self.assertEqual(response.status_code, 302)
 
     def test_post_live_run_redirects(self) -> None:
         self.client.force_login(self.staff)
         response = self.client.post(
-            "/mondmin/reservations/reservationpayment/purge-old-payments/", {"dry_run": False, "confirmed_only": False}
+            "/mondmin/reservations/reservationpayment/purge-old-payments/",
+            {"dry_run": False, "confirmed_only": False},
         )
         self.assertEqual(response.status_code, 302)
 
@@ -523,9 +525,9 @@ class EventAdminEmailActionsTest(TestCase):
 
     def test_print_reservations_excludes_unconfirmed(self) -> None:
         # Remove the confirmed payment so only the unconfirmed one exists
-        ReservationPayment.objects.filter(
-            reservation=self.confirmed_reservation
-        ).update(status=PaymentStatus.WAITING)
+        ReservationPayment.objects.filter(reservation=self.confirmed_reservation).update(
+            status=PaymentStatus.WAITING
+        )
         # Action still runs (returns empty sheet) without crashing
         response = self._bulk_post("print_reservations")
         self.assertEqual(response.status_code, 200)
