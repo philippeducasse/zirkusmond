@@ -95,7 +95,7 @@ export default function StripePaymentForm({
 
       {errorMessage && (
         <div className="mb-4 p-3 bg-white/10 border-2 border-destructive text-red/30 text-xl">
-          {errorMessage}
+          <p className="text-red-300 text-center">{errorMessage}</p>
         </div>
       )}
       <NavigationButtonWrapper>
