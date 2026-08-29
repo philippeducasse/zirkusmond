@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button.tsx'
 import type { Show } from '#/interfaces/show.ts'
-import { useCreateReservation, createPaymentIntent } from '#/lib/payments.ts'
 import { fillReservationFormWithDummyData } from './fillDummyData.ts'
 import GuestForm from './components/GuestForm.tsx'
 import ReservationForm from './components/ReservationForm.tsx'
@@ -11,7 +10,8 @@ import SlidingScale from './components/SlidingScale.tsx'
 import SectionCard from '../general/SectionCard.tsx'
 import NavigationButtonWrapper from '../general/NavigationButtonWrapper.tsx'
 import { useTranslation } from 'react-i18next'
-import { clearFieldError, validateReservationForm } from './validateForm.ts'
+import { loadDraft, useFormStorage } from './reservationDraft.ts'
+import { useReservationSubmit } from './useReservationSubmit.ts'
 
 interface ReservationPageProps {
   show: Show
@@ -20,100 +20,45 @@ interface ReservationPageProps {
 export default function ReservationPage({ show }: ReservationPageProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+
+  // Initialise formInputs from sessionStorage if they exist
+  const savedInputs = loadDraft()
+  useFormStorage(savedInputs)
+
   const [selectedEventId, setSelectedEventId] = useState(
-    show.upcomingEvents[0]?.id ?? '',
+    () => savedInputs?.selectedEventId ?? show.upcomingEvents[0]?.id,
   )
-  const [attendeeCount, setAttendeeCount] = useState(1)
+  const [attendeeCount, setAttendeeCount] = useState(
+    () => savedInputs?.attendeeCount ?? 1,
+  )
   const [customPrice, setCustomPrice] = useState(
-    show.baseTicketPrice ?? show.reservationPrice ?? 15,
+    () =>
+      savedInputs?.customPrice ??
+      show.baseTicketPrice ??
+      show.reservationPrice ??
+      15,
   )
-  const [newsletter, setNewsletter] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [newsletter, setNewsletter] = useState(
+    () => savedInputs?.newsletter ?? false,
+  )
 
   const guestCount = Math.min(9, Math.max(0, attendeeCount - 1))
 
-  const mutation = useCreateReservation()
-
-  function handleClearFieldError(id: string) {
-    setFieldErrors((prev) => clearFieldError(prev, id))
-  }
-
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
-    setIsProcessing(true)
-
-    const formData = new FormData(e.currentTarget)
-    const guests: { firstName: string; lastName: string }[] = []
-
-    for (let i = 0; i < guestCount; i++) {
-      guests.push({
-        firstName: formData.get(`guest-${i}-first-name`) as string,
-        lastName: formData.get(`guest-${i}-last-name`) as string,
-      })
-    }
-    const guestFormData = {
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
-      email: formData.get('email') as string,
-      guests,
-    }
-
-    const errors = validateReservationForm(guestFormData, guestCount, t)
-    setFieldErrors(errors)
-
-    const firstErrorId = Object.keys(errors)[0]
-    if (firstErrorId) {
-      setIsProcessing(false)
-      document.getElementById(firstErrorId)?.focus()
-      return
-    }
-
-    mutation.mutate(
-      {
-        ...guestFormData,
-        showId: String(show.id),
-        eventId: selectedEventId,
-        newsletter,
-        attendeeCount,
-        customTicketPrice: customPrice,
-      },
-      {
-        onSuccess: async (data) => {
-          try {
-            const paymentIntent = await createPaymentIntent(
-              data.reservationId,
-              customPrice,
-            )
-            navigate({
-              to: '/reserve/$showId/payment',
-              params: { showId: String(show.id) },
-              search: {
-                reservationId: data.reservationId,
-                customTicketPrice: customPrice,
-                clientSecret: paymentIntent.clientSecret,
-              },
-            })
-          } catch (err) {
-            setIsProcessing(false)
-            setError(
-              err instanceof Error
-                ? err.message
-                : t('reservation_error_generic'),
-            )
-          }
-        },
-        onError: (err) => {
-          setIsProcessing(false)
-          setError(
-            err instanceof Error ? err.message : t('reservation_error_generic'),
-          )
-        },
-      },
-    )
-  }
+  const {
+    handleSubmit,
+    handleFormChange,
+    handleClearFieldError,
+    error,
+    fieldErrors,
+    isProcessing,
+  } = useReservationSubmit({
+    show,
+    selectedEventId,
+    attendeeCount,
+    customPrice,
+    newsletter,
+    guestCount,
+  })
 
   function handleBack() {
     navigate({ to: '/show/$showId', params: { showId: String(show.id) } })
@@ -131,7 +76,12 @@ export default function ReservationPage({ show }: ReservationPageProps) {
 
   return (
     <div className="flex items-center justify-center max-w-7xl mx-auto text-white p-1 md:p-8">
-      <form onSubmit={handleSubmit} id="reservation-form" noValidate>
+      <form
+        onSubmit={handleSubmit}
+        id="reservation-form"
+        noValidate
+        onChange={handleFormChange}
+      >
         {import.meta.env.DEV && (
           <div className="flex justify-end mb-2">
             <Button

@@ -1,4 +1,4 @@
-import { buildNewsletterField } from '../buildFormFields'
+import { buildNewsletterField } from '../formFieldBuilders'
 import DynamicForm from '../../form/DynamicForm'
 
 interface NewsletterFormProps {

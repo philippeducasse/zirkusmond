@@ -1,5 +1,6 @@
 import { flushSync } from 'react-dom'
 import type { Show } from '#/interfaces/show'
+import { setFormValue } from './reservationDraft'
 
 interface FillDummyDataParams {
   show: Show
@@ -27,23 +28,13 @@ export function fillReservationFormWithDummyData({
     if (show.baseTicketPrice) setCustomPrice(show.baseTicketPrice)
   })
 
-  const form = document.getElementById(
-    'reservation-form',
-  ) as HTMLFormElement | null
-  if (!form) return
-
-  const setValue = (name: string, value: string) => {
-    const el = form.elements.namedItem(name)
-    if (el instanceof HTMLInputElement) el.value = value
-  }
-
-  setValue('firstName', 'Max')
-  setValue('lastName', 'Mustermann')
-  setValue('email', `ducassephi@hotmail.fr`)
+  setFormValue('firstName', 'Max')
+  setFormValue('lastName', 'Mustermann')
+  setFormValue('email', `ducassephi@hotmail.fr`)
 
   const dummyGuestCount = Math.min(9, Math.max(0, dummyAttendeeCount - 1))
   for (let i = 0; i < dummyGuestCount; i++) {
-    setValue(`guest-${i}-first-name`, 'Erika')
-    setValue(`guest-${i}-last-name`, 'Musterfrau')
+    setFormValue(`guest-${i}-first-name`, 'Erika')
+    setFormValue(`guest-${i}-last-name`, 'Musterfrau')
   }
 }

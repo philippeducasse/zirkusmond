@@ -6,7 +6,7 @@ import TextField from '#/components/zirkusmond/form/TextField'
 import {
   FieldType,
   type DynamicFieldConfig,
-} from '#/components/zirkusmond/reserve/buildFormFields'
+} from '#/components/zirkusmond/reserve/formFieldBuilders'
 
 interface DynamicFieldProps {
   field: DynamicFieldConfig

@@ -1,5 +1,5 @@
 import DynamicForm from '#/components/zirkusmond/form/DynamicForm'
-import { buildGuestFields } from '#/components/zirkusmond/reserve/buildFormFields'
+import { buildGuestFields } from '#/components/zirkusmond/reserve/formFieldBuilders'
 import { useTranslation } from 'react-i18next'
 
 interface GuestFormProps {

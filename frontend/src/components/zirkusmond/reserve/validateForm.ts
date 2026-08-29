@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next'
+import type { GuestFormData } from './reservationDraft.ts'
 
 const EMAIL_REGEX =
   /^[^\s@.]+(?:\.[^\s@.]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/
@@ -6,15 +7,7 @@ const EMAIL_REGEX =
 export const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email)
 
 export const validateReservationForm = (
-  guestFormData: {
-    firstName: string
-    lastName: string
-    email: string
-    guests: {
-      firstName: string
-      lastName: string
-    }[]
-  },
+  guestFormData: GuestFormData,
   guestCount: number,
   t: TFunction,
 ): Record<string, string> => {

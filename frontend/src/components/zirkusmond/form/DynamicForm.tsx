@@ -1,6 +1,6 @@
 import DynamicField from '#/components/zirkusmond/form/DynamicField'
 import FieldsLayout from '#/components/zirkusmond/form/FieldsLayout'
-import type { DynamicFieldConfig } from '#/components/zirkusmond/reserve/buildFormFields'
+import type { DynamicFieldConfig } from '#/components/zirkusmond/reserve/formFieldBuilders'
 
 interface DynamicFormProps {
   fields: DynamicFieldConfig[]

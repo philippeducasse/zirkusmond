@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 
 import PageContainer from '#/components/zirkusmond/general/PageContainer'
 import PageHeader from '#/components/zirkusmond/general/PageHeader'
@@ -10,6 +11,7 @@ import SectionCard from '#/components/zirkusmond/general/SectionCard'
 import SectionCardSkeleton from '#/components/zirkusmond/general/SectionCardSkeleton'
 import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
 import { useTranslation } from 'react-i18next'
+import { clearDraft } from '#/components/zirkusmond/reserve/reservationDraft'
 
 interface PaymentSuccessSearch {
   reservationId: string
@@ -37,6 +39,10 @@ function RouteComponent() {
     reservationDetailQueryOptions(reservationId),
   )
 
+  useEffect(() => {
+    clearDraft()
+  }, [])
+
   return (
     <PageContainer>
       <PageHeader>{t('page_payment_success_title')}</PageHeader>
@@ -53,7 +59,9 @@ function RouteComponent() {
         ) : reservationQuery.data ? (
           <SectionCard className="space-y-6">
             <p>
-              {t('page_payment_success_confirmation', { email: reservationQuery.data.email })}
+              {t('page_payment_success_confirmation', {
+                email: reservationQuery.data.email,
+              })}
             </p>
 
             {(reservationQuery.data.showTime ||
@@ -61,7 +69,7 @@ function RouteComponent() {
               <p>
                 {t('page_payment_success_timing', {
                   admissionTime: reservationQuery.data.admissionTime,
-                  showTime: reservationQuery.data.showTime
+                  showTime: reservationQuery.data.showTime,
                 })}
               </p>
             )}
