@@ -8,7 +8,6 @@ export interface GuestFormData {
 }
 
 export interface ReservationDraft extends GuestFormData {
-  selectedEventId: string
   attendeeCount: number
   customPrice: number
   newsletter: boolean

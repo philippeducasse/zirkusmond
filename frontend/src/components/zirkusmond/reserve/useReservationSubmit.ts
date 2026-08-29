@@ -39,7 +39,6 @@ export function useReservationSubmit({
     const formData = new FormData(e.currentTarget)
     const guestFormData = extractGuestFormData(formData, guestCount)
     saveDraft({
-      selectedEventId,
       attendeeCount,
       customPrice,
       newsletter,

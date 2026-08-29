@@ -26,7 +26,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
   useFormStorage(savedInputs)
 
   const [selectedEventId, setSelectedEventId] = useState(
-    () => savedInputs?.selectedEventId ?? show.upcomingEvents[0]?.id,
+    show.upcomingEvents[0]?.id,
   )
   const [attendeeCount, setAttendeeCount] = useState(
     () => savedInputs?.attendeeCount ?? 1,
