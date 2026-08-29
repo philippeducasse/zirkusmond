@@ -23,6 +23,12 @@ jobs:
       - name: Install dependencies
         run: cd backend && uv sync
 
+      - name: Ruff lint
+        run: cd backend && uv run ruff check
+
+      - name: Ruff format check
+        run: cd backend && uv run ruff format --check
+
       - name: Run tests
         run: cd backend && uv run pytest
 
@@ -42,6 +48,12 @@ jobs:
 
       - name: Install dependencies
         run: cd frontend && pnpm install
+
+      - name: Prettier format check
+        run: cd frontend && pnpm run check
+
+      - name: ESLint
+        run: cd frontend && pnpm run lint
 
       - name: TypeScript type check
         run: cd frontend && pnpm exec tsc --noEmit

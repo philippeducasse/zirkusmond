@@ -46,11 +46,12 @@ Tests run automatically on every push/PR via the `tests` GitHub Actions workflow
 ## Contributing
 
 - Branch off `main` for new work; `staging` and `prod` are deploy branches driven by their own workflows, don't commit directly to them.
-- Install the pre-commit hooks before making changes: `pre-commit install`. They run `ruff` (lint + format) on the backend and basic whitespace/YAML/JSON/merge-conflict checks on every commit.
-- Backend code is linted/formatted with `ruff` (`uv run ruff check --fix` / `uv run ruff format`); keep to the project's `line-length = 100` (see `backend/pyproject.toml`).
+- Install the pre-commit hooks before making changes: `pre-commit install`. They run `ruff` (lint + format) on the backend, `prettier` + `eslint` on the frontend, and basic whitespace/YAML/JSON/merge-conflict checks on every commit.
+- Backend code is linted/formatted with `ruff` (`uv run ruff check --fix` / `uv run ruff format`); keep to the project's `line-length = 100` and `target-version = "py312"` (see `backend/pyproject.toml`). The `ruff` version is pinned there and mirrored in `.pre-commit-config.yaml` — bump both together.
+- Frontend code is formatted with `prettier` (defaults: double quotes, semicolons) and linted with `eslint` (`func-style` enforces arrow functions); run `npm run check && npm run lint` in `frontend/` before opening a PR.
 - Add or update tests for any backend logic change and make sure `uv run pytest` passes before opening a PR.
 - Keep PRs focused and small where possible; describe _why_ a change is needed, not just what changed.
-- Open a PR against `main`; CI (tests workflow) must pass before merging.
+- Open a PR against `main`; CI (tests workflow) must pass before merging. It fails on lint or formatting errors (backend `ruff`, frontend `prettier`/`eslint`) as well as test failures.
 
 # cookie popover
 
