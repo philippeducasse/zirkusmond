@@ -1,21 +1,21 @@
-import { Field, FieldError, FieldLabel } from '#/components/ui/field.tsx'
-import { Input } from '#/components/ui/input.tsx'
+import { Field, FieldError, FieldLabel } from "#/components/ui/field.tsx";
+import { Input } from "#/components/ui/input.tsx";
 
 export interface TextFieldProps {
-  id: string
-  label: string
-  name?: string
-  type?: string
-  required?: boolean
-  error?: string
-  onChange?: () => void
+  id: string;
+  label: string;
+  name?: string;
+  type?: string;
+  required?: boolean;
+  error?: string;
+  onChange?: () => void;
 }
 
 export default function TextField({
   id,
   label,
   name,
-  type = 'text',
+  type = "text",
   required = false,
   error,
   onChange,
@@ -36,5 +36,5 @@ export default function TextField({
       />
       {error && <FieldError>{error}</FieldError>}
     </Field>
-  )
+  );
 }

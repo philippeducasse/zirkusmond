@@ -1,15 +1,15 @@
-import type { ReservationDetail } from '#/interfaces/reservation.ts'
+import type { ReservationDetail } from "#/interfaces/reservation.ts";
 
 interface ReservationSummaryProps {
-  reservation: ReservationDetail
-  customTicketPrice: number
+  reservation: ReservationDetail;
+  customTicketPrice: number;
 }
 
 export default function ReservationSummary({
   reservation,
   customTicketPrice,
 }: ReservationSummaryProps) {
-  const total = customTicketPrice * reservation.ticketCount
+  const total = customTicketPrice * reservation.ticketCount;
 
   return (
     <div className="flex flex-col text-center text-base sm:text-lg gap-2">
@@ -59,5 +59,5 @@ export default function ReservationSummary({
         <span>{total.toFixed(2)} €</span>
       </div>
     </div>
-  )
+  );
 }

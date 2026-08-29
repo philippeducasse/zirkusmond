@@ -1,11 +1,11 @@
-import { Checkbox } from '#/components/ui/checkbox.tsx'
-import { Field, FieldLabel } from '#/components/ui/field.tsx'
+import { Checkbox } from "#/components/ui/checkbox.tsx";
+import { Field, FieldLabel } from "#/components/ui/field.tsx";
 
 export interface CheckboxFieldProps {
-  id: string
-  label: string
-  checked: boolean
-  onChange: (checked: boolean) => void
+  id: string;
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
 }
 
 export default function CheckboxField({
@@ -31,5 +31,5 @@ export default function CheckboxField({
         onCheckedChange={(check) => onChange(check === true)}
       />
     </Field>
-  )
+  );
 }

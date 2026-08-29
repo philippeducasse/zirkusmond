@@ -1,10 +1,10 @@
-import DynamicField from '#/components/zirkusmond/form/DynamicField'
-import FieldsLayout from '#/components/zirkusmond/form/FieldsLayout'
-import type { DynamicFieldConfig } from '#/components/zirkusmond/reserve/formFieldBuilders'
+import DynamicField from "#/components/zirkusmond/form/DynamicField";
+import FieldsLayout from "#/components/zirkusmond/form/FieldsLayout";
+import type { DynamicFieldConfig } from "#/components/zirkusmond/reserve/formFieldBuilders";
 
 interface DynamicFormProps {
-  fields: DynamicFieldConfig[]
-  title?: string
+  fields: DynamicFieldConfig[];
+  title?: string;
 }
 
 export default function DynamicForm({ fields, title }: DynamicFormProps) {
@@ -15,5 +15,5 @@ export default function DynamicForm({ fields, title }: DynamicFormProps) {
         <DynamicField key={field.id} field={field} />
       ))}
     </FieldsLayout>
-  )
+  );
 }

@@ -1,34 +1,34 @@
-import { Button } from '#/components/ui/button.tsx'
-import TextField from '#/components/zirkusmond/form/TextField'
-import ContentSection from '../general/ContentSection'
-import PageHeader from '../general/PageHeader'
-import SectionCard from '../general/SectionCard'
-import { useTranslation } from 'react-i18next'
+import { Button } from "#/components/ui/button.tsx";
+import TextField from "#/components/zirkusmond/form/TextField";
+import ContentSection from "../general/ContentSection";
+import PageHeader from "../general/PageHeader";
+import SectionCard from "../general/SectionCard";
+import { useTranslation } from "react-i18next";
 
 const SOCIAL_LINKS = [
   {
-    label: 'YouTube',
-    href: 'https://www.youtube.com/channel/UCa4CK1Fl7ZpTA6mz04wH6CA',
-    icon: '/images/icons/youtube.svg',
+    label: "YouTube",
+    href: "https://www.youtube.com/channel/UCa4CK1Fl7ZpTA6mz04wH6CA",
+    icon: "/images/icons/youtube.svg",
   },
   {
-    label: 'Facebook',
-    href: 'https://de-de.facebook.com/zirkusmond',
-    icon: '/images/icons/facebook.svg',
+    label: "Facebook",
+    href: "https://de-de.facebook.com/zirkusmond",
+    icon: "/images/icons/facebook.svg",
   },
   {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/zirkus_mond/',
-    icon: '/images/icons/instagram.svg',
+    label: "Instagram",
+    href: "https://www.instagram.com/zirkus_mond/",
+    icon: "/images/icons/instagram.svg",
   },
-]
+];
 
 export default function ContactSection() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <ContentSection>
-      <PageHeader>{t('page_contact_title')}</PageHeader>
+      <PageHeader>{t("page_contact_title")}</PageHeader>
       <SectionCard className="flex flex-col justify-between gap-12 text-center text-primary lg:flex-row mt-">
         <div className="flex flex-col justify-center align-middle lg:w-1/3">
           <div className="flex items-center justify-evenly py-4">
@@ -45,7 +45,7 @@ export default function ContactSection() {
           </div>
           <div className="">
             <p className="p-4 sm:p-6">
-              {t('page_contact_reservations')}
+              {t("page_contact_reservations")}
               <a
                 className="my-4 sm:my-6 block underline"
                 href="mailto:zirkusmond@gmail.com"
@@ -56,18 +56,18 @@ export default function ContactSection() {
           </div>
           <Button
             asChild
-            variant={'primary'}
+            variant={"primary"}
             className="self-center max-w-sm w-full"
           >
             <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E">
-              {t('page_contact_donate')}
+              {t("page_contact_donate")}
             </a>
           </Button>
         </div>
 
         <div className="flex justify-center">
           <div>
-            <h3 className="my-4 sm:my-6">{t('page_contact_find_us')}</h3>
+            <h3 className="my-4 sm:my-6">{t("page_contact_find_us")}</h3>
             <img
               className="m-auto w-9/12 max-w-80"
               src="/images/general/map.webp"
@@ -77,39 +77,39 @@ export default function ContactSection() {
         </div>
 
         <div className="lg:w-1/3 flex flex-col justify-center align-middle">
-          <h3 className="my-4 sm:my-6">{t('page_contact_mailing_list')}</h3>
-          <p className="lg:pr-6">{t('page_contact_mailing_description')}</p>
+          <h3 className="my-4 sm:my-6">{t("page_contact_mailing_list")}</h3>
+          <p className="lg:pr-6">{t("page_contact_mailing_description")}</p>
           <p className="pt-3 sm:pt-4 lg:pr-6">
-            {t('page_contact_telegram')}{' '}
+            {t("page_contact_telegram")}{" "}
             <a
               className="underline"
               href="https://t.me/+bTzQFVB2cHc5b4Zm"
               target="_blank"
               rel="noreferrer"
             >
-              {t('page_contact_channel')}
-            </a>{' '}
-            {t('page_contact_telegram_join')}
+              {t("page_contact_channel")}
+            </a>{" "}
+            {t("page_contact_telegram_join")}
           </p>
           <form
             className="my-6"
             onSubmit={(e) => {
-              e.preventDefault()
+              e.preventDefault();
             }}
           >
             <TextField
               id="newsletter-email"
-              label={`${t('form_email')}:`}
+              label={`${t("form_email")}:`}
               name="email"
               type="email"
               required
             />
             <Button type="submit" className="mt-4">
-              {t('common_submit')}
+              {t("common_submit")}
             </Button>
           </form>
         </div>
       </SectionCard>
     </ContentSection>
-  )
+  );
 }

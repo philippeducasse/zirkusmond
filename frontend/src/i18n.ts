@@ -1,9 +1,9 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-import en from '../messages/en.json'
-import de from '../messages/de.json'
+import en from "../messages/en.json";
+import de from "../messages/de.json";
 
 i18n
   .use(LanguageDetector)
@@ -13,18 +13,18 @@ i18n
       en: { translation: en },
       de: { translation: de },
     },
-    lng: 'de',
-    fallbackLng: 'de',
-    supportedLngs: ['en', 'de'],
+    lng: "de",
+    fallbackLng: "de",
+    supportedLngs: ["en", "de"],
     detection: {
-      order: ['cookie', 'navigator'],
-      caches: ['cookie'],
+      order: ["cookie", "navigator"],
+      caches: ["cookie"],
     },
     interpolation: {
       escapeValue: false,
-      prefix: '{',
-      suffix: '}',
+      prefix: "{",
+      suffix: "}",
     },
-  })
+  });
 
-export default i18n
+export default i18n;

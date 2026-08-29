@@ -1,25 +1,25 @@
-import { Link } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
+import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from '#/components/ui/navigation-menu.tsx'
-import LocaleSwitcher from './LocaleSwitcher.tsx'
+} from "#/components/ui/navigation-menu.tsx";
+import LocaleSwitcher from "./LocaleSwitcher.tsx";
 
-import type { NavItem } from './nav-items.ts'
+import type { NavItem } from "./nav-items.ts";
 
 interface DesktopNavProps {
-  items: NavItem[]
+  items: NavItem[];
 }
 
 const linkClassName =
-  'w-fit rounded-none text-primary bg-transparent p-0 text-xl md:text-2xl hover:bg-transparent focus:bg-transparent'
+  "w-fit rounded-none text-primary bg-transparent p-0 text-xl md:text-2xl hover:bg-transparent focus:bg-transparent";
 
 export default function DesktopNav({ items }: DesktopNavProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <div className="hidden items-center gap-6 md:flex">
@@ -40,5 +40,5 @@ export default function DesktopNav({ items }: DesktopNavProps) {
       </NavigationMenu>
       <LocaleSwitcher />
     </div>
-  )
+  );
 }

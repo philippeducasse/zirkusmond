@@ -1,53 +1,53 @@
-import type { TFunction } from 'i18next'
-import type { GuestFormData } from './reservationDraft.ts'
+import type { TFunction } from "i18next";
+import type { GuestFormData } from "./reservationDraft.ts";
 
 const EMAIL_REGEX =
-  /^[^\s@.]+(?:\.[^\s@.]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/
+  /^[^\s@.]+(?:\.[^\s@.]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
-export const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email)
+export const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email);
 
 export const validateReservationForm = (
   guestFormData: GuestFormData,
   guestCount: number,
   t: TFunction,
 ): Record<string, string> => {
-  const { firstName, lastName, email } = guestFormData
-  const GENERIC_ERROR = t('form_error_required')
-  const errors: Record<string, string> = {}
+  const { firstName, lastName, email } = guestFormData;
+  const GENERIC_ERROR = t("form_error_required");
+  const errors: Record<string, string> = {};
 
   if (!firstName) {
-    errors['first-name'] = GENERIC_ERROR
+    errors["first-name"] = GENERIC_ERROR;
   }
   if (!lastName) {
-    errors['last-name'] = GENERIC_ERROR
+    errors["last-name"] = GENERIC_ERROR;
   }
   if (!email) {
-    errors['email'] = GENERIC_ERROR
+    errors["email"] = GENERIC_ERROR;
   } else if (!isValidEmail(email)) {
-    errors['email'] = t('form_error_invalid_email')
+    errors["email"] = t("form_error_invalid_email");
   }
 
   for (let i = 0; i < guestCount; i++) {
     const { firstName: guestFirstName, lastName: guestLastName } =
-      guestFormData.guests[i]
+      guestFormData.guests[i];
 
     if (!guestFirstName) {
-      errors[`guest-${i}-first-name`] = GENERIC_ERROR
+      errors[`guest-${i}-first-name`] = GENERIC_ERROR;
     }
     if (!guestLastName) {
-      errors[`guest-${i}-last-name`] = GENERIC_ERROR
+      errors[`guest-${i}-last-name`] = GENERIC_ERROR;
     }
   }
 
-  return errors
-}
+  return errors;
+};
 
 export const clearFieldError = (
   fieldErrors: Record<string, string>,
   id: string,
 ): Record<string, string> => {
-  if (!(id in fieldErrors)) return fieldErrors
-  const next = { ...fieldErrors }
-  delete next[id]
-  return next
-}
+  if (!(id in fieldErrors)) return fieldErrors;
+  const next = { ...fieldErrors };
+  delete next[id];
+  return next;
+};

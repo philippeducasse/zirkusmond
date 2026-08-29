@@ -1,9 +1,9 @@
-import { Menu, XIcon } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
+import { Menu, XIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
-import { Button } from '#/components/ui/button.tsx'
-import { Separator } from '#/components/ui/separator.tsx'
+import { Button } from "#/components/ui/button.tsx";
+import { Separator } from "#/components/ui/separator.tsx";
 import {
   Sheet,
   SheetClose,
@@ -11,19 +11,19 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '#/components/ui/sheet.tsx'
-import LocaleSwitcher from './LocaleSwitcher.tsx'
+} from "#/components/ui/sheet.tsx";
+import LocaleSwitcher from "./LocaleSwitcher.tsx";
 
-import type { NavItem } from './nav-items.ts'
-import Logo from './Logo.tsx'
-import SectionDivider from '../SectionDivider.tsx'
+import type { NavItem } from "./nav-items.ts";
+import Logo from "./Logo.tsx";
+import SectionDivider from "../SectionDivider.tsx";
 
 interface MobileNavProps {
-  items: NavItem[]
+  items: NavItem[];
 }
 
 export default function MobileNav({ items }: MobileNavProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Sheet>
@@ -85,5 +85,5 @@ export default function MobileNav({ items }: MobileNavProps) {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

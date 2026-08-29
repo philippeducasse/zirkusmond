@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
-import { cn } from '#/lib/utils.ts'
+import type { ReactNode } from "react";
+import { cn } from "#/lib/utils.ts";
 
 interface NavigationButtonWrapperProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 export default function NavigationButtonWrapper({
@@ -13,11 +13,11 @@ export default function NavigationButtonWrapper({
   return (
     <div
       className={cn(
-        'flex flex-col sm:flex-row-reverse sm:justify-between gap-4 mt-8 text-center',
+        "flex flex-col sm:flex-row-reverse sm:justify-between gap-4 mt-8 text-center",
         className,
       )}
     >
       {children}
     </div>
-  )
+  );
 }

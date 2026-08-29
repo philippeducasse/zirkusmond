@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react'
-import { cn } from '#/lib/utils.ts'
+import type { ReactNode } from "react";
+import { cn } from "#/lib/utils.ts";
 
 interface PageHeaderProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 /**
@@ -12,8 +12,8 @@ interface PageHeaderProps {
  */
 export default function PageHeader({ children, className }: PageHeaderProps) {
   return (
-    <h2 className={cn('display-title mb-6 sm:mb-16 text-center', className)}>
+    <h2 className={cn("display-title mb-6 sm:mb-16 text-center", className)}>
       {children}
     </h2>
-  )
+  );
 }

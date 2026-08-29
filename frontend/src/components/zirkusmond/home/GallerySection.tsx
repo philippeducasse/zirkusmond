@@ -4,18 +4,18 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '#/components/ui/carousel.tsx'
-import SectionDivider from '#/components/zirkusmond/general/SectionDivider'
-import ContentSection from '../general/ContentSection'
-import { useTranslation } from 'react-i18next'
+} from "#/components/ui/carousel.tsx";
+import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
+import ContentSection from "../general/ContentSection";
+import { useTranslation } from "react-i18next";
 
 const GALLERY_IMAGES = Array.from(
   { length: 10 },
   (_, i) => `/images/gallery/img-${i}.webp`,
-)
+);
 
 export default function GallerySection() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   return (
     <ContentSection>
       {/* TODO: prepend a video slide once media/video/video.mp4 exists */}
@@ -25,7 +25,7 @@ export default function GallerySection() {
             <CarouselItem key={src}>
               <img
                 src={src}
-                alt={t('gallery_image', { number: i + 1 })}
+                alt={t("gallery_image", { number: i + 1 })}
                 className="aspect-video w-full object-cover"
               />
             </CarouselItem>
@@ -36,5 +36,5 @@ export default function GallerySection() {
       </Carousel>
       <SectionDivider type="flower" />
     </ContentSection>
-  )
+  );
 }

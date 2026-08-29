@@ -1,10 +1,10 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
-import { cn } from '#/lib/utils.ts'
+import { cn } from "#/lib/utils.ts";
 
 interface PageContainerProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 /**
@@ -18,6 +18,6 @@ export default function PageContainer({
   className,
 }: PageContainerProps) {
   return (
-    <main className={cn('page-wrap pt-28 pb-16', className)}>{children}</main>
-  )
+    <main className={cn("page-wrap pt-28 pb-16", className)}>{children}</main>
+  );
 }

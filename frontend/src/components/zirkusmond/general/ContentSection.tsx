@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react'
-import { cn } from '#/lib/utils.ts'
-import CrossFade from './CrossFade.tsx'
+import type { ReactNode } from "react";
+import { cn } from "#/lib/utils.ts";
+import CrossFade from "./CrossFade.tsx";
 
 interface ContentSectionProps {
-  children: ReactNode
-  className?: string
-  isLoading?: boolean
-  skeleton?: ReactNode
-  duration?: number
+  children: ReactNode;
+  className?: string;
+  isLoading?: boolean;
+  skeleton?: ReactNode;
+  duration?: number;
 }
 
 /**
@@ -23,7 +23,7 @@ export default function ContentSection({
   duration,
 }: ContentSectionProps) {
   return (
-    <section className={cn('island-shell rounded-2xl p-2 md:p-10', className)}>
+    <section className={cn("island-shell rounded-2xl p-2 md:p-10", className)}>
       {isLoading !== undefined && skeleton ? (
         <CrossFade
           isLoading={isLoading}
@@ -36,5 +36,5 @@ export default function ContentSection({
         children
       )}
     </section>
-  )
+  );
 }

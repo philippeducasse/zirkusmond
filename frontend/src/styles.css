@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
 @plugin '@tailwindcss/typography';
 
-@import 'tw-animate-css';
+@import "tw-animate-css";
 
-@import 'shadcn/tailwind.css';
+@import "shadcn/tailwind.css";
 
-@import '@fontsource-variable/manrope';
+@import "@fontsource-variable/manrope";
 
-@import '@fontsource-variable/raleway';
+@import "@fontsource-variable/raleway";
 
 :root {
   --surface: rgba(255, 255, 255, 0.74);
@@ -51,7 +51,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Manrope Variable', sans-serif;
+  --font-sans: "Manrope Variable", sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -88,7 +88,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-heading: 'Raleway Variable', sans-serif;
+  --font-heading: "Raleway Variable", sans-serif;
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
@@ -102,7 +102,7 @@ body,
 }
 
 body {
-  background: url('/images/general/bg_pattern.webp') repeat;
+  background: url("/images/general/bg_pattern.webp") repeat;
   color: #f6ae42;
   box-sizing: border-box;
 
@@ -135,7 +135,7 @@ body {
     @apply bg-background text-foreground;
   }
   button:not(:disabled),
-  [role='button']:not(:disabled) {
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
   html {
@@ -153,7 +153,7 @@ body {
   h5,
   h6 {
     color: #f6ae42;
-    font-family: 'Raleway Variable', sans-serif;
+    font-family: "Raleway Variable", sans-serif;
     margin: 0.5em 0;
   }
 
@@ -184,7 +184,7 @@ body {
   p {
     @apply text-base md:text-lg;
     color: #fff;
-    font-family: 'Manrope Variable', sans-serif;
+    font-family: "Manrope Variable", sans-serif;
     margin: 0.5em 0;
   }
 }

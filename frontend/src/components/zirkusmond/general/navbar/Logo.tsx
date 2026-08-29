@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from "@tanstack/react-router";
 
 export default function Logo() {
   return (
@@ -10,5 +10,5 @@ export default function Logo() {
         width={100}
       />
     </Link>
-  )
+  );
 }

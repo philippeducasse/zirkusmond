@@ -1,15 +1,15 @@
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
-import { Field, FieldLabel } from '#/components/ui/field.tsx'
-import { Input } from '#/components/ui/input.tsx'
+import { Field, FieldLabel } from "#/components/ui/field.tsx";
+import { Input } from "#/components/ui/input.tsx";
 
 export interface NumberFieldProps {
-  id: string
-  label: string
-  value: number
-  onChange: (value: number) => void
-  min: number
-  max: number
+  id: string;
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
 }
 
 export default function NumberField({
@@ -57,5 +57,5 @@ export default function NumberField({
         </div>
       </div>
     </Field>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-import StripePaymentWrapper from './StripePaymentWrapper.tsx'
+import StripePaymentWrapper from "./StripePaymentWrapper.tsx";
 
 interface PaymentSectionProps {
-  clientSecret: string
-  reservationId: string
-  onPaymentSuccess: () => void
-  onPaymentError: () => void
-  onPaymentCancel: () => void
+  clientSecret: string;
+  reservationId: string;
+  onPaymentSuccess: () => void;
+  onPaymentError: () => void;
+  onPaymentCancel: () => void;
 }
 
 export default function PaymentSection({
@@ -31,5 +31,5 @@ export default function PaymentSection({
         />
       </div>
     </>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from "@tanstack/react-router";
 
-import EventCard from '#/components/zirkusmond/event/EventCard'
-import { Button } from '#/components/ui/button.tsx'
+import EventCard from "#/components/zirkusmond/event/EventCard";
+import { Button } from "#/components/ui/button.tsx";
 
-import type { ShowCard } from '#/interfaces/show.ts'
-import PageHeader from '../general/PageHeader'
-import ContentSection from '../general/ContentSection'
-import { useTranslation } from 'react-i18next'
+import type { ShowCard } from "#/interfaces/show.ts";
+import PageHeader from "../general/PageHeader";
+import ContentSection from "../general/ContentSection";
+import { useTranslation } from "react-i18next";
 
 interface EventsSectionProps {
-  shows: ShowCard[]
-  showAllEventsLink?: boolean
-  showHomeLink?: boolean
+  shows: ShowCard[];
+  showAllEventsLink?: boolean;
+  showHomeLink?: boolean;
 }
 
 export default function EventsSection({
@@ -19,10 +19,10 @@ export default function EventsSection({
   showAllEventsLink = false,
   showHomeLink = false,
 }: EventsSectionProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   return (
     <ContentSection>
-      <PageHeader>{t('page_events_title')}</PageHeader>
+      <PageHeader>{t("page_events_title")}</PageHeader>
 
       <div className="mx-auto flex max-w-[1800px] flex-wrap justify-center gap-8 md:px-6 px-0">
         {shows.map((show) => (
@@ -43,13 +43,13 @@ export default function EventsSection({
         <div className="flex justify-center pt-12 md:pt-24">
           <Button asChild>
             {showAllEventsLink ? (
-              <Link to="/events">{t('button_all_events')}</Link>
+              <Link to="/events">{t("button_all_events")}</Link>
             ) : (
-              <Link to="/">{t('button_back_to_home')}</Link>
+              <Link to="/">{t("button_back_to_home")}</Link>
             )}
           </Button>
         </div>
       )}
     </ContentSection>
-  )
+  );
 }
