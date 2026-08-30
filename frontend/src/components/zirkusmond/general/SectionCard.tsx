@@ -11,7 +11,7 @@ const SectionCard = ({ children, className }: SectionCardProps) => {
   return (
     <Card
       className={cn(
-        "text-white bg-black/10 border-5 border-primary border-double p-4 md:p-8",
+        "text-white bg-black/20 border-5 border-primary border-double p-4 md:p-8",
         className,
       )}
     >

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+// import { Ticket } from "lucide-react";
 
 import { Button } from "#/components/ui/button.tsx";
 import type { Show } from "#/interfaces/show.ts";
@@ -14,6 +15,7 @@ export const ReserveButton = ({ show }: { show: Show }) => {
           target="_blank"
           rel="noreferrer"
         >
+          {/* <Ticket className="size-6" /> */}
           {t("show_reserve")}
         </a>
       </Button>
@@ -22,6 +24,7 @@ export const ReserveButton = ({ show }: { show: Show }) => {
   return (
     <Button asChild>
       <Link to="/reserve/$showId" params={{ showId: String(show.id) }}>
+        {/* <Ticket className="size-6" /> */}
         {show.baseTicketPrice ? t("show_buy_tickets") : t("show_reserve")}
       </Link>
     </Button>
