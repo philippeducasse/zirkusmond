@@ -4,11 +4,10 @@ from typing import Any
 
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandParser
-from payments import PaymentStatus
 from PIL import Image
 
 from events.models import Event
-from reservations.models import Guest, Reservation, ReservationPayment
+from reservations.models import Guest, Payment, Reservation
 from shows.models import Show
 
 # Varying-length HTML texts so the frontend can be tested with short,
@@ -141,7 +140,7 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> None:
         # Clear the database first
         Guest.objects.all().delete()
-        ReservationPayment.objects.all().delete()
+        Payment.objects.all().delete()
         Reservation.objects.all().delete()
         Event.objects.all().delete()
         Show.objects.all().delete()
@@ -200,7 +199,7 @@ class Command(BaseCommand):
 
         # Create reservations and payments for all events
         reservations_to_create: list[Reservation] = []
-        payments_to_create: list[ReservationPayment] = []
+        payments_to_create: list[Payment] = []
         guests_to_create: list[Guest] = []
 
         for event in Event.objects.all():
@@ -229,24 +228,21 @@ class Command(BaseCommand):
                 )
                 guests_to_create.append(guest)
 
-            # Create payment with confirmed status
+            # Create payment with completed status
             ticket_count = 1 + num_guests
             price_per_ticket = 15
             total = ticket_count * price_per_ticket
 
-            payment = ReservationPayment(
+            payment = Payment(
                 reservation=reservation,
-                status=PaymentStatus.CONFIRMED,
+                status=Payment.Status.COMPLETED,
                 total=total,
-                billing_email=reservation.email,
-                description=f"Reservations for {reservation.event}",
-                currency="EUR",
-                variant="default",
+                custom_ticket_price=price_per_ticket,
             )
             payments_to_create.append(payment)
 
         Guest.objects.bulk_create(guests_to_create)
-        ReservationPayment.objects.bulk_create(payments_to_create)
+        Payment.objects.bulk_create(payments_to_create)
 
         total_events = len(events_to_create)
         self.stdout.write(

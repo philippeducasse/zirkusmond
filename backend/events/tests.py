@@ -11,12 +11,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
-from payments import PaymentStatus
 from PIL import Image
 
 from events.forms import ReservationForm
 from events.models import Event
-from reservations.models import Reservation, ReservationPayment
+from reservations.models import Payment, Reservation
 from shows.models import Show
 
 # ---------------------------------------------------------------------------
@@ -74,6 +73,30 @@ def make_reservation(event: Event, **kwargs: Any) -> Reservation:
     return Reservation.objects.create(event=event, **defaults)
 
 
+def make_payment(
+    reservation: Reservation,
+    *,
+    total: Decimal | int = 15,
+    status: str = Payment.Status.COMPLETED,
+    custom_ticket_price: int = 15,
+) -> Payment:
+    """Create a Payment for a reservation.
+
+    Non-pending statuses are set via a queryset .update() so the post_save
+    confirmation-email signal doesn't fire during unrelated unit tests.
+    """
+    payment = Payment.objects.create(
+        reservation=reservation,
+        total=Decimal(total),
+        custom_ticket_price=custom_ticket_price,
+        status=Payment.Status.PENDING,
+    )
+    if status != Payment.Status.PENDING:
+        Payment.objects.filter(pk=payment.pk).update(status=status)
+        payment.status = status
+    return payment
+
+
 # ---------------------------------------------------------------------------
 # Event model
 # ---------------------------------------------------------------------------
@@ -112,14 +135,8 @@ class EventModelTest(TestCase):
 
     def test_reservation_closed_when_over_capacity(self) -> None:
         event = make_event(self.show, capacity=1)
-        p1 = ReservationPayment.from_reservation(make_reservation(event), variant="paypal")
-        p1.save()
-        p1.change_status(PaymentStatus.CONFIRMED)
-        p2 = ReservationPayment.from_reservation(
-            make_reservation(event, email="other@example.com"), variant="paypal"
-        )
-        p2.save()
-        p2.change_status(PaymentStatus.CONFIRMED)
+        make_payment(make_reservation(event))
+        make_payment(make_reservation(event, email="other@example.com"))
         self.assertFalse(event.reservation_open())
 
     def test_reservation_count_empty(self) -> None:
@@ -127,31 +144,25 @@ class EventModelTest(TestCase):
 
     def test_reservation_count_with_payment(self) -> None:
         reservation = make_reservation(self.event)
-        payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        payment.save()
-        payment.change_status(PaymentStatus.CONFIRMED)
+        make_payment(reservation)
         self.assertEqual(self.event.reservation_count(), 1)
 
     def test_reservation_count_unconfirmed_not_counted(self) -> None:
         reservation = make_reservation(self.event)
-        ReservationPayment.from_reservation(reservation, variant="paypal").save()
+        make_payment(reservation, status=Payment.Status.PENDING)
         self.assertEqual(self.event.reservation_count(), 0)
 
     def test_reservation_count_includes_guests(self) -> None:
         from reservations.models import Guest
 
         reservation = make_reservation(self.event)
-        payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        payment.save()
-        payment.change_status(PaymentStatus.CONFIRMED)
+        make_payment(reservation)
         Guest.objects.create(reservation=reservation, first_name="G", last_name="H")
         self.assertEqual(self.event.reservation_count(), 2)
 
     def test_reserved_tickets_display_format(self) -> None:
         reservation = make_reservation(self.event)
-        payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        payment.save()
-        payment.change_status(PaymentStatus.CONFIRMED)
+        make_payment(reservation)
         self.assertEqual(self.event.reserved_tickets(), "1/150")
 
     def test_clean_raises_if_begin_before_admission(self) -> None:
@@ -292,9 +303,7 @@ class ReservationFormTest(TestCase):
     def test_over_capacity_event_excluded(self) -> None:
         event = self._make_event(self.future, capacity=1)
         for r in [make_reservation(event), make_reservation(event, email="other@example.com")]:
-            p = ReservationPayment.from_reservation(r, variant="paypal")
-            p.save()
-            p.change_status(PaymentStatus.CONFIRMED)
+            make_payment(r)
         form = ReservationForm(self.show)
         self.assertNotIn(event, form.fields["event"].queryset)
 
@@ -383,13 +392,12 @@ class EventAdminRevenueTest(TestCase):
         return self.admin.get_queryset(request).get(pk=self.event.pk)
 
     def _make_payment(
-        self, reservation: Reservation, total: Decimal, status: str = PaymentStatus.CONFIRMED
-    ) -> ReservationPayment:
-        payment = ReservationPayment.from_reservation(reservation, variant="paypal")
-        payment.total = total
-        payment.status = status
-        payment.save()
-        return payment
+        self,
+        reservation: Reservation,
+        total: Decimal,
+        status: str = Payment.Status.COMPLETED,
+    ) -> Payment:
+        return make_payment(reservation, total=total, status=status)
 
     def test_revenue_display_returns_dash_when_no_payments(self) -> None:
         event = self._get_annotated_event()
@@ -412,56 +420,52 @@ class EventAdminRevenueTest(TestCase):
 
     def test_total_revenue_excludes_non_confirmed_payments(self) -> None:
         reservation = make_reservation(self.event)
-        self._make_payment(reservation, Decimal("50.00"), status=PaymentStatus.WAITING)
+        self._make_payment(reservation, Decimal("50.00"), status=Payment.Status.PENDING)
         event = self._get_annotated_event()
         self.assertIsNone(event.total_revenue)
         self.assertEqual(self.admin.revenue(event), "—")
 
     def test_total_revenue_only_counts_confirmed_among_mixed_statuses(self) -> None:
         reservation = make_reservation(self.event)
-        self._make_payment(reservation, Decimal("20.00"), status=PaymentStatus.CONFIRMED)
+        self._make_payment(reservation, Decimal("20.00"), status=Payment.Status.COMPLETED)
         reservation2 = make_reservation(self.event, email="b@example.com")
-        self._make_payment(reservation2, Decimal("100.00"), status=PaymentStatus.WAITING)
+        self._make_payment(reservation2, Decimal("100.00"), status=Payment.Status.PENDING)
         event = self._get_annotated_event()
         self.assertEqual(event.total_revenue, Decimal("20.00"))
 
 
 # ---------------------------------------------------------------------------
-# ReservationPaymentAdmin confirmed_total display
+# PaymentAdmin confirmed_total display
 # ---------------------------------------------------------------------------
 
 
-class ReservationPaymentAdminConfirmedTotalTest(TestCase):
+class PaymentAdminConfirmedTotalTest(TestCase):
     def setUp(self) -> None:
-        from reservations.payments.admin import ReservationPaymentAdmin
+        from reservations.payments.admin import PaymentAdmin
 
         self.show = make_show(base_ticket_price=15)
         self.event = make_event(self.show)
         self.reservation = make_reservation(self.event)
         self.site = AdminSite()
-        self.admin = ReservationPaymentAdmin(ReservationPayment, self.site)
+        self.admin = PaymentAdmin(Payment, self.site)
 
-    def _make_payment(self, total: Decimal, status: str) -> ReservationPayment:
-        payment = ReservationPayment.from_reservation(self.reservation, variant="paypal")
-        payment.total = total
-        payment.status = status
-        payment.save()
-        return payment
+    def _make_payment(self, total: Decimal, status: str) -> Payment:
+        return make_payment(self.reservation, total=total, status=status)
 
-    def test_confirmed_total_shows_amount_for_confirmed_payment(self) -> None:
-        payment = self._make_payment(Decimal("30.00"), PaymentStatus.CONFIRMED)
+    def test_confirmed_total_shows_amount_for_completed_payment(self) -> None:
+        payment = self._make_payment(Decimal("30.00"), Payment.Status.COMPLETED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 30.00")
 
-    def test_confirmed_total_shows_zero_for_waiting_payment(self) -> None:
-        payment = self._make_payment(Decimal("30.00"), PaymentStatus.WAITING)
+    def test_confirmed_total_shows_zero_for_pending_payment(self) -> None:
+        payment = self._make_payment(Decimal("30.00"), Payment.Status.PENDING)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
 
-    def test_confirmed_total_shows_zero_for_rejected_payment(self) -> None:
-        payment = self._make_payment(Decimal("30.00"), PaymentStatus.REJECTED)
+    def test_confirmed_total_shows_zero_for_failed_payment(self) -> None:
+        payment = self._make_payment(Decimal("30.00"), Payment.Status.FAILED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
 
     def test_confirmed_total_shows_zero_for_refunded_payment(self) -> None:
-        payment = self._make_payment(Decimal("30.00"), PaymentStatus.REFUNDED)
+        payment = self._make_payment(Decimal("30.00"), Payment.Status.REFUNDED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
 
 
@@ -483,18 +487,12 @@ class EventAdminEmailActionsTest(TestCase):
         self.confirmed_reservation = make_reservation(
             self.event, first_name="Anna", last_name="Smith", email="anna@example.com"
         )
-        confirmed_payment = ReservationPayment.from_reservation(
-            self.confirmed_reservation, variant="paypal"
-        )
-        confirmed_payment.save()
-        confirmed_payment.change_status(PaymentStatus.CONFIRMED)
+        make_payment(self.confirmed_reservation)
 
         # unconfirmed reservation — should never be included
         waiting_reservation = make_reservation(self.event, email="pending@example.com")
-        waiting_payment = ReservationPayment.from_reservation(waiting_reservation, variant="paypal")
-        waiting_payment.save()
+        make_payment(waiting_reservation, status=Payment.Status.PENDING)
 
-        # clear confirmation email triggered by change_status above
         mail.outbox.clear()
 
     def _bulk_post(self, action_name: str, **extra: Any) -> HttpResponse:
@@ -525,8 +523,8 @@ class EventAdminEmailActionsTest(TestCase):
 
     def test_print_reservations_excludes_unconfirmed(self) -> None:
         # Remove the confirmed payment so only the unconfirmed one exists
-        ReservationPayment.objects.filter(reservation=self.confirmed_reservation).update(
-            status=PaymentStatus.WAITING
+        Payment.objects.filter(reservation=self.confirmed_reservation).update(
+            status=Payment.Status.PENDING
         )
         # Action still runs (returns empty sheet) without crashing
         response = self._bulk_post("print_reservations")

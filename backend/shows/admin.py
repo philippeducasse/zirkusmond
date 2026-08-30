@@ -19,12 +19,11 @@ from django.db.models import (
 from django.db.models.functions import Coalesce
 from django.http import HttpRequest
 from django.utils import timezone
-from payments import PaymentStatus
 from tinymce.widgets import TinyMCE
 from unfold.admin import ModelAdmin
 
 from events.models import Event
-from reservations.models import Guest, ReservationPayment
+from reservations.models import Guest, Payment
 
 from .models import PastShow, Show, UnscheduledShow, UpcomingShow
 
@@ -198,9 +197,9 @@ class ShowAdmin(ModelAdmin):
         ).values("total_capacity")[:1]
 
         confirmed_reservations_subquery = (
-            ReservationPayment.objects.filter(
+            Payment.objects.filter(
                 reservation__event__show=OuterRef("pk"),
-                status=PaymentStatus.CONFIRMED,
+                status=Payment.Status.COMPLETED,
             )
             .values("reservation__event__show")
             .annotate(total_reservations=Count("reservation", distinct=True))
@@ -210,7 +209,7 @@ class ShowAdmin(ModelAdmin):
         confirmed_guests_subquery = (
             Guest.objects.filter(
                 reservation__event__show=OuterRef("pk"),
-                reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
+                reservation__payment__status=Payment.Status.COMPLETED,
             )
             .values("reservation__event__show")
             .annotate(total_guests=Count("pk", distinct=True))
@@ -218,9 +217,9 @@ class ShowAdmin(ModelAdmin):
         )
 
         event_reservations = (
-            ReservationPayment.objects.filter(
+            Payment.objects.filter(
                 reservation__event=OuterRef("pk"),
-                status=PaymentStatus.CONFIRMED,
+                status=Payment.Status.COMPLETED,
             )
             .values("reservation__event")
             .annotate(count=Count("reservation", distinct=True))
@@ -230,7 +229,7 @@ class ShowAdmin(ModelAdmin):
         event_guests = (
             Guest.objects.filter(
                 reservation__event=OuterRef("pk"),
-                reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
+                reservation__payment__status=Payment.Status.COMPLETED,
             )
             .values("reservation__event")
             .annotate(count=Count("pk", distinct=True))

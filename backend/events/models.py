@@ -63,12 +63,11 @@ class Event(models.Model):
             return self.annotated_reservation_count
 
         from django.db.models import Count
-        from payments import PaymentStatus
 
-        from reservations.models import ReservationPayment
+        from reservations.models import Payment
 
-        result = ReservationPayment.objects.filter(
-            reservation__event=self, status=PaymentStatus.CONFIRMED
+        result = Payment.objects.filter(
+            reservation__event=self, status=Payment.Status.COMPLETED
         ).aggregate(
             reservations=Count("reservation", distinct=True),
             guests=Count("reservation__guests", distinct=True),

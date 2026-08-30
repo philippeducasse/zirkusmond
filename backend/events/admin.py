@@ -14,13 +14,12 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce, Lower
 from django.http import HttpRequest, HttpResponse
-from payments import PaymentStatus
 from unfold.admin import ModelAdmin
 from unfold.decorators import action
 from xlsxwriter.worksheet import Worksheet
 
 from events.models import Event, PastEvent, UpcomingEvent
-from reservations.models import Guest, Reservation, ReservationPayment
+from reservations.models import Guest, Payment, Reservation
 from reservations.payments.admin import reservation_to_dict, send_email_to_reservants
 
 
@@ -49,9 +48,9 @@ class BaseEventAdmin(ModelAdmin):
         queryset = queryset.select_related("show")
 
         confirmed_reservations = (
-            ReservationPayment.objects.filter(
+            Payment.objects.filter(
                 reservation__event=OuterRef("pk"),
-                status=PaymentStatus.CONFIRMED,
+                status=Payment.Status.COMPLETED,
             )
             .values("reservation__event")
             .annotate(count=Count("reservation", distinct=True))
@@ -61,7 +60,7 @@ class BaseEventAdmin(ModelAdmin):
         confirmed_guests = (
             Guest.objects.filter(
                 reservation__event=OuterRef("pk"),
-                reservation__reservationpayment__status=PaymentStatus.CONFIRMED,
+                reservation__payment__status=Payment.Status.COMPLETED,
             )
             .values("reservation__event")
             .annotate(count=Count("pk", distinct=True))
@@ -69,9 +68,9 @@ class BaseEventAdmin(ModelAdmin):
         )
 
         revenue_subquery = (
-            ReservationPayment.objects.filter(
+            Payment.objects.filter(
                 reservation__event=OuterRef("pk"),
-                status=PaymentStatus.CONFIRMED,
+                status=Payment.Status.COMPLETED,
             )
             .values("reservation__event")
             .annotate(total=Sum("total"))
@@ -104,8 +103,8 @@ class BaseEventAdmin(ModelAdmin):
         self, request: HttpRequest, queryset: QuerySet[Event]
     ) -> HttpResponse | None:
         for event in queryset:
-            payments = ReservationPayment.objects.filter(
-                reservation__event=event, status=PaymentStatus.CONFIRMED
+            payments = Payment.objects.filter(
+                reservation__event=event, status=Payment.Status.COMPLETED
             ).order_by(Lower("reservation__last_name"))
             reservations = [payment.reservation for payment in payments]
 
@@ -161,18 +160,18 @@ class BaseEventAdmin(ModelAdmin):
 
     @admin.action(description="Send mail to Reservants")
     def send_to_reservants(self, request: HttpRequest, queryset: QuerySet[Event]) -> HttpResponse:
-        all_payments: list[ReservationPayment] = []
+        all_payments: list[Payment] = []
         for event in queryset:
             all_payments += list(
-                ReservationPayment.objects.filter(status="confirmed", reservation__event=event)
+                Payment.objects.filter(status=Payment.Status.COMPLETED, reservation__event=event)
             )
         dicts = [reservation_to_dict(payment.reservation) for payment in all_payments]
         return send_email_to_reservants(request, dicts, self)
 
     @action(description="Send mail to Reservants", url_path="send-mail", icon="mail")
     def send_mail_to_reservants_detail(self, request: HttpRequest, object_id: str) -> HttpResponse:
-        payments = ReservationPayment.objects.filter(
-            status="confirmed", reservation__event_id=object_id
+        payments = Payment.objects.filter(
+            status=Payment.Status.COMPLETED, reservation__event_id=object_id
         )
         dicts = [reservation_to_dict(p.reservation) for p in payments]
         return send_email_to_reservants(request, dicts, self)

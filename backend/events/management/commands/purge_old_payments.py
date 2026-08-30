@@ -6,7 +6,7 @@ from events.services import purge_old_payments
 
 
 class Command(BaseCommand):
-    help = "Delete ReservationPayments older than ~6 months and bump SiteStats.deleted_visitors."
+    help = "Delete Payments older than ~6 months and bump SiteStats.deleted_visitors."
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--confirmed-only", action="store_true")

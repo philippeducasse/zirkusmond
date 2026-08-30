@@ -10,12 +10,11 @@ from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import Exists, F, OuterRef
 from django.utils import timezone
-from payments import PaymentStatus
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas as rl_canvas
 
-from reservations.models import Reservation, ReservationPayment
+from reservations.models import Payment, Reservation
 from stats.models import SiteStats
 
 logger = logging.getLogger(__name__)
@@ -91,7 +90,7 @@ def send_confirmation_mail(reservation: Reservation) -> None:
     )
     show = reservation.event.show
     guests = list(reservation.guests.all())
-    payment = ReservationPayment.objects.filter(reservation=reservation).first()
+    payment = Payment.objects.filter(reservation=reservation).order_by("-created_at").first()
 
     tickets = [
         (
@@ -178,9 +177,9 @@ Please note that tickets are non-refundable. However, if you can't make it, you'
 def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False) -> dict[str, Any]:
     cutoff = timezone.now() - datetime.timedelta(days=HALF_YEAR_DAYS)
 
-    payments_qs = ReservationPayment.objects.filter(created__lt=cutoff)
+    payments_qs = Payment.objects.filter(created_at__lt=cutoff)
     if confirmed_only:
-        payments_qs = payments_qs.filter(status=PaymentStatus.CONFIRMED)
+        payments_qs = payments_qs.filter(status=Payment.Status.COMPLETED)
 
     payments = list(
         payments_qs.select_related(
@@ -225,7 +224,7 @@ def purge_old_payments(*, confirmed_only: bool = False, dry_run: bool = False) -
 
 def purge_orphan_reservations(*, dry_run: bool = True) -> dict[str, Any]:
     orphan_reservations_qs = Reservation.objects.filter(
-        ~Exists(ReservationPayment.objects.filter(reservation=OuterRef("pk")))
+        ~Exists(Payment.objects.filter(reservation=OuterRef("pk")))
     )
     reservations_to_delete = orphan_reservations_qs.count()
 
