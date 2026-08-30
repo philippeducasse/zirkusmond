@@ -44,6 +44,6 @@ frontend-1/package-lock.json
 .envrc
 
 docker-compose.local.yml
-.claude
+#.claude
 .coverage
 .vscode
