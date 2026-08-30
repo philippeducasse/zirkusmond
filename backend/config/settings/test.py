@@ -12,11 +12,6 @@ DATABASES = {
 SECRET_KEY = "test-secret-key-for-ci"
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False
-PAYMENT_VARIANTS = {
-    "default": ("payments.dummy.DummyProvider", {}),
-    "paypal": ("payments.dummy.DummyProvider", {}),
-    "stripe": ("payments.dummy.DummyProvider", {}),
-}
 
 logging.config.dictConfig(
     {

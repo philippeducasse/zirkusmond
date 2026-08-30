@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 
 from reservations.payments import views
 
@@ -10,6 +10,4 @@ urlpatterns = [
         views.CreatePaymentIntentView.as_view(),
         name="create_payment_intent",
     ),
-    # django-payments webhook/callback routes (process/<uuid:token>/) — JSON, not HTML templates.
-    path("", include("payments.urls")),
 ]
