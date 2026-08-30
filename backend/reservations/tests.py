@@ -1,16 +1,25 @@
 from datetime import timedelta
+from decimal import Decimal
 from io import BytesIO
 from typing import Any
+from unittest.mock import patch
 
+from django.contrib import messages
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.utils import timezone
 from PIL import Image
 from rest_framework.test import APIClient
 
 from events.models import Event
 from newsletter.models import NewsletterRegistration
+from reservations.admin import ReservationAdmin
 from reservations.models import Guest, Reservation
+from reservations.payments.models import Payment
 from shows.models import Show
 
 # ---------------------------------------------------------------------------
@@ -340,3 +349,119 @@ class ReserveAPIViewTest(TestCase):
         data = self._post_data(event_id=other_event.pk)
         response = self.client.post(self._url(), data, format="json")
         self.assertEqual(response.status_code, 404)
+
+
+# ---------------------------------------------------------------------------
+# ReservationAdmin — re-send confirmation mail when a reservation is moved
+# to a different event
+# ---------------------------------------------------------------------------
+
+
+class _StubForm:
+    """Minimal stand-in for the admin ModelForm: only ``changed_data`` matters."""
+
+    def __init__(self, changed_data: list[str]) -> None:
+        self.changed_data = changed_data
+
+
+class ReservationAdminRescheduleEmailTest(TestCase):
+    def setUp(self) -> None:
+        self.show = make_show()
+        self.old_event = make_event(self.show, offset_days=7)
+        self.new_event = make_event(self.show, offset_days=14)
+        self.reservation = make_reservation(self.old_event, email="guest@example.com")
+        self.admin = ReservationAdmin(Reservation, AdminSite())
+        self.user = User.objects.create_superuser("admin", "admin@example.com", "pw")
+        mail.outbox.clear()
+
+    def _request(self) -> Any:
+        request = RequestFactory().post("/")
+        request.user = self.user
+        request.session = {}
+        request._messages = FallbackStorage(request)
+        return request
+
+    def _pay(self, status: str = Payment.Status.COMPLETED) -> Payment:
+        payment = Payment.objects.create(
+            reservation=self.reservation,
+            status=status,
+            total=Decimal("15.00"),
+            custom_ticket_price=15,
+        )
+        # a COMPLETED payment triggers its own confirmation mail via the
+        # post_save signal on Payment — drop it so the outbox only reflects
+        # what save_model does.
+        mail.outbox.clear()
+        return payment
+
+    def _save(self, changed_fields: list[str], *, change: bool = True) -> Any:
+        request = self._request()
+        self.admin.save_model(request, self.reservation, _StubForm(changed_fields), change)
+        return request
+
+    def test_paid_reservation_event_change_sends_mail(self) -> None:
+        self._pay()
+        self.reservation.event = self.new_event
+        self._save(["event"])
+
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        self.assertEqual(sent.to, ["guest@example.com"])
+        self.assertIn(self.show.title, sent.subject)
+        self.assertEqual(len(sent.attachments), 1)
+
+    def test_mail_reflects_new_event_date_not_old(self) -> None:
+        self._pay()
+        self.reservation.event = self.new_event
+        self._save(["event"])
+
+        body = mail.outbox[0].body
+        self.assertIn(self.new_event.date_str(), body)
+        self.assertNotIn(self.old_event.date_str(), body)
+
+    def test_admin_gets_success_message(self) -> None:
+        self._pay()
+        self.reservation.event = self.new_event
+        request = self._save(["event"])
+
+        levels = [m.level for m in request._messages]
+        self.assertIn(messages.INFO, levels)
+
+    def test_no_mail_when_event_field_not_changed(self) -> None:
+        self._pay()
+        self._save(["checked_in"])
+        self.assertEqual(mail.outbox, [])
+
+    def test_no_mail_when_reservation_has_no_completed_payment(self) -> None:
+        self._pay(status=Payment.Status.PENDING)
+        self.reservation.event = self.new_event
+        self._save(["event"])
+        self.assertEqual(mail.outbox, [])
+
+    def test_no_mail_when_reservation_has_no_payment_at_all(self) -> None:
+        self.reservation.event = self.new_event
+        self._save(["event"])
+        self.assertEqual(mail.outbox, [])
+
+    def test_no_mail_on_create(self) -> None:
+        self._pay()
+        self._save(["event"], change=False)
+        self.assertEqual(mail.outbox, [])
+
+    def test_no_mail_and_no_crash_when_event_cleared(self) -> None:
+        self._pay()
+        self.reservation.event = None
+        self._save(["event"])
+        self.assertEqual(mail.outbox, [])
+
+    def test_send_failure_is_reported_and_not_raised(self) -> None:
+        self._pay()
+        self.reservation.event = self.new_event
+        with patch(
+            "reservations.admin.services.send_confirmation_mail",
+            side_effect=RuntimeError("smtp down"),
+        ):
+            request = self._save(["event"])
+
+        error_levels = [m.level for m in request._messages if m.level == messages.ERROR]
+        self.assertEqual(len(error_levels), 1)

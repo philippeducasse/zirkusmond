@@ -25,11 +25,15 @@ export const qrScannerEventsQueryOptions = queryOptions({
 
 export const checkInTicket = async (
   ticketUuid: string,
+  eventId: number,
 ): Promise<CheckInResponse> => {
-  const res = await fetch(apiUrl(`/qr-scanner/${ticketUuid}/check-in`), {
-    method: "POST",
-    credentials: "include",
-  });
+  const res = await fetch(
+    apiUrl(`/qr-scanner/${ticketUuid}/check-in?event=${eventId}`),
+    {
+      method: "POST",
+      credentials: "include",
+    },
+  );
   if (!res.ok) {
     throw new Error(`Check-in request failed with status ${res.status}`);
   }

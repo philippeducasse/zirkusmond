@@ -201,3 +201,142 @@ class CheckInViewTest(TestCase):
         response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
+
+
+# ---------------------------------------------------------------------------
+# Check-in view — ?event=<id> scoping
+# ---------------------------------------------------------------------------
+
+
+class CheckInEventScopeTest(TestCase):
+    def setUp(self) -> None:
+        self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
+        self.client.force_login(self.staff)
+
+        show = make_show()
+        self.event = make_event(show, offset_days=7)
+        self.other_event = make_event(show, offset_days=14)
+        self.reservation = make_reservation(self.event)
+        self.guest = Guest.objects.create(
+            reservation=self.reservation, first_name="Guest", last_name="One"
+        )
+
+    def _url(self, ticket_id: uuid.UUID, event_id: int | str | None = None) -> str:
+        url = f"/qr-scanner/{ticket_id}/check-in"
+        if event_id is not None:
+            url += f"?event={event_id}"
+        return url
+
+    # --- matching / absent / unparsable event param: check-in proceeds ---
+
+    def test_matching_event_allows_reservation_check_in(self) -> None:
+        response = self.client.post(self._url(self.reservation.id, self.event.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+
+    def test_matching_event_allows_guest_check_in(self) -> None:
+        response = self.client.post(self._url(self.guest.ticket_id, self.event.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+
+    def test_absent_event_param_still_checks_in(self) -> None:
+        response = self.client.post(self._url(self.reservation.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+
+    def test_non_numeric_event_param_is_ignored(self) -> None:
+        response = self.client.post(self._url(self.reservation.id, "abc"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+
+    # --- wrong event: 409, nobody checked in ---
+
+    def test_wrong_event_rejects_reservation(self) -> None:
+        response = self.client.post(self._url(self.reservation.id, self.other_event.id))
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("different event", response.json()["error"])
+
+    def test_wrong_event_does_not_check_in_reservation(self) -> None:
+        self.client.post(self._url(self.reservation.id, self.other_event.id))
+        self.reservation.refresh_from_db()
+        self.assertFalse(self.reservation.checked_in)
+
+    def test_wrong_event_rejects_guest(self) -> None:
+        response = self.client.post(self._url(self.guest.ticket_id, self.other_event.id))
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("different event", response.json()["error"])
+
+    def test_wrong_event_does_not_check_in_guest(self) -> None:
+        self.client.post(self._url(self.guest.ticket_id, self.other_event.id))
+        self.guest.refresh_from_db()
+        self.assertFalse(self.guest.checked_in)
+
+    def test_wrong_event_response_includes_guest_names(self) -> None:
+        response = self.client.post(self._url(self.reservation.id, self.other_event.id))
+        self.assertTrue(any("Guest" in name for name in response.json()["guests"]))
+
+    def test_unknown_ticket_with_event_returns_404_not_409(self) -> None:
+        response = self.client.post(self._url(uuid.uuid4(), self.event.id))
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("not found", response.json()["error"].lower())
+
+
+# ---------------------------------------------------------------------------
+# Rescheduled reservation — old-event QR fails, new-event QR checks in,
+# for the reservant AND every guest
+# ---------------------------------------------------------------------------
+
+
+class RescheduledReservationCheckInTest(TestCase):
+    def setUp(self) -> None:
+        self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
+        self.client.force_login(self.staff)
+
+        show = make_show()
+        self.old_event = make_event(show, offset_days=7)
+        self.new_event = make_event(show, offset_days=21)
+        self.reservation = make_reservation(self.old_event)
+        self.guests = [
+            Guest.objects.create(
+                reservation=self.reservation, first_name=f"Guest{i}", last_name="X"
+            )
+            for i in range(3)
+        ]
+
+        # staff moves the booking to another event
+        self.reservation.event = self.new_event
+        self.reservation.save()
+
+    def _check_in(self, ticket_id: uuid.UUID, event_id: int) -> Any:
+        return self.client.post(f"/qr-scanner/{ticket_id}/check-in?event={event_id}")
+
+    def _all_ticket_ids(self) -> list[uuid.UUID]:
+        return [self.reservation.id, *(g.ticket_id for g in self.guests)]
+
+    def test_old_event_qr_rejected_for_reservant_and_every_guest(self) -> None:
+        for ticket_id in self._all_ticket_ids():
+            response = self._check_in(ticket_id, self.old_event.id)
+            self.assertEqual(response.status_code, 409, msg=f"ticket {ticket_id}")
+            self.assertIn("different event", response.json()["error"])
+
+    def test_old_event_qr_checks_in_nobody(self) -> None:
+        for ticket_id in self._all_ticket_ids():
+            self._check_in(ticket_id, self.old_event.id)
+
+        self.reservation.refresh_from_db()
+        self.assertFalse(self.reservation.checked_in)
+        for guest in self.guests:
+            guest.refresh_from_db()
+            self.assertFalse(guest.checked_in)
+
+    def test_new_event_qr_checks_in_reservant_and_every_guest(self) -> None:
+        for ticket_id in self._all_ticket_ids():
+            response = self._check_in(ticket_id, self.new_event.id)
+            self.assertEqual(response.status_code, 200, msg=f"ticket {ticket_id}")
+            self.assertTrue(response.json()["success"])
+
+        self.reservation.refresh_from_db()
+        self.assertTrue(self.reservation.checked_in)
+        for guest in self.guests:
+            guest.refresh_from_db()
+            self.assertTrue(guest.checked_in)

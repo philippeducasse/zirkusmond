@@ -25,6 +25,12 @@ def get_events(request: Request) -> Response:
 
 @api_view(["POST"])
 @permission_classes([IsAdminUser])
-def check_in(request: Request, reservation_id: uuid.UUID) -> Response:
-    result, status_code = check_in_ticket(reservation_id)
+def check_in(
+    request: Request,
+    reservation_id: uuid.UUID,
+) -> Response:
+    raw_event = request.query_params.get("event")
+    event_id = int(raw_event) if raw_event and raw_event.isdigit() else None
+    result, status_code = check_in_ticket(reservation_id, event_id=event_id)
+
     return Response(result, status=status_code)

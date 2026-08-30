@@ -37,18 +37,44 @@ def _do_check_in(
     return {"success": True, "reservation_number": str(ticket_id), "guests": names, **extra}, 200
 
 
-def check_in_ticket(ticket_id: uuid.UUID) -> tuple[dict[str, Any], int]:
+def _wrong_event_response(
+    reservation: Reservation,
+    event_id: int | None,
+    ticket_id: uuid.UUID | None,
+    names: list[str],
+) -> tuple[dict[str, Any], int] | None:
+    """409 response if the ticket's reservation is not for ``event_id`` (when given)."""
+    if event_id is None or reservation.event_id == event_id:
+        return None
+    return {
+        "error": "Ticket is for a different event",
+        "reservation_number": str(ticket_id),
+        "guests": names,
+    }, 409
+
+
+def check_in_ticket(
+    ticket_id: uuid.UUID, event_id: int | None = None
+) -> tuple[dict[str, Any], int]:
     """Returns (response_dict, http_status_code)."""
     try:
         reservation = Reservation.objects.get(id=ticket_id)
         names = [f"{reservation.first_name} {reservation.last_name}"]
         names.extend(str(g) for g in reservation.guests.all())
+        wrong_event = _wrong_event_response(reservation, event_id, reservation.id, names)
+        if wrong_event:
+            return wrong_event
         return _do_check_in(reservation, reservation, reservation.id, names, is_group=True)
     except Reservation.DoesNotExist:
         pass
 
     try:
         guest = Guest.objects.get(ticket_id=ticket_id)
+        wrong_event = _wrong_event_response(
+            guest.reservation, event_id, guest.ticket_id, [str(guest)]
+        )
+        if wrong_event:
+            return wrong_event
         return _do_check_in(guest, guest.reservation, guest.ticket_id, [str(guest)])
     except Guest.DoesNotExist:
         return {"error": "Ticket not found"}, 404

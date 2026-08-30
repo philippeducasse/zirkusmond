@@ -1,7 +1,8 @@
+import logging
 from typing import Any
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import Field, QuerySet
 from django.http import HttpRequest
 from django.utils import timezone
@@ -10,6 +11,9 @@ from unfold.admin import ModelAdmin
 from events import services
 from events.models import Event
 from reservations.models import Guest, Reservation
+from reservations.payments.models import Payment
+
+logger = logging.getLogger(__name__)
 
 
 class InlineGuest(admin.StackedInline):
@@ -55,6 +59,38 @@ class ReservationAdmin(ModelAdmin):
     fields = ["event", "first_name", "last_name", "email", "checked_in"]
     list_select_related = ["event"]
     date_hierarchy = "event__begin"
+
+    # Resend confirmation email if event date is changed
+    def save_model(
+        self, request: HttpRequest, obj: Reservation, form: forms.ModelForm, change: bool
+    ) -> None:
+        event_changed = change and "event" in form.changed_data
+        super().save_model(request, obj, form, change)
+
+        if not event_changed or obj.event is None:
+            return
+
+        is_paid = Payment.objects.filter(reservation=obj, status=Payment.Status.COMPLETED).exists()
+
+        if not is_paid:
+            return
+
+        try:
+            services.send_confirmation_mail(obj)
+        except Exception:
+            logger.exception(f"Confirmation mail failed to send for event change on {obj.pk}")
+            self.message_user(
+                request,
+                f"Reservation saved, but the confirmation email to {obj.email} could not be sent.",
+                level=messages.ERROR,
+            )
+        else:
+            logger.info(f"Confirmation mail sent for event change on {obj.pk}")
+            self.message_user(
+                request,
+                f"Event changed — confirmation email re-sent to {obj.email}.",
+                level=messages.INFO,
+            )
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Reservation]:
         queryset = super().get_queryset(request)

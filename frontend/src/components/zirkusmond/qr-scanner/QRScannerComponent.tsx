@@ -79,7 +79,7 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
     }
 
     try {
-      const data = await checkInTicket(ticketUuid);
+      const data = await checkInTicket(ticketUuid, eventId);
 
       if (data.success) {
         setLastScan(data);
