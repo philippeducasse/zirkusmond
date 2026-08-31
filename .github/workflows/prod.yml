@@ -56,7 +56,7 @@ jobs:
           echo "DB_HOST=prod_postgres" >> .env
 
           # Frontend .env
-          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" > .env
+          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" >> .env
           echo "VITE_API_URL=/api" >> .env
 
       - name: Build Django image
