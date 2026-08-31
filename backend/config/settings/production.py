@@ -9,5 +9,5 @@ ALLOWED_HOSTS = [
 ]
 
 PAYMENT_USES_SSL = True
-
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://zirkusmond.de")
 PAYMENT_HOST = "zirkusmond.de"
