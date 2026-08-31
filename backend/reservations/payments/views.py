@@ -19,6 +19,25 @@ from reservations.payments.serializers import (
 logger = logging.getLogger(__name__)
 
 
+def set_payment_method_from_charge(payment: Payment, charge) -> None:
+    """Extract and set payment method from Stripe charge details."""
+    details = charge.payment_method_details
+    payment_method_type = details.type
+    if payment_method_type == "card":
+        wallet = details.card.wallet
+        wallet_type = wallet.type if wallet else None
+        if wallet_type == "apple_pay":
+            payment.payment_method = Payment.PaymentMethod.APPLE
+        elif wallet_type == "google_pay":
+            payment.payment_method = Payment.PaymentMethod.GOOGLE
+        else:
+            payment.payment_method = Payment.PaymentMethod.CARD
+    elif payment_method_type == "paypal":
+        payment.payment_method = Payment.PaymentMethod.PAYPAL
+    else:
+        payment.payment_method = Payment.PaymentMethod.UNKNOWN
+
+
 class CreatePaymentIntentView(generics.GenericAPIView):
     serializer_class = CreatePaymentIntentSerializer
     authentication_classes = []
@@ -74,21 +93,7 @@ def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
             payment_id = payment.id
             charge = intent.get("latest_charge")
             if charge:
-                details = charge.payment_method_details
-                payment_method_type = details.type
-                if payment_method_type == "card":
-                    wallet = details.card.wallet
-                    wallet_type = wallet.type if wallet else None
-                    if wallet_type == "apple_pay":
-                        payment.payment_method = Payment.PaymentMethod.APPLE
-                    elif wallet_type == "google_pay":
-                        payment.payment_method = Payment.PaymentMethod.GOOGLE
-                    else:
-                        payment.payment_method = Payment.PaymentMethod.CARD
-                elif payment_method_type == "paypal":
-                    payment.payment_method = Payment.PaymentMethod.PAYPAL
-                else:
-                    payment.payment_method = Payment.PaymentMethod.UNKNOWN
+                set_payment_method_from_charge(payment, charge)
                 payment.save()
         except Payment.DoesNotExist:
             logger.warning("stripe_return: payment not found for intent %s", payment_intent_id)
@@ -173,9 +178,27 @@ class StripeWebhookView(APIView):
                 try:
                     payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
                     payment.status = Payment.Status.COMPLETED
+
+                    # Set payment method from latest charge (if not already set)
+                    if not payment.payment_method:
+                        latest_charge_id = intent.get("latest_charge")
+                        if latest_charge_id:
+                            try:
+                                charge = stripe.Charge.retrieve(
+                                    latest_charge_id, expand=["payment_method_details"]
+                                )
+                                set_payment_method_from_charge(payment, charge)
+                            except stripe.error.StripeError as e:
+                                logger.warning(
+                                    "webhook: failed to retrieve charge %s: %s", latest_charge_id, e
+                                )
+
                     payment.save()
                     logger.info(
-                        "payment_completed: payment=%s intent=%s", payment.id, payment_intent_id
+                        "payment_completed: payment=%s intent=%s method=%s",
+                        payment.id,
+                        payment_intent_id,
+                        payment.payment_method,
                     )
                 except Payment.DoesNotExist:
                     logger.warning(
