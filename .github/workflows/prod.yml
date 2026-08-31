@@ -45,16 +45,17 @@ jobs:
         run: |
           # Backend .env
           cp deploy/.env.basic .env
+          echo "" >> .env
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env
           echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "BREVO_API_KEY=${{ secrets.MAILER_TOKEN }}" >> .env
-          echo "PAYPAL_LIVE_CLIENT_ID=${{ secrets.PAYPAL_LIVE_CLIENT_ID }}" >> .env
           echo "STRIPE_TOKEN=${{ secrets.STRIPE_TOKEN }}" >> .env
-          echo "PAYPAL_LIVE_SECRET=${{ secrets.PAYPAL_LIVE_SECRET }}" >> .env
-          echo "STRIPE_LIVE_SECRET_KEY=${{ secrets.STRIPE_TOKEN }}" >> .env
-          echo "STRIPE_LIVE_WEBHOOK_SECRET=${{ secrets.STRIPE_HOOK_TOKEN }}" >> .env
+          echo "STRIPE_HOOK_TOKEN=${{ secrets.STRIPE_HOOK_TOKEN }}" >> .env
           echo "DB_HOST=prod_postgres" >> .env
+          echo "DJANGO_SETTINGS_MODULE=config.settings.production" >> .env
+          echo "API_URL=http://localhost:8010" >> .env
+          echo "FRONTEND_URL=https://zirkusmond.de" >> .env
 
           # Frontend .env
           echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" >> .env
