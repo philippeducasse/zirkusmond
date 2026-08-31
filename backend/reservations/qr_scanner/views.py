@@ -1,12 +1,17 @@
 import uuid
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
 
 from .services import check_in_ticket, get_upcoming_events
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+    def enforce_csrf(self, request):
+        return  # Skip CSRF check
 
 
 @api_view(["GET"])
@@ -24,8 +29,8 @@ def get_events(request: Request) -> Response:
     return Response(events)
 
 
-@csrf_exempt
 @api_view(["POST"])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([IsAdminUser])
 def check_in(
     request: Request,
