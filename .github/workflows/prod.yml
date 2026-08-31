@@ -50,6 +50,7 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "BREVO_API_KEY=${{ secrets.MAILER_TOKEN }}" >> .env
           echo "PAYPAL_LIVE_CLIENT_ID=${{ secrets.PAYPAL_LIVE_CLIENT_ID }}" >> .env
+          echo "STRIPE_TOKEN=${{ secrets.STRIPE_TOKEN }}" >> .env
           echo "PAYPAL_LIVE_SECRET=${{ secrets.PAYPAL_LIVE_SECRET }}" >> .env
           echo "STRIPE_LIVE_SECRET_KEY=${{ secrets.STRIPE_TOKEN }}" >> .env
           echo "STRIPE_LIVE_WEBHOOK_SECRET=${{ secrets.STRIPE_HOOK_TOKEN }}" >> .env
