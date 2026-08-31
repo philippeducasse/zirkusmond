@@ -62,7 +62,11 @@ jobs:
           echo "VITE_API_URL=https://zirkusmond.de/api"  >> .env
 
       - name: Build Django image
-        run: docker build -f deploy/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest .
+        run: |
+          docker build -f deploy/Dockerfile \
+            --build-arg VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }} \
+            --build-arg VITE_API_URL=https://zirkusmond.de/api \
+            -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest .
 
       - name: Push to registry
         run: docker push ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest
