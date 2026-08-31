@@ -93,6 +93,10 @@ export default function StripePaymentForm({
                 address: "never",
               },
             },
+            wallets: {
+              applePay: "auto",
+              googlePay: "auto",
+            },
           }}
         />
       </div>
