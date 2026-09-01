@@ -4,6 +4,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { useTranslation } from "react-i18next";
 import { Button } from "#/components/ui/button.tsx";
 import SectionCardSkeleton from "../../general/SectionCardSkeleton.tsx";
 import NavigationButtonWrapper from "../../general/NavigationButtonWrapper.tsx";
@@ -23,6 +24,7 @@ export default function StripePaymentForm({
   onError,
   onCancel,
 }: StripePaymentFormProps) {
+  const { t } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -108,10 +110,10 @@ export default function StripePaymentForm({
       )}
       <NavigationButtonWrapper>
         <Button type="submit" disabled={isProcessing}>
-          {isProcessing ? "Processing..." : "Pay Now"}
+          {isProcessing ? t("button_processing") : t("button_pay_now")}
         </Button>
         <Button type="button" variant="secondary" onClick={onCancel}>
-          Back
+          {t("button_back")}
         </Button>
       </NavigationButtonWrapper>
     </form>

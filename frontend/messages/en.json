@@ -26,6 +26,8 @@
   "button_back_to_show": "Back to Show",
   "button_proceed_to_payment": "Proceed to Payment",
   "button_processing": "Processing...",
+  "button_pay_now": "Pay Now",
+  "button_back": "Back",
   "button_fill_test_data": "Fill test data",
   "button_all_events": "View all events",
 
