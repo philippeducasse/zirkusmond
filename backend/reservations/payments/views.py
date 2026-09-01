@@ -30,10 +30,14 @@ def set_payment_method_from_charge(payment: Payment, charge) -> None:
             payment.payment_method = Payment.PaymentMethod.APPLE
         elif wallet_type == "google_pay":
             payment.payment_method = Payment.PaymentMethod.GOOGLE
+        elif wallet_type == "link":
+            payment.payment_method = Payment.PaymentMethod.LINK
         else:
             payment.payment_method = Payment.PaymentMethod.CARD
     elif payment_method_type == "paypal":
         payment.payment_method = Payment.PaymentMethod.PAYPAL
+    elif payment_method_type == "klarna":
+        payment.payment_method = Payment.PaymentMethod.KLARNA
     else:
         payment.payment_method = Payment.PaymentMethod.UNKNOWN
 
