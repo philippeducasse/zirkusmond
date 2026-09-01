@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "#/components/ui/button.tsx";
 import SectionCardSkeleton from "../../general/SectionCardSkeleton.tsx";
 import NavigationButtonWrapper from "../../general/NavigationButtonWrapper.tsx";
@@ -87,7 +83,7 @@ export default function StripePaymentForm({
       <div className="mb-6 [&_iframe]:outline-none">
         <PaymentElement
           options={{
-            layout: "tabs",
+            layout: "accordion",
             fields: {
               billingDetails: {
                 address: "never",
