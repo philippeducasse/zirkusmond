@@ -17,7 +17,7 @@ export default function CheckboxField({
   return (
     <Field
       orientation="horizontal"
-      className="my-4 sm:my-6 flex p-4 sm:p-4 items-center max-w-62 sm:max-w-md md:max-w-lg"
+      className="flex items-center max-w-62 sm:max-w-md md:max-w-lg"
     >
       <FieldLabel
         htmlFor={id}

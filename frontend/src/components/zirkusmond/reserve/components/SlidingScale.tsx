@@ -42,7 +42,7 @@ export default function SlidingScale({
   const maxPrice = show.maxTicketPrice ?? show.baseTicketPrice + 10;
 
   return (
-    <div className="my-4 sm:my-6">
+    <div className="my-4 sm:my-8 max-w-lg">
       <h4 className="mb-2 sm:mb-3 text-primary text-center">
         {t("sliding_scale_title")}
       </h4>

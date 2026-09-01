@@ -37,6 +37,15 @@ const appearance: Appearance = {
       borderRadius: "0px",
       boxShadow: "none",
     },
+    ".Tab:hover": {
+      color: "var(--colorPrimary)",
+    },
+    ".Tab--selected, .Tab--selected:focus, .Tab--selected:hover": {
+      color: "var(--colorPrimary)",
+    },
+    ".AccordionItem:hover": {
+      color: "var(--colorPrimary)",
+    },
   },
 };
 

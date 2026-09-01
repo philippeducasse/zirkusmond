@@ -37,22 +37,16 @@ export default function ReservationForm({
   );
 
   return (
-    <div className="w-full flex flex-col justify-center mx-auto gap-4 my-8">
-      <div className="p-4 md:p-8">
-        <DynamicForm title="Tickets" fields={ticketFields} />
-
-        {!show.baseTicketPrice && (
-          <p className="w-full my-3 sm:my-4">
-            For your Reservation, you will have to pay{" "}
-            {show.reservationPrice ?? 5} Euro per Ticket. This will be fully
-            deducted from your entree fee at the box office.
-          </p>
-        )}
-      </div>
-
-      <div className="p-4 md:p-8">
-        <DynamicForm title="Personal Information" fields={personalInfoFields} />
-      </div>
+    <div className="w-full flex flex-col justify-center mx-auto gap-6 my-8">
+      <DynamicForm title="Tickets" fields={ticketFields} />
+      {!show.baseTicketPrice && (
+        <p className="w-full my-3 sm:my-4">
+          For your Reservation, you will have to pay{" "}
+          {show.reservationPrice ?? 5} Euro per Ticket. This will be fully
+          deducted from your entree fee at the box office.
+        </p>
+      )}
+      <DynamicForm title="Personal Information" fields={personalInfoFields} />
     </div>
   );
 }
