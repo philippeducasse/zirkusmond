@@ -7,7 +7,9 @@ interface AlreadyCheckedInProps {
 export const AlreadyCheckedIn = ({ data }: AlreadyCheckedInProps) => {
   return (
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-      <h2 className="font-bold text-yellow-800 text-6xl mb-2">Already Checked In</h2>
+      <h2 className="font-bold text-yellow-800 text-6xl mb-2">
+        Already Checked In
+      </h2>
       <div className="flex flex-col items-center">
         <svg
           className="w-28 h-28 mx-auto text-yellow-500 mb-4"
