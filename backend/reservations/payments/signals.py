@@ -4,7 +4,7 @@ from typing import Any
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from events import services
+from reservations import emails
 from reservations.payments.models import Payment
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def on_payment_status_changed(
     # Send confirmation email when payment is completed
     if instance.status == Payment.Status.COMPLETED:
         try:
-            services.send_confirmation_mail(reservation)
+            emails.send_confirmation_mail(reservation)
             logger.info(
                 "confirmation email sent for payment=%s to=%s", payment_id, reservation.email
             )
@@ -50,3 +50,11 @@ def on_payment_status_changed(
             logger.error(
                 "failed to send payment failure email for payment=%s: %s", payment_id, error
             )
+
+    # Send refund notification email when payment is refunded
+    elif instance.status == Payment.Status.REFUNDED:
+        try:
+            emails.send_refund_mail(reservation)
+            logger.info("refund email sent for payment=%s to=%s", payment_id, reservation.email)
+        except Exception as error:
+            logger.error("failed to send refund email for payment=%s: %s", payment_id, error)
