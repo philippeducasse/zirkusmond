@@ -1,7 +1,7 @@
 import hashlib
 import logging
 
-import mailchimp_marketing as MailchimpMarketing
+import mailchimp_marketing
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -28,7 +28,7 @@ def register(request: Request) -> Response:
 
     # Add to Mailchimp
     try:
-        client = MailchimpMarketing.Client()
+        client = mailchimp_marketing.Client()
         client.set_config(
             {"api_key": settings.NEWSLETTER_TOKEN, "server": settings.MAILCHIMP_SERVER_PREFIX}
         )
