@@ -181,3 +181,35 @@ class SiteViewsTest(TestCase):
         self.assertIn("upcoming_shows", data)
         self.assertEqual(len(data["upcoming_shows"]), 1)
         self.assertEqual(data["upcoming_shows"][0]["title"], "Test Show")
+
+    def test_home_limits_to_six_shows(self) -> None:
+        """Homepage should only return 6 shows even if more exist."""
+        for i in range(10):
+            show = make_show(title=f"Show {i}")
+            make_event(show, offset_days=i + 1)
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data["upcoming_shows"]), 6)
+
+    def test_all_shows_returns_all(self) -> None:
+        """The /shows/ endpoint should return all upcoming shows."""
+        for i in range(10):
+            show = make_show(title=f"Show {i}")
+            make_event(show, offset_days=i + 1)
+        response = self.client.get("/shows/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data["upcoming_shows"]), 10)
+
+    def test_all_shows_excludes_private(self) -> None:
+        """Private shows should not appear in /shows/."""
+        public_show = make_show(title="Public", private=False)
+        private_show = make_show(title="Private", private=True)
+        make_event(public_show)
+        make_event(private_show)
+        response = self.client.get("/shows/")
+        data = response.json()
+        titles = [s["title"] for s in data["upcoming_shows"]]
+        self.assertIn("Public", titles)
+        self.assertNotIn("Private", titles)
