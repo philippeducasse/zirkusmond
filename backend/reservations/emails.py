@@ -42,7 +42,9 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list[tuple[str, BytesI
         canvas.drawCentredString(center_x, qr_y + qr_size + 60, show.title)
 
         canvas.setFont("Helvetica", 14)
-        canvas.drawCentredString(center_x, qr_y + qr_size + 36, f"Ticket fuer / Ticket for:  {name}")
+        canvas.drawCentredString(
+            center_x, qr_y + qr_size + 36, f"Ticket fuer / Ticket for:  {name}"
+        )
 
         canvas.setLineWidth(0.5)
         canvas.line(72, qr_y + qr_size + 22, width - 72, qr_y + qr_size + 22)
