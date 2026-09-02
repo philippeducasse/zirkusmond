@@ -458,7 +458,7 @@ class ReservationAdminRescheduleEmailTest(TestCase):
         self._pay()
         self.reservation.event = self.new_event
         with patch(
-            "reservations.admin.services.send_confirmation_mail",
+            "reservations.emails.send_confirmation_mail",
             side_effect=RuntimeError("smtp down"),
         ):
             request = self._save(["event"])

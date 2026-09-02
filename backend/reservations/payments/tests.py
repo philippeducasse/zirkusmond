@@ -263,6 +263,37 @@ class CreatePaymentIntentViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+    @patch("stripe.PaymentIntent.create")
+    def test_receipt_email_is_set_to_reservation_email(self, mock_create: MagicMock) -> None:
+        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
+
+        self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
+
+        mock_create.assert_called_once()
+        call_kwargs = mock_create.call_args[1]
+        self.assertEqual(call_kwargs["receipt_email"], self.reservation.email)
+
+    @patch("stripe.PaymentIntent.create")
+    def test_metadata_includes_customer_name(self, mock_create: MagicMock) -> None:
+        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
+
+        self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
+
+        mock_create.assert_called_once()
+        call_kwargs = mock_create.call_args[1]
+        expected_name = f"{self.reservation.first_name} {self.reservation.last_name}"
+        self.assertEqual(call_kwargs["metadata"]["customer_name"], expected_name)
+
+    @patch("stripe.PaymentIntent.create")
+    def test_metadata_includes_reservation_id(self, mock_create: MagicMock) -> None:
+        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
+
+        self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
+
+        mock_create.assert_called_once()
+        call_kwargs = mock_create.call_args[1]
+        self.assertEqual(call_kwargs["metadata"]["reservation_id"], str(self.reservation.id))
+
 
 # ---------------------------------------------------------------------------
 # Stripe webhook view
@@ -341,8 +372,11 @@ class StripeWebhookViewTest(TestCase):
         self.payment.refresh_from_db()
         self.assertEqual(self.payment.status, Payment.Status.FAILED)
 
+    @patch("reservations.emails.send_refund_mail")
     @patch("stripe.Webhook.construct_event")
-    def test_charge_refunded_marks_refunded(self, mock_construct: MagicMock) -> None:
+    def test_charge_refunded_marks_refunded(
+        self, mock_construct: MagicMock, mock_send_refund: MagicMock
+    ) -> None:
         mock_construct.return_value = {
             "type": "charge.refunded",
             "data": {"object": {"payment_intent": "pi_test_123"}},
@@ -358,6 +392,7 @@ class StripeWebhookViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.payment.refresh_from_db()
         self.assertEqual(self.payment.status, Payment.Status.REFUNDED)
+        mock_send_refund.assert_called_once_with(self.payment.reservation)
 
     @patch("stripe.Webhook.construct_event")
     def test_unknown_payment_intent_returns_404(self, mock_construct: MagicMock) -> None:
