@@ -8,7 +8,7 @@ from shows.models import Show
 from shows.serializers import ShowCardSerializer
 
 
-def _upcoming_shows() -> list[Show]:
+def _upcoming_shows(limit: int | None = None) -> list[Show]:
     upcoming_shows = Show.objects.prefetch_related("events").all()
     upcoming_shows = list(filter(lambda x: x.show_in_preview(), upcoming_shows))
     upcoming_shows = sorted(
@@ -19,10 +19,12 @@ def _upcoming_shows() -> list[Show]:
             else x.future_events()[0].admission.date()
         ),
     )
+    if limit is not None:
+        upcoming_shows = upcoming_shows[:limit]
     return upcoming_shows
 
 
 @api_view(["GET"])
 def homepage(request: Request) -> Response:
-    shows = _upcoming_shows()[:6]
+    shows = _upcoming_shows(limit=6)
     return Response({"upcoming_shows": ShowCardSerializer(shows, many=True).data})

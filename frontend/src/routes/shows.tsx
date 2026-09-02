@@ -3,11 +3,11 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import EventsSection from "#/components/zirkusmond/home/EventsSection";
 import PageContainer from "#/components/zirkusmond/general/PageContainer";
-import { homepageQueryOptions } from "#/lib/api.ts";
+import { allShowsQueryOptions } from "#/lib/api.ts";
 
 const RouteComponent = () => {
   // TanStack Query: reads the cache entry the loader ensured; no loading state.
-  const { data } = useSuspenseQuery(homepageQueryOptions);
+  const { data } = useSuspenseQuery(allShowsQueryOptions);
 
   return (
     <PageContainer>
@@ -16,11 +16,10 @@ const RouteComponent = () => {
   );
 };
 
-export const Route = createFileRoute("/events")({
-  // TanStack Query: prefetch into the cache during SSR / navigation. Reuses
-  // the homepage query, so navigating from / renders without a refetch.
+export const Route = createFileRoute("/shows")({
+  // TanStack Query: prefetch into the cache during SSR / navigation.
   loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(homepageQueryOptions),
+    queryClient.ensureQueryData(allShowsQueryOptions),
   head: () => ({
     meta: [
       { title: "Zirkus Mond – Shows & Events" },

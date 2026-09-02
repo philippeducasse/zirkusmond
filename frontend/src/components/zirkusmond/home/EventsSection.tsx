@@ -43,7 +43,7 @@ export default function EventsSection({
         <div className="flex justify-center pt-12 md:pt-24">
           <Button asChild>
             {showAllEventsLink ? (
-              <Link to="/events">{t("button_all_events")}</Link>
+              <Link to="/shows">{t("button_all_events")}</Link>
             ) : (
               <Link to="/">{t("button_back_to_home")}</Link>
             )}

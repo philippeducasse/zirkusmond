@@ -13,10 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DatenschutzRouteImport } from './routes/datenschutz'
-import { Route as EventsRouteImport } from './routes/events'
 import { Route as ImpressumRouteImport } from './routes/impressum'
 import { Route as QrScannerRouteImport } from './routes/qr-scanner'
 import { Route as RentalsRouteImport } from './routes/rentals'
+import { Route as ShowsRouteImport } from './routes/shows'
 import { Route as ApiSplatRouteImport } from './routes/api.$'
 import { Route as PaymentFailureRouteImport } from './routes/payment.failure'
 import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
@@ -44,11 +44,6 @@ const DatenschutzRoute = DatenschutzRouteImport.update({
   path: '/datenschutz',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ImpressumRoute = ImpressumRouteImport.update({
   id: '/impressum',
   path: '/impressum',
@@ -62,6 +57,11 @@ const QrScannerRoute = QrScannerRouteImport.update({
 const RentalsRoute = RentalsRouteImport.update({
   id: '/rentals',
   path: '/rentals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowsRoute = ShowsRouteImport.update({
+  id: '/shows',
+  path: '/shows',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
@@ -100,10 +100,10 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/datenschutz': typeof DatenschutzRoute
-  '/events': typeof EventsRoute
   '/impressum': typeof ImpressumRoute
   '/qr-scanner': typeof QrScannerRoute
   '/rentals': typeof RentalsRoute
+  '/shows': typeof ShowsRoute
   '/api/$': typeof ApiSplatRoute
   '/payment/failure': typeof PaymentFailureRoute
   '/payment/success': typeof PaymentSuccessRoute
@@ -116,10 +116,10 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/datenschutz': typeof DatenschutzRoute
-  '/events': typeof EventsRoute
   '/impressum': typeof ImpressumRoute
   '/qr-scanner': typeof QrScannerRoute
   '/rentals': typeof RentalsRoute
+  '/shows': typeof ShowsRoute
   '/api/$': typeof ApiSplatRoute
   '/payment/failure': typeof PaymentFailureRoute
   '/payment/success': typeof PaymentSuccessRoute
@@ -133,10 +133,10 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/datenschutz': typeof DatenschutzRoute
-  '/events': typeof EventsRoute
   '/impressum': typeof ImpressumRoute
   '/qr-scanner': typeof QrScannerRoute
   '/rentals': typeof RentalsRoute
+  '/shows': typeof ShowsRoute
   '/api/$': typeof ApiSplatRoute
   '/payment/failure': typeof PaymentFailureRoute
   '/payment/success': typeof PaymentSuccessRoute
@@ -151,10 +151,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/datenschutz'
-    | '/events'
     | '/impressum'
     | '/qr-scanner'
     | '/rentals'
+    | '/shows'
     | '/api/$'
     | '/payment/failure'
     | '/payment/success'
@@ -167,10 +167,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/datenschutz'
-    | '/events'
     | '/impressum'
     | '/qr-scanner'
     | '/rentals'
+    | '/shows'
     | '/api/$'
     | '/payment/failure'
     | '/payment/success'
@@ -183,10 +183,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/datenschutz'
-    | '/events'
     | '/impressum'
     | '/qr-scanner'
     | '/rentals'
+    | '/shows'
     | '/api/$'
     | '/payment/failure'
     | '/payment/success'
@@ -200,10 +200,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   DatenschutzRoute: typeof DatenschutzRoute
-  EventsRoute: typeof EventsRoute
   ImpressumRoute: typeof ImpressumRoute
   QrScannerRoute: typeof QrScannerRoute
   RentalsRoute: typeof RentalsRoute
+  ShowsRoute: typeof ShowsRoute
   ApiSplatRoute: typeof ApiSplatRoute
   PaymentFailureRoute: typeof PaymentFailureRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
@@ -242,13 +242,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DatenschutzRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/impressum': {
       id: '/impressum'
       path: '/impressum'
@@ -268,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/rentals'
       fullPath: '/rentals'
       preLoaderRoute: typeof RentalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shows': {
+      id: '/shows'
+      path: '/shows'
+      fullPath: '/shows'
+      preLoaderRoute: typeof ShowsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$': {
@@ -320,10 +320,10 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   DatenschutzRoute: DatenschutzRoute,
-  EventsRoute: EventsRoute,
   ImpressumRoute: ImpressumRoute,
   QrScannerRoute: QrScannerRoute,
   RentalsRoute: RentalsRoute,
+  ShowsRoute: ShowsRoute,
   ApiSplatRoute: ApiSplatRoute,
   PaymentFailureRoute: PaymentFailureRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,

@@ -64,6 +64,11 @@ export const homepageQueryOptions = queryOptions({
   queryFn: () => fetchJson<HomepageResponse>("/"),
 });
 
+export const allShowsQueryOptions = queryOptions({
+  queryKey: ["allShows"],
+  queryFn: () => fetchJson<HomepageResponse>("/shows/"),
+});
+
 /**
  * TanStack Query: parameterised query — a factory because the cache key must
  * include the showId, giving each show its own cache entry.
