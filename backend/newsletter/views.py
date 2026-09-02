@@ -40,6 +40,8 @@ def register(request: Request) -> Response:
             subscriber_hash,
             {"email_address": email, "status_if_new": "subscribed"},
         )
+        logger.info(f"Email {email} successfully added to mailchimp")
+
     except ApiClientError as error:
         logger.error(f"Mailchimp API error: {error.text}")
         # Don't fail the request if Mailchimp fails

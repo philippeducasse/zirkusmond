@@ -112,7 +112,7 @@ UNFOLD = {
                     {
                         "title": "Newsletter",
                         "icon": "mail",
-                        "link": "/mondmin/newsletter/newslettersubscriber/",
+                        "link": "/mondmin/newsletter/newsletterregistration/",
                     },
                     {
                         "title": "Rentals",
