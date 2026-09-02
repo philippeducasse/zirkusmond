@@ -13,9 +13,9 @@ from django.utils import timezone
 from payments import PaymentStatus
 from unfold.admin import ModelAdmin
 
-from events import services
 from events.forms import EmailTextForm
 from events.services import purge_old_payments
+from reservations import emails
 from reservations.models import Reservation, ReservationPayment
 from reservations.payments.models import Payment
 
@@ -206,7 +206,7 @@ class ReservationPaymentAdmin(ModelAdmin):
         self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
     ) -> None:
         for payment in queryset:
-            services.send_confirmation_mail(payment.reservation)
+            emails.send_confirmation_mail(payment.reservation)
 
     @admin.action(description="Send mail to Reservants")
     def send_to_reservants(
@@ -289,7 +289,7 @@ class PaymentAdmin(ModelAdmin):
     def resend_confirmation_mail(self, request: HttpRequest, queryset: QuerySet[Payment]) -> None:
         for payment in queryset:
             if payment.reservation:
-                services.send_confirmation_mail(payment.reservation)
+                emails.send_confirmation_mail(payment.reservation)
 
     @admin.action(description="Send mail to Reservants")
     def send_to_reservants(

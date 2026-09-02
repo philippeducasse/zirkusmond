@@ -8,8 +8,8 @@ from django.http import HttpRequest
 from django.utils import timezone
 from unfold.admin import ModelAdmin
 
-from events import services
 from events.models import Event
+from reservations import emails
 from reservations.models import Guest, Reservation
 from reservations.payments.models import Payment
 
@@ -76,7 +76,7 @@ class ReservationAdmin(ModelAdmin):
             return
 
         try:
-            services.send_confirmation_mail(obj)
+            emails.send_confirmation_mail(obj)
         except Exception:
             logger.exception(f"Confirmation mail failed to send for event change on {obj.pk}")
             self.message_user(
@@ -133,7 +133,7 @@ class ReservationAdmin(ModelAdmin):
         self, request: HttpRequest, queryset: QuerySet[Reservation]
     ) -> None:
         for reservation in queryset:
-            services.send_confirmation_mail(reservation)
+            emails.send_confirmation_mail(reservation)
 
 
 class GuestAdmin(ModelAdmin):
