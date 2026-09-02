@@ -21,6 +21,7 @@ dependencies = [
     "django-unfold>=0.97.0",
     "djangorestframework>=3.17.1",
     "django-cors-headers>=4.9.0",
+    "mailchimp-marketing>=3.0.80",
 ]
 
 [tool.pytest.ini_options]

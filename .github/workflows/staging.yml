@@ -51,6 +51,9 @@ jobs:
           echo "PAYPAL_SANDBOX_SECRET=${{ secrets.PAYPAL_SANDBOX_SECRET }}" >> .env
           echo "STRIPE_TEST_TOKEN=${{ secrets.STRIPE_TEST_TOKEN }}" >> .env
           echo "STRIPE_HOOK_TOKEN=${{ secrets.STRIPE_TEST_HOOK_TOKEN }}" >> .env
+          echo "NEWSLETTER_TOKEN=${{ secrets.NEWSLETTER_TOKEN }}" >> .env
+          echo "MAILCHIMP_SERVER_PREFIX=${{ secrets.MAILCHIMP_SERVER_PREFIX }}" >> .env
+          echo "MAILCHIMP_AUDIENCE_ID=${{ secrets.MAILCHIMP_AUDIENCE_ID }}" >> .env
           echo "DB_HOST=staging_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
           echo "API_URL=http://localhost:8010" >> .env

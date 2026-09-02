@@ -52,6 +52,9 @@ jobs:
           echo "BREVO_API_KEY=${{ secrets.MAILER_TOKEN }}" >> .env
           echo "STRIPE_TOKEN=${{ secrets.STRIPE_TOKEN }}" >> .env
           echo "STRIPE_HOOK_TOKEN=${{ secrets.STRIPE_HOOK_TOKEN }}" >> .env
+          echo "NEWSLETTER_TOKEN=${{ secrets.NEWSLETTER_TOKEN }}" >> .env
+          echo "MAILCHIMP_SERVER_PREFIX=${{ secrets.MAILCHIMP_SERVER_PREFIX }}" >> .env
+          echo "MAILCHIMP_AUDIENCE_ID=${{ secrets.MAILCHIMP_AUDIENCE_ID }}" >> .env
           echo "DB_HOST=prod_postgres" >> .env
           echo "DJANGO_SETTINGS_MODULE=config.settings.production" >> .env
           echo "API_URL=http://localhost:8010" >> .env
