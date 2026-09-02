@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import StripePaymentWrapper from "./StripePaymentWrapper.tsx";
 
 interface PaymentSectionProps {
@@ -15,10 +16,12 @@ export default function PaymentSection({
   onPaymentError,
   onPaymentCancel,
 }: PaymentSectionProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="my-4 sm:my-6">
-        <h3 className="text-center">Payment</h3>
+        <h3 className="text-center">{t("payment_section_title")}</h3>
       </div>
 
       <div className="my-6">
