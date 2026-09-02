@@ -63,7 +63,11 @@ class CreatePaymentIntentView(generics.GenericAPIView):
         intent: stripe.PaymentIntent = stripe.PaymentIntent.create(
             amount=int(payment.total * 100),
             currency="eur",
-            metadata={"reservation_id": str(reservation.id)},
+            receipt_email=reservation.email,
+            metadata={
+                "reservation_id": str(reservation.id),
+                "customer_name": f"{reservation.first_name} {reservation.last_name}",
+            },
         )
         payment.stripe_payment_intent_id = intent.id
         payment.save()
