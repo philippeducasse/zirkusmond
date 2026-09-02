@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "#/components/ui/button.tsx";
 import SectionCardSkeleton from "../../general/SectionCardSkeleton.tsx";
 import NavigationButtonWrapper from "../../general/NavigationButtonWrapper.tsx";
+import { useQuery } from "@tanstack/react-query";
+import { reservationDetailQueryOptions } from "#/lib/api.ts";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -30,6 +32,11 @@ export default function StripePaymentForm({
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // this same query is hit on the parent PaymentPage, so it will be cached
+  const { data: reservation } = useQuery(
+    reservationDetailQueryOptions(reservationId),
+  );
+
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -49,6 +56,8 @@ export default function StripePaymentForm({
             billing_details: {
               // hardcode the billing details. cant reliably display the country drop down, so have to pass this info to stripe manually.
               // shouldnt affect payment success
+              name: `${reservation?.firstName} ${reservation?.lastName}`,
+              email: reservation?.email,
               address: {
                 country: "DE",
                 postal_code: "00000",
