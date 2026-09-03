@@ -34,6 +34,8 @@ def set_payment_method_from_charge(payment: Payment, charge) -> None:
             payment.payment_method = Payment.PaymentMethod.LINK
         else:
             payment.payment_method = Payment.PaymentMethod.CARD
+    elif payment_method_type == "link":
+        payment.payment_method = Payment.PaymentMethod.LINK
     elif payment_method_type == "paypal":
         payment.payment_method = Payment.PaymentMethod.PAYPAL
     elif payment_method_type == "klarna":
