@@ -106,7 +106,7 @@ class Payment(models.Model):
         APPLE = "apple"
         GOOGLE = "google"
         KLARNA = "klarna"
-        LINK = "linke"
+        LINK = "link"
         UNKNOWN = "unknown"
 
     class Status(models.TextChoices):
