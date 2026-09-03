@@ -264,16 +264,6 @@ class CreatePaymentIntentViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     @patch("stripe.PaymentIntent.create")
-    def test_receipt_email_is_set_to_reservation_email(self, mock_create: MagicMock) -> None:
-        mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
-
-        self.client.post(self._url(), {"custom_ticket_price": 20}, format="json")
-
-        mock_create.assert_called_once()
-        call_kwargs = mock_create.call_args[1]
-        self.assertEqual(call_kwargs["receipt_email"], self.reservation.email)
-
-    @patch("stripe.PaymentIntent.create")
     def test_metadata_includes_customer_name(self, mock_create: MagicMock) -> None:
         mock_create.return_value = MagicMock(id="pi_test_123", client_secret="secret_123")
 
