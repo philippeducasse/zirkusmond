@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "#/components/ui/button.tsx";
 import SectionCardSkeleton from "../../general/SectionCardSkeleton.tsx";
 import NavigationButtonWrapper from "../../general/NavigationButtonWrapper.tsx";
+import Spinner from "../../general/Spinner.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { reservationDetailQueryOptions } from "#/lib/api.ts";
 
@@ -94,37 +95,40 @@ export default function StripePaymentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
-      <div className="mb-6 [&_iframe]:outline-none">
-        <PaymentElement
-          options={{
-            layout: "accordion",
-            fields: {
-              billingDetails: {
-                address: "never",
+    <>
+      {isProcessing && <Spinner />}
+      <form onSubmit={handleSubmit} className="flex flex-col">
+        <div className="mb-6 [&_iframe]:outline-none">
+          <PaymentElement
+            options={{
+              layout: "accordion",
+              fields: {
+                billingDetails: {
+                  address: "never",
+                },
               },
-            },
-            wallets: {
-              applePay: "auto",
-              googlePay: "auto",
-            },
-          }}
-        />
-      </div>
-
-      {errorMessage && (
-        <div className="mb-4 p-3 bg-white/10 border-2 border-destructive text-red/30 text-xl">
-          <p className="text-red-300 text-center">{errorMessage}</p>
+              wallets: {
+                applePay: "auto",
+                googlePay: "auto",
+              },
+            }}
+          />
         </div>
-      )}
-      <NavigationButtonWrapper>
-        <Button type="submit" disabled={isProcessing}>
-          {isProcessing ? t("button_processing") : t("button_pay_now")}
-        </Button>
-        <Button type="button" variant="secondary" onClick={onCancel}>
-          {t("button_back")}
-        </Button>
-      </NavigationButtonWrapper>
-    </form>
+
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-white/10 border-2 border-destructive text-red/30 text-xl">
+            <p className="text-red-300 text-center">{errorMessage}</p>
+          </div>
+        )}
+        <NavigationButtonWrapper>
+          <Button type="submit" disabled={isProcessing}>
+            {isProcessing ? t("button_processing") : t("button_pay_now")}
+          </Button>
+          <Button type="button" variant="secondary" onClick={onCancel}>
+            {t("button_back")}
+          </Button>
+        </NavigationButtonWrapper>
+      </form>
+    </>
   );
 }
