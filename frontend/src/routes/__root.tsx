@@ -62,7 +62,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Zirkusmond",
+        title: "Zirkus Mond",
+      },
+      {
+        name: "description",
+        content:
+          "Zirkus Mond – Dein Zirkus in Berlin! Entdecke unser Programm: Live Shows, Events, Community und zeitgenössische Zirkuskunst im Herzen Berlins.",
       },
     ],
     links: [
@@ -78,5 +83,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   }),
   shellComponent: RootDocument,
   notFoundComponent: () => <NotFound />,
-  errorComponent: ErrorPage,
+  errorComponent: (props) => (
+    <RootDocument>
+      <ErrorPage {...props} />
+    </RootDocument>
+  ),
 });
