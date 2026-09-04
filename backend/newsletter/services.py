@@ -24,9 +24,9 @@ def register_email_to_mailchimp(email: str) -> None:
             subscriber_hash,
             {"email_address": email, "status_if_new": "subscribed"},
         )
+        logger.info(f"Successfully registered {email} to Mailchimp")
     except ApiClientError as e:
         logger.error(f"Mailchimp API error for {email}: {e.text}")
-        raise
 
 
 def register_newsletter_email(email: str) -> None:
