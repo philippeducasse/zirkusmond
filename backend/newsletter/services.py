@@ -1,9 +1,13 @@
 import hashlib
+import logging
 
 import mailchimp_marketing
 from django.conf import settings
+from mailchimp_marketing.api_client import ApiClientError
 
 from newsletter.models import NewsletterRegistration
+
+logger = logging.getLogger(__name__)
 
 
 def register_email_to_mailchimp(email: str) -> None:
@@ -14,11 +18,15 @@ def register_email_to_mailchimp(email: str) -> None:
 
     subscriber_hash = hashlib.md5(email.lower().encode()).hexdigest()
 
-    client.lists.set_list_member(
-        settings.MAILCHIMP_AUDIENCE_ID,
-        subscriber_hash,
-        {"email_address": email, "status_if_new": "subscribed"},
-    )
+    try:
+        client.lists.set_list_member(
+            settings.MAILCHIMP_AUDIENCE_ID,
+            subscriber_hash,
+            {"email_address": email, "status_if_new": "subscribed"},
+        )
+    except ApiClientError as e:
+        logger.error(f"Mailchimp API error for {email}: {e.text}")
+        raise
 
 
 def register_newsletter_email(email: str) -> None:

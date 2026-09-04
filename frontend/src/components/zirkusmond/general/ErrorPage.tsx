@@ -18,6 +18,8 @@ const ErrorPage = ({ error }: { error: Error }) => {
 
       <ContentSection className="text-center text-white max-w-2xl mx-auto">
         <SectionCard className="space-y-6">
+          <h4 className="font-semibold">{t("error_generic_title")}</h4>
+
           <p className="text-gray-300">
             {error instanceof Error ? error.message : t("error_generic")}
           </p>
