@@ -1,20 +1,116 @@
+from unittest.mock import MagicMock, patch
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 from newsletter.models import NewsletterRegistration
-from newsletter.services import register_newsletter_email
+from newsletter.services import register_email_to_mailchimp, register_newsletter_email
+
+
+class RegisterEmailToMailchimpTest(TestCase):
+    """Tests for the low-level Mailchimp API integration."""
+
+    @patch("newsletter.services.mailchimp_marketing.Client")
+    @patch("newsletter.services.settings")
+    def test_calls_mailchimp_with_correct_config(
+        self, mock_settings: MagicMock, mock_client_class: MagicMock
+    ) -> None:
+        mock_settings.NEWSLETTER_TOKEN = "test-api-key"
+        mock_settings.MAILCHIMP_SERVER_PREFIX = "us12"
+        mock_settings.MAILCHIMP_AUDIENCE_ID = "audience123"
+
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        register_email_to_mailchimp("test@example.com")
+
+        mock_client.set_config.assert_called_once_with(
+            {"api_key": "test-api-key", "server": "us12"}
+        )
+
+    @patch("newsletter.services.mailchimp_marketing.Client")
+    @patch("newsletter.services.settings")
+    def test_calls_set_list_member_with_correct_params(
+        self, mock_settings: MagicMock, mock_client_class: MagicMock
+    ) -> None:
+        mock_settings.NEWSLETTER_TOKEN = "test-api-key"
+        mock_settings.MAILCHIMP_SERVER_PREFIX = "us12"
+        mock_settings.MAILCHIMP_AUDIENCE_ID = "audience123"
+
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        register_email_to_mailchimp("test@example.com")
+
+        # MD5 hash of "test@example.com" (lowercase)
+        expected_hash = "55502f40dc8b7c769880b10874abc9d0"
+        mock_client.lists.set_list_member.assert_called_once_with(
+            "audience123",
+            expected_hash,
+            {"email_address": "test@example.com", "status_if_new": "subscribed"},
+        )
+
+    @patch("newsletter.services.mailchimp_marketing.Client")
+    @patch("newsletter.services.settings")
+    def test_normalizes_email_case_for_hash(
+        self, mock_settings: MagicMock, mock_client_class: MagicMock
+    ) -> None:
+        mock_settings.NEWSLETTER_TOKEN = "test-api-key"
+        mock_settings.MAILCHIMP_SERVER_PREFIX = "us12"
+        mock_settings.MAILCHIMP_AUDIENCE_ID = "audience123"
+
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        register_email_to_mailchimp("Test@EXAMPLE.COM")
+
+        # MD5 hash must be computed from lowercase email
+        expected_hash = "55502f40dc8b7c769880b10874abc9d0"
+        mock_client.lists.set_list_member.assert_called_once_with(
+            "audience123",
+            expected_hash,
+            {"email_address": "Test@EXAMPLE.COM", "status_if_new": "subscribed"},
+        )
 
 
 class RegisterNewsletterEmailTest(TestCase):
-    def test_creates_registration(self) -> None:
+    """Tests for the combined DB + Mailchimp service function."""
+
+    @patch("newsletter.services.register_email_to_mailchimp")
+    def test_creates_database_registration(self, mock_mailchimp: MagicMock) -> None:
         register_newsletter_email("test@example.com")
         self.assertEqual(NewsletterRegistration.objects.count(), 1)
         self.assertEqual(NewsletterRegistration.objects.first().email, "test@example.com")
 
-    def test_multiple_calls_create_multiple_records(self) -> None:
+    @patch("newsletter.services.register_email_to_mailchimp")
+    def test_calls_mailchimp_registration(self, mock_mailchimp: MagicMock) -> None:
+        register_newsletter_email("test@example.com")
+        mock_mailchimp.assert_called_once_with("test@example.com")
+
+    @patch("newsletter.services.register_email_to_mailchimp")
+    def test_normalizes_email_before_saving(self, mock_mailchimp: MagicMock) -> None:
+        register_newsletter_email("  Test@EXAMPLE.COM  ")
+        saved = NewsletterRegistration.objects.first()
+        self.assertEqual(saved.email, "test@example.com")
+
+    @patch("newsletter.services.register_email_to_mailchimp")
+    def test_passes_normalized_email_to_mailchimp(self, mock_mailchimp: MagicMock) -> None:
+        register_newsletter_email("  Test@EXAMPLE.COM  ")
+        mock_mailchimp.assert_called_once_with("test@example.com")
+
+    @patch("newsletter.services.register_email_to_mailchimp")
+    def test_multiple_calls_create_multiple_records(self, mock_mailchimp: MagicMock) -> None:
         register_newsletter_email("a@example.com")
         register_newsletter_email("b@example.com")
         self.assertEqual(NewsletterRegistration.objects.count(), 2)
+
+    @patch("newsletter.services.register_email_to_mailchimp")
+    def test_idempotent_for_duplicate_email(self, mock_mailchimp: MagicMock) -> None:
+        register_newsletter_email("test@example.com")
+        register_newsletter_email("test@example.com")
+        self.assertEqual(NewsletterRegistration.objects.count(), 1)
+        # Mailchimp is called both times (set_list_member is idempotent on their end)
+        self.assertEqual(mock_mailchimp.call_count, 2)
 
 
 NEWSLETTER_URL = "/newsletter/register"
