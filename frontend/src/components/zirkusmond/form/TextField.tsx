@@ -8,7 +8,8 @@ export interface TextFieldProps {
   type?: string;
   required?: boolean;
   error?: string;
-  onChange?: () => void;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function TextField({
@@ -18,6 +19,7 @@ export default function TextField({
   type = "text",
   required = false,
   error,
+  value,
   onChange,
 }: TextFieldProps) {
   return (
@@ -31,6 +33,7 @@ export default function TextField({
         type={type}
         required={required}
         aria-invalid={!!error}
+        value={value}
         onChange={onChange}
         className="h-10 sm:h-11 text-base! sm:text-lg! text-white"
       />

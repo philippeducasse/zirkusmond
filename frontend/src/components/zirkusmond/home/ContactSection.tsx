@@ -4,6 +4,10 @@ import ContentSection from "../general/ContentSection";
 import PageHeader from "../general/PageHeader";
 import SectionCard from "../general/SectionCard";
 import { useTranslation } from "react-i18next";
+import { useMutation } from "@tanstack/react-query";
+import { postJson } from "#/lib/api";
+import type React from "react";
+import { useState } from "react";
 
 const SOCIAL_LINKS = [
   {
@@ -25,6 +29,22 @@ const SOCIAL_LINKS = [
 
 export default function ContactSection() {
   const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+
+  const registerEmailToNewsletter = () =>
+    useMutation({
+      mutationFn: () => postJson("/newsletter/register", { email: email }),
+      onSuccess: () => {
+        setEmail("");
+      },
+    });
+
+  const mutation = registerEmailToNewsletter();
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutation.mutate();
+  };
 
   return (
     <ContentSection>
@@ -94,7 +114,7 @@ export default function ContactSection() {
           <form
             className="my-6"
             onSubmit={(e) => {
-              e.preventDefault();
+              handleSubmit(e);
             }}
           >
             <TextField
@@ -103,7 +123,16 @@ export default function ContactSection() {
               name="email"
               type="email"
               required
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
             />
+            {mutation.isSuccess && (
+              <p className="text-sm mt-2">
+                {t("page_contact_newsletter_success")}
+              </p>
+            )}
             <Button type="submit" className="mt-4">
               {t("common_submit")}
             </Button>

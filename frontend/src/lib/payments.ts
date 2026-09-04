@@ -84,6 +84,5 @@ export const useCreatePaymentIntent = (
   const mutation = useMutation({
     mutationFn: () => createPaymentIntent(reservationId, customTicketPrice),
   });
-  console.log({ mutation });
   return mutation.data?.clientSecret;
 };
