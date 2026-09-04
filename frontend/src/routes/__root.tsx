@@ -11,6 +11,7 @@ import "#/i18n";
 import { useTranslation } from "react-i18next";
 import Navbar from "#/components/zirkusmond/general/Navbar";
 import NotFound from "#/components/zirkusmond/general/NotFound";
+import ErrorPage from "#/components/zirkusmond/general/ErrorPage";
 
 import appCss from "../styles.css?url";
 import Footer from "#/components/zirkusmond/general/Footer";
@@ -77,4 +78,5 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   }),
   shellComponent: RootDocument,
   notFoundComponent: () => <NotFound />,
+  errorComponent: ErrorPage,
 });
