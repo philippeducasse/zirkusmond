@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-// import { Ticket } from "lucide-react";
 
 import { Button } from "#/components/ui/button.tsx";
 import type { Show } from "#/interfaces/show.ts";
 import { useTranslation } from "react-i18next";
+import { Ticket } from "lucide-react";
 
 export const ReserveButton = ({ show }: { show: Show }) => {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ export const ReserveButton = ({ show }: { show: Show }) => {
   return (
     <Button asChild>
       <Link to="/reserve/$showId" params={{ showId: String(show.id) }}>
-        {/* <Ticket className="size-6" /> */}
+        <Ticket />
         {show.baseTicketPrice ? t("show_buy_tickets") : t("show_reserve")}
       </Link>
     </Button>

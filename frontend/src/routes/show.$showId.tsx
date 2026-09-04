@@ -11,6 +11,7 @@ import { ApiError, showQueryOptions } from "#/lib/api.ts";
 import NotFound from "#/components/zirkusmond/general/NotFound";
 import NavigationButtonWrapper from "#/components/zirkusmond/general/NavigationButtonWrapper";
 import { useTranslation } from "react-i18next";
+import { Home } from "lucide-react";
 
 const RouteComponent = () => {
   const { t } = useTranslation();
@@ -46,7 +47,10 @@ const RouteComponent = () => {
       <NavigationButtonWrapper>
         <ReserveButton show={show} />
         <Button variant={"secondary"} asChild>
-          <Link to="/">{t("common_home")}</Link>
+          <Link to="/">
+            <Home />
+            {t("common_home")}
+          </Link>
         </Button>
       </NavigationButtonWrapper>
     </PageContainer>

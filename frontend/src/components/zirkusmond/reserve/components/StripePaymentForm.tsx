@@ -6,6 +6,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { useTranslation } from "react-i18next";
 import { Button } from "#/components/ui/button.tsx";
+import { ArrowLeft, HandCoins } from "lucide-react";
 import SectionCardSkeleton from "../../general/SectionCardSkeleton.tsx";
 import NavigationButtonWrapper from "../../general/NavigationButtonWrapper.tsx";
 import Spinner from "../../general/Spinner.tsx";
@@ -45,8 +46,14 @@ export default function StripePaymentForm({
       return;
     }
 
-    setIsProcessing(true);
     setErrorMessage(null);
+
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      return;
+    }
+
+    setIsProcessing(true);
 
     try {
       const { error } = await stripe.confirmPayment({
@@ -122,9 +129,11 @@ export default function StripePaymentForm({
         )}
         <NavigationButtonWrapper>
           <Button type="submit" disabled={isProcessing}>
+            <HandCoins />
             {isProcessing ? t("button_processing") : t("button_pay_now")}
           </Button>
           <Button type="button" variant="secondary" onClick={onCancel}>
+            <ArrowLeft />
             {t("button_back")}
           </Button>
         </NavigationButtonWrapper>

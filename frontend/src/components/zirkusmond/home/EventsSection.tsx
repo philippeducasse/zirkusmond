@@ -7,6 +7,7 @@ import type { ShowCard } from "#/interfaces/show.ts";
 import PageHeader from "../general/PageHeader";
 import ContentSection from "../general/ContentSection";
 import { useTranslation } from "react-i18next";
+import { Drama, Home } from "lucide-react";
 
 interface EventsSectionProps {
   shows: ShowCard[];
@@ -43,9 +44,14 @@ export default function EventsSection({
         <div className="flex justify-center pt-12 md:pt-24">
           <Button asChild>
             {showAllEventsLink ? (
-              <Link to="/shows">{t("button_all_events")}</Link>
+              <Link to="/shows">
+                <Drama /> {t("button_all_events")}
+              </Link>
             ) : (
-              <Link to="/">{t("button_back_to_home")}</Link>
+              <Link to="/">
+                <Home />
+                {t("button_back_to_home")}
+              </Link>
             )}
           </Button>
         </div>

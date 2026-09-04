@@ -7,6 +7,7 @@ import SectionCard from "#/components/zirkusmond/general/SectionCard";
 import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
 import { Button } from "#/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { Home } from "lucide-react";
 
 interface PaymentFailureSearch {
   paymentId?: string;
@@ -73,6 +74,7 @@ const RouteComponent = () => {
         </SectionCard>
         <SectionDivider type="flower" />
         <Button asChild>
+          <Home />
           <Link to="/">{t("button_back_to_home")}</Link>
         </Button>
       </ContentSection>

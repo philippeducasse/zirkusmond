@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
+import { Loader2, CreditCard, ArrowLeft, TestTube } from "lucide-react";
 import type { Show } from "#/interfaces/show.ts";
 import { fillReservationFormWithDummyData } from "./fillDummyData.ts";
 import GuestForm from "./components/GuestForm.tsx";
@@ -89,6 +90,7 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               variant="secondary"
               onClick={handleFillDummyData}
             >
+              <TestTube />
               {t("button_fill_test_data")}
             </Button>
           </div>
@@ -144,11 +146,17 @@ export default function ReservationPage({ show }: ReservationPageProps) {
               disabled={isProcessing}
               className="sm:min-w-[200px]"
             >
+              {isProcessing ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <CreditCard />
+              )}
               {isProcessing
                 ? t("button_processing")
                 : t("button_proceed_to_payment")}
             </Button>
             <Button type="button" variant="secondary" onClick={handleBack}>
+              <ArrowLeft />
               {t("button_back_to_show")}
             </Button>
           </NavigationButtonWrapper>
