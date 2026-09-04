@@ -37,6 +37,9 @@ export default function ContactSection() {
       onSuccess: () => {
         setEmail("");
       },
+      onError: (error) => {
+        console.error(`Mailchimp API error for ${email}:`, error);
+      },
     });
 
   const mutation = registerEmailToNewsletter();
