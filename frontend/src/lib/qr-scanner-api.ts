@@ -34,9 +34,6 @@ export const checkInTicket = async (
       credentials: "include",
     },
   );
-  if (!res.ok) {
-    throw new Error(`Check-in request failed with status ${res.status}`);
-  }
   const data = await res.json();
   return keysToCamelCase<CheckInResponse>(data);
 };
