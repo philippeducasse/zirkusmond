@@ -1,5 +1,6 @@
 import datetime
 
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -25,6 +26,7 @@ def _upcoming_shows(limit: int | None = None) -> list[Show]:
 
 
 @api_view(["GET"])
+@ensure_csrf_cookie
 def homepage(request: Request) -> Response:
     shows = _upcoming_shows(limit=6)
     return Response({"upcoming_shows": ShowCardSerializer(shows, many=True).data})

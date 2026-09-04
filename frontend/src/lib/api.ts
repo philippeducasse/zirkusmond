@@ -39,11 +39,34 @@ export const fetchJson = async <T>(path: string): Promise<T> => {
   return keysToCamelCase<T>(data);
 };
 
+const getCsrfToken = (): string | null => {
+  if (typeof document === "undefined") return null;
+  const name = "csrftoken";
+  const cookies = document.cookie.split(";");
+  for (const cookie of cookies) {
+    const trimmed = cookie.trim();
+    if (trimmed.startsWith(name + "=")) {
+      return trimmed.substring(name.length + 1);
+    }
+  }
+  return null;
+};
+
 export const postJson = async <T>(path: string, body: unknown): Promise<T> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRFToken"] = csrfToken;
+  }
+
   const res = await fetch(apiUrl(path), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(keysToSnakeCase(body)),
+    credentials: "include",
   });
   if (!res.ok) {
     throw new ApiError(res.status, path);
