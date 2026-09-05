@@ -187,7 +187,6 @@ class ShowAdmin(ModelAdmin):
     ordering = []
     default_ordering = [F("next_event_begin").desc(nulls_last=True), "-title"]
     inlines = [EventInline]
-    exclude = ["seo_image_crop"]
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Show]:
         queryset = super().get_queryset(request)

@@ -3,7 +3,6 @@
 import uuid
 
 import django.db.models.deletion
-import image_cropping.fields
 import phonenumber_field.modelfields
 from django.db import migrations, models
 
@@ -94,16 +93,8 @@ class Migration(migrations.Migration):
                 ("banner_link", models.ImageField(blank=True, upload_to="")),
                 (
                     "head_img",
-                    image_cropping.fields.ImageRatioField(
-                        "banner_link",
-                        "400x225",
-                        adapt_rotation=False,
-                        allow_fullsize=False,
-                        free_crop=False,
-                        help_text=None,
-                        hide_image_field=False,
-                        size_warning=False,
-                        verbose_name="head img",
+                    models.CharField(
+                        blank=True, default="", max_length=255, verbose_name="head img"
                     ),
                 ),
                 ("private", models.BooleanField(default=False)),

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 from django.contrib import admin
 from django.db import models
 from django.utils import timezone
-from image_cropping import ImageRatioField
 from tinymce import models as tinymce_models
 
 from .managers import PastShowManager, UnscheduledShowManager, UpcomingShowManager
@@ -21,7 +20,6 @@ class Show(models.Model):
     card_image = models.ImageField()
     website_link = models.CharField(max_length=255, blank=True)
     banner_image = models.ImageField(blank=True)
-    seo_image_crop = ImageRatioField("banner_image", "400x225")
 
     private = models.BooleanField(default=False)
     third_party_reservation = models.BooleanField(
