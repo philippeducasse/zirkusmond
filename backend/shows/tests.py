@@ -1,13 +1,17 @@
+import shutil
+import tempfile
 from datetime import timedelta
 from io import BytesIO
 from typing import Any
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from PIL import Image
 
 from events.models import Event
+from shows.image_processor import process_show_image
 from shows.models import PastShow, Show, UnscheduledShow, UpcomingShow
 
 # ---------------------------------------------------------------------------
@@ -213,3 +217,113 @@ class SiteViewsTest(TestCase):
         titles = [s["title"] for s in data["upcoming_shows"]]
         self.assertIn("Public", titles)
         self.assertNotIn("Private", titles)
+
+
+# ---------------------------------------------------------------------------
+# Image processing
+# ---------------------------------------------------------------------------
+
+
+def make_jpeg_bytes(width: int, height: int) -> BytesIO:
+    buf = BytesIO()
+    Image.new("RGB", (width, height), color="green").save(buf, format="JPEG")
+    buf.seek(0)
+    return buf
+
+
+def make_jpeg_upload(width: int, height: int, name: str = "pic.jpg") -> SimpleUploadedFile:
+    return SimpleUploadedFile(
+        name, make_jpeg_bytes(width, height).read(), content_type="image/jpeg"
+    )
+
+
+class ProcessShowImageTest(TestCase):
+    def test_returns_webp(self) -> None:
+        result = process_show_image(make_jpeg_bytes(800, 800), max_width=900)
+        self.assertEqual(Image.open(result).format, "WEBP")
+
+    def test_crops_wide_image_to_square(self) -> None:
+        result = process_show_image(make_jpeg_bytes(800, 400), max_width=900)
+        img = Image.open(result)
+        self.assertEqual(img.width, img.height)
+        self.assertEqual(img.width, 400)
+
+    def test_crops_tall_image_to_square(self) -> None:
+        result = process_show_image(make_jpeg_bytes(400, 800), max_width=900)
+        img = Image.open(result)
+        self.assertEqual(img.width, img.height)
+        self.assertEqual(img.width, 400)
+
+    def test_resizes_down_to_max_width(self) -> None:
+        result = process_show_image(make_jpeg_bytes(2000, 2000), max_width=900)
+        img = Image.open(result)
+        self.assertEqual(img.width, 900)
+        self.assertEqual(img.height, 900)
+
+    def test_does_not_upscale_below_max_width(self) -> None:
+        result = process_show_image(make_jpeg_bytes(300, 300), max_width=900)
+        self.assertEqual(Image.open(result).width, 300)
+
+    def test_crop_false_preserves_aspect_ratio(self) -> None:
+        result = process_show_image(make_jpeg_bytes(1600, 900), max_width=1600, crop=False)
+        img = Image.open(result)
+        self.assertEqual((img.width, img.height), (1600, 900))
+
+    def test_crop_false_still_resizes_down(self) -> None:
+        result = process_show_image(make_jpeg_bytes(2000, 1000), max_width=1600, crop=False)
+        img = Image.open(result)
+        self.assertEqual((img.width, img.height), (1600, 800))
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class ShowSaveImageProcessingTest(TestCase):
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
+    def make_show(self, **kwargs: Any) -> Show:
+        defaults = dict(
+            title="Image Show",
+            description="A description",
+            cast="A cast",
+            card_image=make_jpeg_upload(800, 400, name="card.jpg"),
+            banner_image=make_jpeg_upload(2000, 1000, name="banner.jpg"),
+            private=False,
+        )
+        defaults.update(kwargs)
+        return Show.objects.create(**defaults)
+
+    def test_card_image_converted_to_webp(self) -> None:
+        show = self.make_show()
+        self.assertTrue(show.card_image.name.endswith(".webp"))
+        self.assertEqual(Image.open(show.card_image).format, "WEBP")
+
+    def test_banner_image_converted_to_webp(self) -> None:
+        show = self.make_show()
+        self.assertTrue(show.banner_image.name.endswith(".webp"))
+        self.assertEqual(Image.open(show.banner_image).format, "WEBP")
+
+    def test_card_image_cropped_square_and_capped_at_max_width(self) -> None:
+        show = self.make_show(card_image=make_jpeg_upload(3000, 3000, name="big.jpg"))
+        img = Image.open(show.card_image)
+        self.assertEqual(img.width, img.height)
+        self.assertEqual(img.width, Show.CARD_IMAGE_MAX_WIDTH)
+
+    def test_banner_image_not_cropped_to_square(self) -> None:
+        show = self.make_show()
+        img = Image.open(show.banner_image)
+        self.assertEqual((img.width, img.height), (1600, 800))
+
+    def test_save_without_banner_image(self) -> None:
+        show = self.make_show(banner_image="")
+        self.assertFalse(show.banner_image)
+        self.assertTrue(show.card_image.name.endswith(".webp"))
+
+    def test_reprocessing_is_skipped_for_existing_webp(self) -> None:
+        show = self.make_show()
+        processed_name = show.card_image.name
+        show.title = "Renamed"
+        show.save()
+        show.refresh_from_db()
+        self.assertEqual(show.card_image.name, processed_name)
