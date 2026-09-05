@@ -21,12 +21,13 @@ const RouteComponent = () => {
   const { data: show } = useSuspenseQuery(showQueryOptions(showId));
   return (
     <PageContainer className="px-0 md:px-4">
-      <img
-        src={show.bannerImage}
-        alt={`${show.title} Banner`}
-        className="mx-auto w-full object-cover"
-      />
-
+      {show?.bannerImage && (
+        <img
+          src={show.bannerImage}
+          alt={`${show.title} Banner`}
+          className="mx-auto w-full object-cover"
+        />
+      )}
       <div className="flex flex-wrap justify-center gap-6 py-8">
         {show.upcomingEvents.map((event) => (
           <TimeDetails
