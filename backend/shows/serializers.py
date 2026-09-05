@@ -37,4 +37,5 @@ class ShowDetailSerializer(ModelSerializer):
             "third_party_reservation_link",
             "upcoming_events",
             "last_modified",
+            "reservation_open",
         ]

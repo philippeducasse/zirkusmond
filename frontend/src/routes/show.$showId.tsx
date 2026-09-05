@@ -39,14 +39,18 @@ const RouteComponent = () => {
       </div>
 
       <div className="my-8 flex justify-center">
-        <ReserveButton show={show} />
+        {show.reservationOpen ? (
+          <ReserveButton show={show} />
+        ) : (
+          <h4>{t("show_reservations_not_open")}</h4>
+        )}
       </div>
 
       <SectionDivider type="flower" />
 
       <ShowDetails show={show} />
       <NavigationButtonWrapper>
-        <ReserveButton show={show} />
+        {show.reservationOpen && <ReserveButton show={show} />}
         <Button variant={"secondary"} asChild>
           <Link to="/">
             <Home />

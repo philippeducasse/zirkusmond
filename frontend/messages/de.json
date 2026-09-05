@@ -101,6 +101,7 @@
   "show_admission": "Einlass:",
   "show_reserve": "Zur Reservierung",
   "show_buy_tickets": "Tickets kaufen",
+  "show_reservations_not_open": "Reservierungen sind noch nicht geöffnet!",
 
   "not_found_title": "{entity} nicht gefunden",
   "not_found_message": "Diese {entity} existiert nicht oder ist nicht mehr verfügbar.",

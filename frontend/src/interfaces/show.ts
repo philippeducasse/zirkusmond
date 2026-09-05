@@ -32,6 +32,7 @@ export interface Show {
   thirdPartyReservationLink?: string;
   upcomingEvents: ShowEvent[];
   lastModified: string;
+  reservationOpen: boolean;
 }
 
 export interface ShowDetailResponse {
