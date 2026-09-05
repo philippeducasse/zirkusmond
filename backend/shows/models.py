@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 from tinymce import models as tinymce_models
 
+from .image_processor import process_show_image
 from .managers import PastShowManager, UnscheduledShowManager, UpcomingShowManager
 
 if TYPE_CHECKING:
@@ -68,6 +69,24 @@ class Show(models.Model):
 
     def lastmod(self) -> str:
         return self.last_modified.strftime("%Y-%m-%d")
+
+    CARD_IMAGE_MAX_WIDTH = 900
+
+    def save(self, *args, **kwargs):
+        if self.card_image and not self.card_image.name.endswith(".webp"):
+            content = process_show_image(
+                self.card_image,
+                max_width=self.CARD_IMAGE_MAX_WIDTH,
+            )
+            self.card_image.save(
+                f"{self.card_image.name.rsplit('.', 1)[0]}.webp", content, save=False
+            )
+        if self.banner_image and not self.banner_image.name.endswith(".webp"):
+            content = process_show_image(self.banner_image, max_width=1600, crop=False)
+            self.banner_image.save(
+                f"{self.banner_image.name.rsplit('.', 1)[0]}.webp", content, save=False
+            )
+        super().save(*args, **kwargs)
 
     @admin.display(boolean=True)
     def reservation_open(self) -> bool:
