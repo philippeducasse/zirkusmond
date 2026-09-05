@@ -21,7 +21,7 @@ const RouteComponent = () => {
   const { data: show } = useSuspenseQuery(showQueryOptions(showId));
   return (
     <PageContainer className="px-0 md:px-4">
-      {show?.bannerImage && (
+      {show.bannerImage && (
         <img
           src={show.bannerImage}
           alt={`${show.title} Banner`}
