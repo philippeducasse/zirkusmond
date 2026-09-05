@@ -3,7 +3,7 @@ from typing import Any
 
 from django import forms
 from django.contrib import admin, messages
-from django.db.models import Field, QuerySet
+from django.db.models import Count, Field, Prefetch, QuerySet
 from django.http import HttpRequest
 from django.utils import timezone
 from unfold.admin import ModelAdmin
@@ -57,7 +57,6 @@ class ReservationAdmin(ModelAdmin):
     search_fields = ["first_name", "last_name", "email"]
     ordering = ["-event__begin"]
     fields = ["event", "first_name", "last_name", "email", "checked_in"]
-    list_select_related = ["event"]
     date_hierarchy = "event__begin"
 
     # Resend confirmation email if event date is changed
@@ -97,6 +96,9 @@ class ReservationAdmin(ModelAdmin):
         is_detail_view = request.resolver_match.url_name.endswith("_change")
         if not request.GET.get("event_status") and not is_detail_view:
             queryset = queryset.filter(event__begin__gte=timezone.now())
+        queryset = queryset.select_related("event__show").annotate(
+            annotated_guest_count=Count("guests", distinct=True)
+        )
         return queryset
 
     def formfield_for_foreignkey(
@@ -147,7 +149,13 @@ class GuestAdmin(ModelAdmin):
     search_fields = ["first_name", "last_name", "ticket_id"]
     raw_id_fields = ["reservation"]
     ordering = ["-reservation__event__begin"]
-    list_select_related = ["reservation__event"]
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Guest]:
+        queryset = super().get_queryset(request)
+        reservation_queryset = Reservation.objects.select_related("event").annotate(
+            annotated_guest_count=Count("guests", distinct=True)
+        )
+        return queryset.prefetch_related(Prefetch("reservation", queryset=reservation_queryset))
 
     @admin.display(ordering="last_name")
     def last_name(self, obj: Guest) -> str:

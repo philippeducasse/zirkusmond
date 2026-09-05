@@ -78,9 +78,12 @@ class Show(models.Model):
     @admin.display(boolean=True)
     def show_in_preview(self) -> bool:
         events = self.events.all()
-        return not self.private and (
-            not len(events) or events.last().begin + timedelta(hours=4) > timezone.now()
-        )
+        if self.private:
+            return False
+        if not len(events):
+            return True
+        last_event = max(events, key=lambda e: e.admission)
+        return last_event.begin + timedelta(hours=4) > timezone.now()
 
     def clean(self) -> None:
         from django.core.exceptions import ValidationError

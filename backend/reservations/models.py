@@ -18,10 +18,12 @@ class Reservation(models.Model):
 
     @admin.display
     def ticket_count(self) -> int:
+        if hasattr(self, "annotated_guest_count"):
+            return self.annotated_guest_count + 1
         return self.guests.count() + 1
 
     def __str__(self) -> str:
-        return f"Reservation for {self.event} - tickets: {self.ticket_count()} — bought by {self.last_name} {self.first_name}"
+        return f"{self.first_name} {self.last_name}"
 
 
 class Guest(models.Model):

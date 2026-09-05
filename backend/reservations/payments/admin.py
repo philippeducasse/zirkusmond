@@ -3,7 +3,7 @@ from typing import Any
 from django import forms
 from django.contrib import admin, messages
 from django.core.mail import EmailMessage
-from django.db.models import QuerySet
+from django.db.models import Count, Prefetch, QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import Context, Template
@@ -176,11 +176,11 @@ class ReservationPaymentAdmin(ModelAdmin):
     list_display = [
         "reservation",
         "status",
-        "variant",
         "ticket_count",
-        "event",
         "ticket_price",
         "confirmed_total",
+        "variant",
+        "event",
         "created",
     ]
     ordering = ["-created"]
@@ -192,8 +192,14 @@ class ReservationPaymentAdmin(ModelAdmin):
         "billing_email",
     ]
     readonly_fields = ["reservation"]
-    list_select_related = True
     actions = ["resend_confirmation_mail", "send_to_reservants"]
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[ReservationPayment]:
+        queryset = super().get_queryset(request)
+        reservation_queryset = Reservation.objects.select_related("event__show").annotate(
+            annotated_guest_count=Count("guests", distinct=True)
+        )
+        return queryset.prefetch_related(Prefetch("reservation", queryset=reservation_queryset))
 
     @admin.display(description="Total")
     def confirmed_total(self, obj: ReservationPayment) -> str:
@@ -260,12 +266,12 @@ class PaymentAdmin(ModelAdmin):
     list_display = [
         "reservation",
         "status",
-        "payment_method",
-        "ticket_count",
+        "created_at",
         "event",
+        "ticket_count",
         "ticket_price",
         "confirmed_total",
-        "created_at",
+        "payment_method",
     ]
     ordering = ["-created_at"]
     date_hierarchy = "created_at"
@@ -276,8 +282,14 @@ class PaymentAdmin(ModelAdmin):
         "reservation__email",
     ]
     readonly_fields = ["reservation", "stripe_session_id", "stripe_payment_intent_id"]
-    list_select_related = True
     actions = ["resend_confirmation_mail", "send_to_reservants"]
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Payment]:
+        queryset = super().get_queryset(request)
+        reservation_queryset = Reservation.objects.select_related("event__show").annotate(
+            annotated_guest_count=Count("guests", distinct=True)
+        )
+        return queryset.prefetch_related(Prefetch("reservation", queryset=reservation_queryset))
 
     @admin.display(description="Total")
     def confirmed_total(self, obj: Payment) -> str:

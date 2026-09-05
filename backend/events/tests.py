@@ -15,7 +15,7 @@ from PIL import Image
 
 from events.forms import ReservationForm
 from events.models import Event
-from reservations.models import Payment, Reservation
+from reservations.models import Guest, Payment, Reservation
 from shows.models import Show
 
 # ---------------------------------------------------------------------------
@@ -467,6 +467,29 @@ class PaymentAdminConfirmedTotalTest(TestCase):
     def test_confirmed_total_shows_zero_for_refunded_payment(self) -> None:
         payment = self._make_payment(Decimal("30.00"), Payment.Status.REFUNDED)
         self.assertEqual(self.admin.confirmed_total(payment), "€ 0.00")
+
+
+class PaymentAdminQueryCountTest(TestCase):
+    def setUp(self) -> None:
+        from reservations.payments.admin import PaymentAdmin
+
+        self.show = make_show(base_ticket_price=15)
+        self.event = make_event(self.show)
+        self.admin = PaymentAdmin(Payment, AdminSite())
+
+    def test_changelist_query_count_does_not_scale_with_rows(self) -> None:
+        for i in range(3):
+            reservation = make_reservation(self.event, email=f"r{i}@example.com")
+            Guest.objects.create(reservation=reservation, first_name="A", last_name="B")
+            make_payment(reservation, total=Decimal("15.00"))
+
+        queryset = self.admin.get_queryset(RequestFactory().get("/"))
+        with self.assertNumQueries(2):
+            for payment in queryset:
+                str(payment.reservation)
+                payment.ticket_count()
+                payment.event()
+                _ = payment.ticket_price
 
 
 # ---------------------------------------------------------------------------

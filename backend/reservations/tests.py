@@ -1,6 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal
 from io import BytesIO
+from types import SimpleNamespace
 from typing import Any
 from unittest.mock import patch
 
@@ -10,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db.models import Count
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 from PIL import Image
@@ -17,7 +19,7 @@ from rest_framework.test import APIClient
 
 from events.models import Event
 from newsletter.models import NewsletterRegistration
-from reservations.admin import ReservationAdmin
+from reservations.admin import GuestAdmin, ReservationAdmin
 from reservations.models import Guest, Reservation
 from reservations.payments.models import Payment
 from shows.models import Show
@@ -106,6 +108,15 @@ class ReservationModelTest(TestCase):
     def test_uuid_primary_key(self) -> None:
         self.assertIsNotNone(self.reservation.id)
         self.assertIsInstance(str(self.reservation.id), str)
+
+    def test_ticket_count_uses_annotated_guest_count_without_query(self) -> None:
+        Guest.objects.create(reservation=self.reservation, first_name="G", last_name="H")
+        annotated = Reservation.objects.annotate(
+            annotated_guest_count=Count("guests", distinct=True)
+        ).get(pk=self.reservation.pk)
+
+        with self.assertNumQueries(0):
+            self.assertEqual(annotated.ticket_count(), 2)
 
 
 # ---------------------------------------------------------------------------
@@ -465,3 +476,50 @@ class ReservationAdminRescheduleEmailTest(TestCase):
 
         error_levels = [m.level for m in request._messages if m.level == messages.ERROR]
         self.assertEqual(len(error_levels), 1)
+
+
+# ---------------------------------------------------------------------------
+# Admin changelist query counts (N+1 regression guards)
+# ---------------------------------------------------------------------------
+
+
+class ReservationAdminQueryCountTest(TestCase):
+    def setUp(self) -> None:
+        self.show = make_show()
+        self.event = make_event(self.show)
+        self.admin = ReservationAdmin(Reservation, AdminSite())
+
+    def _request(self) -> Any:
+        request = RequestFactory().get("/")
+        request.resolver_match = SimpleNamespace(url_name="reservation_changelist")
+        return request
+
+    def test_changelist_query_count_does_not_scale_with_guests(self) -> None:
+        for i in range(3):
+            reservation = make_reservation(self.event, email=f"r{i}@example.com")
+            Guest.objects.create(reservation=reservation, first_name="A", last_name="B")
+            Guest.objects.create(reservation=reservation, first_name="C", last_name="D")
+
+        queryset = self.admin.get_queryset(self._request())
+        with self.assertNumQueries(1):
+            for reservation in queryset:
+                str(reservation)
+                reservation.ticket_count()
+
+
+class GuestAdminQueryCountTest(TestCase):
+    def setUp(self) -> None:
+        self.show = make_show()
+        self.event = make_event(self.show)
+        self.admin = GuestAdmin(Guest, AdminSite())
+
+    def test_changelist_query_count_does_not_scale_with_reservations(self) -> None:
+        for i in range(3):
+            reservation = make_reservation(self.event, email=f"r{i}@example.com")
+            Guest.objects.create(reservation=reservation, first_name="A", last_name="B")
+            Guest.objects.create(reservation=reservation, first_name="C", last_name="D")
+
+        queryset = self.admin.get_queryset(RequestFactory().get("/"))
+        with self.assertNumQueries(2):
+            for guest in queryset:
+                str(guest.reservation)
