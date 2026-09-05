@@ -13,7 +13,7 @@ export default function Spinner({ text }: SpinnerProps) {
       <div className="flex flex-col items-center gap-6">
         <div className="relative w-32">
           <img
-            src="/images/logos/logo_16x9.webp"
+            src="/images/logos/logo.webp"
             alt="Zirkusmond logo"
             className="w-full h-auto object-contain"
             style={{

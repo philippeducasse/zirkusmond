@@ -5,7 +5,7 @@ export default function Logo() {
     <Link to="/" className="flex justify-center">
       <img
         className="h-[56.25px] w-[56.25px] object-cover"
-        src="/images/logos/logo_16x9.webp"
+        src="/images/logos/logo.webp"
         alt="Zirkusmond logo"
         width={100}
       />
