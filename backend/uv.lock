@@ -454,18 +454,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-appconf"
-version = "1.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/a2/e58bec8d7941b914af52a67c35b5709eceed2caa2848f28437f1666ed668/django_appconf-1.2.0.tar.gz", hash = "sha256:15a88d60dd942d6059f467412fe4581db632ef03018a3c183fb415d6fc9e5cec", size = 16127, upload-time = "2025-11-08T15:46:27.304Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/e6/4c34d94dfb74bbcbc489606e61f1924933de30d22c593dd1f429f35fbd7f/django_appconf-1.2.0-py3-none-any.whl", hash = "sha256:b81bce5ef0ceb9d84df48dfb623a32235d941c78cc5e45dbb6947f154ea277f4", size = 6500, upload-time = "2025-11-08T15:46:25.957Z" },
-]
-
-[[package]]
 name = "django-cors-headers"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -488,18 +476,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6d/b3/ed0f54ed706ec0b54fd251cc0364a249c6cd6c6ec97f04dc34be5e929eac/django_extensions-4.1.tar.gz", hash = "sha256:7b70a4d28e9b840f44694e3f7feb54f55d495f8b3fa6c5c0e5e12bcb2aa3cdeb", size = 283078, upload-time = "2025-04-11T01:15:39.617Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/64/96/d967ca440d6a8e3861120f51985d8e5aec79b9a8bdda16041206adfe7adc/django_extensions-4.1-py3-none-any.whl", hash = "sha256:0699a7af28f2523bf8db309a80278519362cd4b6e1fd0a8cd4bf063e1e023336", size = 232980, upload-time = "2025-04-11T01:15:37.701Z" },
-]
-
-[[package]]
-name = "django-image-cropping"
-version = "1.7"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django-appconf" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/af/f1/fabd56516baf0efe5db723c61b0ede674367a13ce991568c1a4608eac9dc/django-image-cropping-1.7.tar.gz", hash = "sha256:971d1a92c9ef14f1bf95996dd4eeed0a00dbb2221bfa762290d9525696243232", size = 32945, upload-time = "2022-02-08T09:07:17.449Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/28/c2ce1794282fc7aee6118ac1b39057952a9b8dd17406dcd23d0b77ea3ca7/django_image_cropping-1.7-py3-none-any.whl", hash = "sha256:429ad2c3ccad5ddeb079fbee24dc1536105b3e9d30beb53d1446fd560da04d5b", size = 43884, upload-time = "2022-02-08T09:07:15.822Z" },
 ]
 
 [[package]]
@@ -567,19 +543,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ca/d7/c016e69fac19ff8afdc89db9d31d9ae43ae031e4d1993b20aca179b8301a/djangorestframework-3.17.1.tar.gz", hash = "sha256:a6def5f447fe78ff853bff1d47a3c59bf38f5434b031780b351b0c73a62db1a5", size = 905742, upload-time = "2026-03-24T16:58:33.705Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/e1/2c516bdc83652b1a60c6119366ac2c0607b479ed05cd6093f916ca8928f8/djangorestframework-3.17.1-py3-none-any.whl", hash = "sha256:c3c74dd3e83a5a3efc37b3c18d92bd6f86a6791c7b7d4dff62bb068500e76457", size = 898844, upload-time = "2026-03-24T16:58:31.845Z" },
-]
-
-[[package]]
-name = "easy-thumbnails"
-version = "2.10.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "pillow" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/04/2f/71f17c3ce65b25dd8fc8e513738c8496eadbd8bab94f39509a511ff99704/easy_thumbnails-2.10.1.tar.gz", hash = "sha256:a50aa5f99387546c35ab5ba1ea9b3cbbc5658e65601cd34949f62137c32c222e", size = 81446, upload-time = "2025-08-17T20:49:11.308Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/90/be137d0592501ec08d4a00c8430121e95dfe6c8114a1d4436b5cdd6b9803/easy_thumbnails-2.10.1-py3-none-any.whl", hash = "sha256:24462d63dd31543ef1585538b2bfefe0db96d3409bb431c70b81548fb2cfc5be", size = 79695, upload-time = "2025-08-17T20:49:09.119Z" },
 ]
 
 [[package]]
@@ -2100,16 +2063,15 @@ dependencies = [
     { name = "django-anymail" },
     { name = "django-cors-headers" },
     { name = "django-extensions" },
-    { name = "django-image-cropping" },
     { name = "django-payments" },
     { name = "django-tinymce" },
     { name = "django-unfold" },
     { name = "djangorestframework" },
-    { name = "easy-thumbnails" },
     { name = "gunicorn" },
     { name = "imaplib2" },
     { name = "jupyter-nbextensions-configurator" },
     { name = "mailchimp-marketing" },
+    { name = "pillow" },
     { name = "psycopg2-binary" },
     { name = "qrcode", extra = ["pil"] },
     { name = "reportlab" },
@@ -2130,16 +2092,15 @@ requires-dist = [
     { name = "django-anymail", specifier = "==15.0" },
     { name = "django-cors-headers", specifier = ">=4.9.0" },
     { name = "django-extensions", specifier = "==4.1" },
-    { name = "django-image-cropping", specifier = "==1.7" },
     { name = "django-payments", specifier = "==3.1.0" },
     { name = "django-tinymce", specifier = "==5.0.0" },
     { name = "django-unfold", specifier = ">=0.97.0" },
     { name = "djangorestframework", specifier = ">=3.17.1" },
-    { name = "easy-thumbnails", specifier = "==2.10.1" },
     { name = "gunicorn", specifier = "==26.0.0" },
     { name = "imaplib2", specifier = "==3.6" },
     { name = "jupyter-nbextensions-configurator", specifier = "==0.6.4" },
     { name = "mailchimp-marketing", specifier = ">=3.0.80" },
+    { name = "pillow", specifier = ">=12.2.0" },
     { name = "psycopg2-binary", specifier = "==2.9.12" },
     { name = "qrcode", extras = ["pil"], specifier = "==8.2" },
     { name = "reportlab", specifier = "==4.5.1" },

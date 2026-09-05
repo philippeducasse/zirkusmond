@@ -4,8 +4,6 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "django-payments==3.1.0",
-    "django-image-cropping==1.7",
-    "easy_thumbnails==2.10.1",
     "jupyter_nbextensions_configurator==0.6.4",
     "django_extensions==4.1",
     "xlsxwriter==3.2.9",
@@ -22,6 +20,7 @@ dependencies = [
     "djangorestframework>=3.17.1",
     "django-cors-headers>=4.9.0",
     "mailchimp-marketing>=3.0.80",
+    "pillow>=12.2.0",
 ]
 
 [tool.pytest.ini_options]

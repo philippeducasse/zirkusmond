@@ -2,8 +2,6 @@ import logging.config
 import os
 from pathlib import Path
 
-from easy_thumbnails.conf import Settings as ThumbnailSettings
-
 from config.settings.logging_config import LOGGING
 from config.settings.rest_framework_config import REST_FRAMEWORK  # noqa: F401
 from config.settings.tinymce_config import TINYMCE_DEFAULT_CONFIG  # noqa: F401
@@ -30,8 +28,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "payments",
     "anymail",
-    "easy_thumbnails",
-    "image_cropping",
     "tinymce",
     "rest_framework",
     # Zirkusmond apps
@@ -88,10 +84,6 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = "config.asgi.application"
-
-THUMBNAIL_PROCESSORS = (
-    "image_cropping.thumbnail_processors.crop_corners",
-) + ThumbnailSettings.THUMBNAIL_PROCESSORS
 
 PAYMENT_MODEL = "reservations.ReservationPayment"
 
