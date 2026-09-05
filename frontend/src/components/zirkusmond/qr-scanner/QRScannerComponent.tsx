@@ -11,6 +11,11 @@ import { checkInTicket } from "#/lib/qr-scanner-api.ts";
 import { AlreadyCheckedIn } from "./AlreadyCheckedIn.tsx";
 import { CheckInSuccess as CheckInSuccessComponent } from "./CheckInSuccess.tsx";
 import { EventSelector } from "./EventSelector.tsx";
+import {
+  handleEventChange as handleEventChangeAction,
+  playSound as playSoundAction,
+  unlockAudio as unlockAudioAction,
+} from "./qrScanner.ts";
 import { ScanError } from "./ScanError.tsx";
 
 interface QRScannerComponentProps {
@@ -28,6 +33,7 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
   const [audioUnlocked, setAudioUnlocked] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isProcessingRef = useRef(false);
   const successSoundRef = useRef<HTMLAudioElement | null>(null);
   const errorSoundRef = useRef<HTMLAudioElement | null>(null);
 
@@ -43,31 +49,16 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
   }, [events, selectedEvent]);
 
   // Unlock audio on user interaction
-  const unlockAudio = () => {
-    if (audioUnlocked) return;
-    [successSoundRef.current, errorSoundRef.current].forEach((audio) => {
-      if (audio) {
-        audio.volume = 0;
-        audio
-          .play()
-          .then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-            audio.volume = 1;
-          })
-          .catch(() => {});
-      }
+  const unlockAudio = () =>
+    unlockAudioAction({
+      audioUnlocked,
+      successSoundRef,
+      errorSoundRef,
+      setAudioUnlocked,
     });
-    setAudioUnlocked(true);
-  };
 
-  const playSound = (type: "success" | "error") => {
-    if (type === "success") {
-      successSoundRef.current?.play();
-    } else {
-      errorSoundRef.current?.play();
-    }
-  };
+  const playSound = (type: "success" | "error") =>
+    playSoundAction(type, successSoundRef, errorSoundRef);
 
   const handleCheckIn = async (ticketUuid: string, eventId: number) => {
     if (!selectedEvent) return;
@@ -75,6 +66,10 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
     if (eventId !== selectedEvent.id) {
       setError("Ticket for wrong event!");
       playSound("error");
+      setTimeout(() => {
+        isProcessingRef.current = false;
+        scannerRef.current?.resume();
+      }, 2000);
       return;
     }
 
@@ -86,8 +81,6 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
         setAlreadyCheckedIn(null);
         setError(null);
         playSound("success");
-        scannerRef.current?.pause();
-        setTimeout(() => scannerRef.current?.resume(), 2000);
       } else if (
         data.error === "Ticket already checked in" &&
         "guests" in data &&
@@ -97,8 +90,6 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
         setLastScan(null);
         setError(null);
         playSound("error");
-        scannerRef.current?.pause();
-        setTimeout(() => scannerRef.current?.resume(), 2000);
       } else {
         setError(data.error || "Check-in failed");
         setLastScan(null);
@@ -110,10 +101,20 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
       setLastScan(null);
       setAlreadyCheckedIn(null);
       playSound("error");
+    } finally {
+      setTimeout(() => {
+        isProcessingRef.current = false;
+        scannerRef.current?.resume();
+      }, 2000);
     }
   };
 
   const onScanSuccess = (decodedText: string) => {
+    // guard to prevent scanner from firing before check roundtrip
+    if (isProcessingRef.current) return;
+    isProcessingRef.current = true;
+    scannerRef.current?.pause();
+
     setError(null);
     setAlreadyCheckedIn(null);
     setLastScan(null);
@@ -162,17 +163,15 @@ export const QRScannerComponent = ({ events }: QRScannerComponentProps) => {
     };
   }, [selectedEvent]);
 
-  const handleEventChange = (event: QRScannerEvent | null) => {
-    // Stop scanner if it's running
-    if (scannerRef.current?.isScanning) {
-      scannerRef.current.stop().catch(() => {});
-    }
-    setSelectedEvent(event);
-    setLastScan(null);
-    setAlreadyCheckedIn(null);
-    setError(null);
-    unlockAudio();
-  };
+  const handleEventChange = (event: QRScannerEvent | null) =>
+    handleEventChangeAction(event, {
+      scannerRef,
+      setSelectedEvent,
+      setLastScan,
+      setAlreadyCheckedIn,
+      setError,
+      onUnlockAudio: unlockAudio,
+    });
 
   return (
     <div className="min-h-screen p-4" onClick={unlockAudio}>

@@ -32,6 +32,8 @@ export const checkInTicket = async (
     {
       method: "POST",
       credentials: "include",
+      // Add a timeout to this request so that if something hangs dont have to refresh the entire thing
+      signal: AbortSignal.timeout(8000),
     },
   );
   const data = await res.json();
