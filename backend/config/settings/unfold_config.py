@@ -115,6 +115,11 @@ UNFOLD = {
                         "link": "/mondmin/newsletter/newsletterregistration/",
                     },
                     {
+                        "title": "Homepage elements",
+                        "icon": "code",
+                        "link": "/mondmin/homepage_elements/",
+                    },
+                    {
                         "title": "Rentals",
                         "icon": "storefront",
                         "link": "/mondmin/rentals/rental/",

@@ -1,3 +1,5 @@
+import type { HomepageElement } from "#/interfaces/homepage-element.ts";
+
 export interface ShowCard {
   id: number;
   title: string;
@@ -7,6 +9,7 @@ export interface ShowCard {
 
 export interface HomepageResponse {
   upcomingShows: ShowCard[];
+  additionalElements: HomepageElement[];
 }
 
 export interface ShowEvent {

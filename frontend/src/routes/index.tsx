@@ -12,6 +12,9 @@ const App = () => {
   // TanStack Query: resolves instantly from the cache filled by the loader
   // (no loading state needed); would suspend only on a cache miss.
   const { data } = useSuspenseQuery(homepageQueryOptions);
+  const { additionalElements } = data;
+
+  console.log(additionalElements);
 
   return (
     <>

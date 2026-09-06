@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from homepage_elements.services import get_active_homepage_elements
 from shows.models import Show
 from shows.serializers import ShowCardSerializer
 
@@ -29,4 +30,10 @@ def _upcoming_shows(limit: int | None = None) -> list[Show]:
 @ensure_csrf_cookie
 def homepage(request: Request) -> Response:
     shows = _upcoming_shows(limit=6)
-    return Response({"upcoming_shows": ShowCardSerializer(shows, many=True).data})
+
+    return Response(
+        {
+            "upcoming_shows": ShowCardSerializer(shows, many=True).data,
+            "additional_elements": get_active_homepage_elements(),
+        }
+    )

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "stats",
     "newsletter",
     "rentals",
+    "homepage_elements",
 ]
 
 MIDDLEWARE = [

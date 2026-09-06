@@ -9,7 +9,7 @@ urlpatterns = [
     # Admin
     path("mondmin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
-    # Static pages
+    # homepage
     path("", views.homepage),
     # Apps
     path("", include("shows.urls")),
