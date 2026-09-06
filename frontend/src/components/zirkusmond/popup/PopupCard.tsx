@@ -52,7 +52,7 @@ const PopupCard = ({ element }: { element: PopUpElement }) => {
   };
 
   if (!open) return null;
-
+  console.log("test");
   return (
     <div
       role="dialog"
