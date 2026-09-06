@@ -7,14 +7,12 @@ import Hero from "#/components/zirkusmond/home/Hero";
 import { homepageQueryOptions } from "#/lib/api.ts";
 import PageContainer from "#/components/zirkusmond/general/PageContainer";
 import ContactSection from "#/components/zirkusmond/home/ContactSection";
+import HomepagePopup from "#/components/zirkusmond/popup/HomepagePopup";
 
 const App = () => {
   // TanStack Query: resolves instantly from the cache filled by the loader
   // (no loading state needed); would suspend only on a cache miss.
   const { data } = useSuspenseQuery(homepageQueryOptions);
-  const { additionalElements } = data;
-
-  console.log(additionalElements);
 
   return (
     <>
@@ -24,6 +22,7 @@ const App = () => {
         {/* <GallerySection /> */}
         <ContactSection />
       </PageContainer>
+      <HomepagePopup elements={data.additionalElements} />
     </>
   );
 };

@@ -3,8 +3,10 @@ from tinymce import models as tinymce_models
 
 
 class HomePageElement(models.Model):
-    title = models.CharField(max_length=100)
-    message = tinymce_models.HTMLField(max_length=1000)
+    title_de = models.CharField(max_length=100)
+    title_en = models.CharField(max_length=100)
+    message_de = tinymce_models.HTMLField(max_length=1000)
+    message_en = tinymce_models.HTMLField(max_length=1000)
     active = models.BooleanField(default=False)
     link = models.CharField(max_length=255, blank=True)
 
@@ -12,14 +14,16 @@ class HomePageElement(models.Model):
         abstract = True
 
     def __str__(self) -> str:
-        return self.title
+        return self.title_de
+
+    def save(self, *args, **kwargs):
+        # Only one element of a given type may be active at a time: activating
+        # this one deactivates every other row of the same concrete model.
+        if self.active:
+            type(self).objects.exclude(pk=self.pk).filter(active=True).update(active=False)
+        super().save(*args, **kwargs)
 
 
 class PopUpElement(HomePageElement):
-    class Position(models.TextChoices):
-        TOP = "top"
-        BOTTOM = "bottom"
-        TOP_RIGHT = "top_right"
-        BOTTOM_RIGHT = "bottom_right"
-
-    position = models.CharField(max_length=50, choices=Position, default=Position.BOTTOM_RIGHT)
+    """A dismissible pop-up shown on the homepage. Rendered bottom-right on
+    desktop, bottom-center on mobile — the position is fixed in the frontend."""

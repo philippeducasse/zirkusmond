@@ -1,16 +1,15 @@
 export interface HomepageElementBase {
   id: number;
-  title: string;
-  message: string;
+  titleDe: string;
+  titleEn: string;
+  messageDe: string;
+  messageEn: string;
   active: boolean;
   link: string;
 }
 
-export type PopUpPosition = "top" | "bottom" | "top_right" | "bottom_right";
-
 export interface PopUpElement extends HomepageElementBase {
   type: "popupelement";
-  position: PopUpPosition;
 }
 
 /**

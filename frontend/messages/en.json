@@ -78,6 +78,9 @@
   "common_home": "Home",
   "common_link": "Link",
   "common_submit": "Submit",
+  "common_close": "Close",
+
+  "popup_learn_more": "Learn more",
 
   "page_contact_title": "Contact Us",
   "page_contact_reservations": "Direct matters concerning reservations",

@@ -5,7 +5,7 @@ from .models import PopUpElement
 
 
 class PopUpElementAdmin(ModelAdmin):
-    list_display = ("title", "active", "position")
+    list_display = ("title_de", "title_en", "active")
 
 
 admin.site.register(PopUpElement, PopUpElementAdmin)
