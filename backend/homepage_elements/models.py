@@ -24,6 +24,17 @@ class HomePageElement(models.Model):
         super().save(*args, **kwargs)
 
 
+# For now this class system is a bit over the top, because for now they all havethe same fields
+# BUt maybe in the future certain elements will need additional fields so then it will make sense
+#
 class PopUpElement(HomePageElement):
     """A dismissible pop-up shown on the homepage. Rendered bottom-right on
     desktop, bottom-center on mobile — the position is fixed in the frontend."""
+
+
+class PreShowsElement(HomePageElement):
+    """A section content element displayed before the shows element."""
+
+
+class PostShowsElement(HomePageElement):
+    """A section content element displayed after the shows element, before the footer."""

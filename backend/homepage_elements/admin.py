@@ -1,11 +1,30 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
-from .models import PopUpElement
+from .models import PopUpElement, PostShowsElement, PreShowsElement
 
 
 class PopUpElementAdmin(ModelAdmin):
-    list_display = ("title_de", "title_en", "active")
+    list_display = ("title_en", "active", "link")
 
 
-admin.site.register(PopUpElement, PopUpElementAdmin)
+class PreShowsElementAdmin(ModelAdmin):
+    list_display = ("title_en", "active", "link")
+
+
+class PostShowsElementAdmin(ModelAdmin):
+    list_display = ("title_en", "active", "link")
+
+
+admin.site.register(
+    PopUpElement,
+    PopUpElementAdmin,
+)
+admin.site.register(
+    PreShowsElement,
+    PreShowsElementAdmin,
+)
+admin.site.register(
+    PostShowsElement,
+    PostShowsElementAdmin,
+)
