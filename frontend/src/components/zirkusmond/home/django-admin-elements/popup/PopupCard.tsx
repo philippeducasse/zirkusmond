@@ -6,7 +6,8 @@ import { Button } from "#/components/ui/button.tsx";
 import { CardContent, CardHeader, CardTitle } from "#/components/ui/card.tsx";
 import { cn } from "#/lib/utils.ts";
 import type { PopUpElement } from "#/interfaces/homepage-element.ts";
-import SectionCard from "../general/SectionCard";
+import SectionCard from "#/components/zirkusmond/general/SectionCard";
+import { useTranslatedText } from "#/hooks/useTranslatedText";
 
 // Centered along the bottom on mobile, pinned to the bottom-right corner
 // from the `sm` breakpoint up.
@@ -26,12 +27,8 @@ const isDismissed = (id: number): boolean => {
 };
 
 const PopupCard = ({ element }: { element: PopUpElement }) => {
-  const { t, i18n } = useTranslation();
-  // `de` is the default/fallback locale, so anything that isn't English
-  // falls back to the German copy.
-  const isEnglish = i18n.language.startsWith("en");
-  const title = isEnglish ? element.titleEn : element.titleDe;
-  const message = isEnglish ? element.messageEn : element.messageDe;
+  const { t } = useTranslation();
+  const { title, message } = useTranslatedText(element);
 
   // Nothing renders on the server or the first client paint; the popup is
   // revealed on mount unless this viewer has already dismissed it. Keeping

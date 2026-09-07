@@ -7,19 +7,30 @@ import Hero from "#/components/zirkusmond/home/Hero";
 import { homepageQueryOptions } from "#/lib/api.ts";
 import PageContainer from "#/components/zirkusmond/general/PageContainer";
 import ContactSection from "#/components/zirkusmond/home/ContactSection";
-import HomepagePopup from "#/components/zirkusmond/popup/HomepagePopup";
+import HomepagePopup from "#/components/zirkusmond/home/django-admin-elements/popup/HomepagePopup";
+import InlineSection from "#/components/zirkusmond/home/django-admin-elements/inline-section/InlineSection";
+import type { InlineSectionElement } from "#/interfaces/homepage-element";
 
 const App = () => {
   // TanStack Query: resolves instantly from the cache filled by the loader
   // (no loading state needed); would suspend only on a cache miss.
   const { data } = useSuspenseQuery(homepageQueryOptions);
+  const preShowSection = data.additionalElements.find(
+    (el): el is InlineSectionElement => el.type === "preshowselement",
+  );
+  const postShowSection = data.additionalElements.find(
+    (el): el is InlineSectionElement => el.type === "postshowselement",
+  );
 
   return (
     <>
       <Hero />
       <PageContainer className="pt-0">
+        {preShowSection && <InlineSection element={preShowSection} />}
         <EventsSection shows={data.upcomingShows} showAllEventsLink />
         {/* <GallerySection /> */}
+        {postShowSection && <InlineSection element={postShowSection} />}
+
         <ContactSection />
       </PageContainer>
       <HomepagePopup elements={data.additionalElements} />

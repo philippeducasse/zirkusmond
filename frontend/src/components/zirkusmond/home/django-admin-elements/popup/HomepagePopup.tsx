@@ -7,10 +7,7 @@ import PopupCard from "./PopupCard";
  * are ignored here.
  */
 const HomepagePopup = ({ elements }: { elements: HomepageElement[] }) => {
-  const popup = elements.find(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- guard stays meaningful once the HomepageElement union grows
-    (element) => element.type === "popupelement",
-  );
+  const popup = elements.find((element) => element.type === "popupelement");
 
   if (!popup) return null;
 
