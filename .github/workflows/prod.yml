@@ -74,10 +74,10 @@ jobs:
           docker build -f deploy/Dockerfile \
             --build-arg VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }} \
             --build-arg VITE_API_URL=https://zirkusmond.de/api \
+            --build-arg VITE_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONTEND }} \
             --build-arg SENTRY_ORG=zirkusmond \
             --build-arg SENTRY_PROJECT=zm-tanstackstart-react \
             --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
-            --build-arg SENTRY_DSN_FRONTEND=${{ secrets.SENTRY_DSN_FRONTEND }} \
             -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest .
 
       - name: Push to registry
