@@ -135,7 +135,7 @@ logging.config.dictConfig(LOGGING)
 
 # sentry
 sentry_sdk.init(
-    dsn="https://a72d6165af58f13e5dc9fbce917afd64@o4512050198282240.ingest.de.sentry.io/4512050226200656",
+    dsn=os.environ.get("SENTRY_DSN_BACKEND", ""),
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,

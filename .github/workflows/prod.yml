@@ -59,16 +59,25 @@ jobs:
           echo "DJANGO_SETTINGS_MODULE=config.settings.production" >> .env
           echo "API_URL=http://localhost:8010" >> .env
           echo "FRONTEND_URL=https://zirkusmond.de" >> .env
+          echo "SENTRY_DSN_BACKEND=${{ secrets.SENTRY_DSN_BACKEND }}" >> .env
+          echo "SENTRY_ORG=zirkusmond" >> .env
+          echo "SENTRY_PROJECT=python-django" >> .env
+          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
 
           # Frontend .env
           echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" >> .env
           echo "VITE_API_URL=https://zirkusmond.de/api"  >> .env
+          echo "VITE_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONTEND }}" >> .env
 
       - name: Build Django image
         run: |
           docker build -f deploy/Dockerfile \
             --build-arg VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }} \
             --build-arg VITE_API_URL=https://zirkusmond.de/api \
+            --build-arg SENTRY_ORG=zirkusmond \
+            --build-arg SENTRY_PROJECT=zm-tanstackstart-react \
+            --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            --build-arg SENTRY_DSN_FRONTEND=${{ secrets.SENTRY_DSN_FRONTEND }} \
             -t ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest .
 
       - name: Push to registry
