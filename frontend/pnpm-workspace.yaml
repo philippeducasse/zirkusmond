@@ -1,5 +1,5 @@
 allowBuilds:
-  '@sentry/cli': true
+  "@sentry/cli": true
   unrs-resolver: true
 onlyBuiltDependencies:
   - esbuild

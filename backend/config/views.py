@@ -40,7 +40,5 @@ def homepage(request: Request) -> Response:
 
 
 # dummy route for sentry
-
-
 def trigger_error(request: Request):
-    divide_by_zero = 1 / 0
+    divide_by_zero = 1 / 0  # noqa
