@@ -21,6 +21,8 @@ dependencies = [
     "django-cors-headers>=4.9.0",
     "mailchimp-marketing>=3.0.80",
     "pillow>=12.2.0",
+    "sentry-sdk>=2.69.0",
+    "django>=5.2.15",
 ]
 
 [tool.pytest.ini_options]

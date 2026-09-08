@@ -2,6 +2,8 @@ import logging.config
 import os
 from pathlib import Path
 
+import sentry_sdk
+
 from config.settings.logging_config import LOGGING
 from config.settings.rest_framework_config import REST_FRAMEWORK  # noqa: F401
 from config.settings.tinymce_config import TINYMCE_DEFAULT_CONFIG  # noqa: F401
@@ -129,3 +131,12 @@ MEDIA_ROOT = os.environ.get("MEDIA_ROOT", BASE_DIR / "media")
 
 LOGGING_CONFIG = None
 logging.config.dictConfig(LOGGING)
+
+
+# sentry
+sentry_sdk.init(
+    dsn="https://a72d6165af58f13e5dc9fbce917afd64@o4512050198282240.ingest.de.sentry.io/4512050226200656",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)

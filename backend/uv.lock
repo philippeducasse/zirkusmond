@@ -1851,6 +1851,19 @@ wheels = [
 ]
 
 [[package]]
+name = "sentry-sdk"
+version = "2.69.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3e/d4/911132f0ad673372159b4c47d3074444651b68c4c834fd5427f91285c66a/sentry_sdk-2.69.0.tar.gz", hash = "sha256:0cf7d29419145ab0250ea51363ad79fb7509996aaa35c5d5d2c3ed85b3b80a7d", size = 1042224, upload-time = "2026-09-08T08:16:29.258Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f2/c4/11acfc646282156d8bec336db28143d33196531bd982fe20c2280f03abf6/sentry_sdk-2.69.0-py3-none-any.whl", hash = "sha256:3b92738027322061fbab34199102fcc0459ff9a5bf373ccca7091af9a5f07530", size = 528018, upload-time = "2026-09-08T08:16:27.203Z" },
+]
+
+[[package]]
 name = "setuptools"
 version = "82.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2060,6 +2073,7 @@ name = "zirkusmond"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "django" },
     { name = "django-anymail" },
     { name = "django-cors-headers" },
     { name = "django-extensions" },
@@ -2075,6 +2089,7 @@ dependencies = [
     { name = "psycopg2-binary" },
     { name = "qrcode", extra = ["pil"] },
     { name = "reportlab" },
+    { name = "sentry-sdk" },
     { name = "stripe" },
     { name = "xlsxwriter" },
     { name = "xmltodict" },
@@ -2089,6 +2104,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "django", specifier = ">=5.2.15" },
     { name = "django-anymail", specifier = "==15.0" },
     { name = "django-cors-headers", specifier = ">=4.9.0" },
     { name = "django-extensions", specifier = "==4.1" },
@@ -2104,6 +2120,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = "==2.9.12" },
     { name = "qrcode", extras = ["pil"], specifier = "==8.2" },
     { name = "reportlab", specifier = "==4.5.1" },
+    { name = "sentry-sdk", specifier = ">=2.69.0" },
     { name = "stripe", specifier = "==14.4.1" },
     { name = "xlsxwriter", specifier = "==3.2.9" },
     { name = "xmltodict", specifier = "==1.0.4" },

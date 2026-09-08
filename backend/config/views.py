@@ -37,3 +37,10 @@ def homepage(request: Request) -> Response:
             "additional_elements": get_active_homepage_elements(),
         }
     )
+
+
+# dummy route for sentry
+
+
+def trigger_error(request: Request):
+    divide_by_zero = 1 / 0

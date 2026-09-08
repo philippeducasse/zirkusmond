@@ -9,12 +9,15 @@ urlpatterns = [
     # Admin
     path("mondmin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
+    # newsletter
+    path("newsletter/", include("newsletter.urls")),
     # homepage
     path("", views.homepage),
     # Apps
     path("", include("shows.urls")),
     path("", include("reservations.urls")),
-    path("newsletter/", include("newsletter.urls")),
+    # Sentry dummy route
+    path("sentry-debug/", views.trigger_error),
 ]
 
 if settings.DEBUG:
