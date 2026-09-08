@@ -9,7 +9,7 @@ import SectionCard from "#/components/zirkusmond/general/SectionCard";
 import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
 import { Button } from "#/components/ui/button";
 
-const ErrorPage = ({ error }: { error: Error }) => {
+const ErrorPage = ({ error }: { error: unknown }) => {
   const { t } = useTranslation();
 
   return (
