@@ -26,19 +26,6 @@ const App = () => {
     <>
       <Hero />
       <PageContainer className="pt-0">
-        {import.meta.env.DEV && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <button
-              type="button"
-              onClick={() => {
-                throw new Error("Sentry Frontend Test Error");
-              }}
-              className="rounded bg-red-600 px-4 py-2 text-white shadow-lg hover:bg-red-700"
-            >
-              Test Sentry Error
-            </button>
-          </div>
-        )}
         {preShowSection && <InlineSection element={preShowSection} />}
         <EventsSection shows={data.upcomingShows} showAllEventsLink />
         {/* <GallerySection /> */}
