@@ -23,28 +23,40 @@ export const getRouter = () => {
   if (!router.isServer) {
     // Dynamic import to avoid bundling on server
     import("#/lib/cookieConsent").then(({ hasConsent }) => {
-      if (hasConsent()) {
-        Sentry.init({
-          dsn: import.meta.env.VITE_SENTRY_DSN,
-          dataCollection: {
-            userInfo: false,
-            httpBodies: [],
-          },
+      const initSentry = () => {
+        if (hasConsent() && !Sentry.isInitialized()) {
+          Sentry.init({
+            dsn: import.meta.env.VITE_SENTRY_DSN,
+            dataCollection: {
+              userInfo: false,
+              httpBodies: [],
+            },
 
-          integrations: [
-            Sentry.tanstackRouterBrowserTracingIntegration(router),
-            Sentry.replayIntegration(),
-            Sentry.feedbackIntegration({
-              colorScheme: "system",
-            }),
-          ],
+            integrations: [
+              Sentry.tanstackRouterBrowserTracingIntegration(router),
+              Sentry.replayIntegration(),
+              Sentry.feedbackIntegration({
+                colorScheme: "system",
+              }),
+            ],
 
-          enableLogs: true,
-          tracesSampleRate: 1.0,
-          replaysSessionSampleRate: 0.1,
-          replaysOnErrorSampleRate: 1.0,
-        });
-      }
+            enableLogs: true,
+            tracesSampleRate: 1.0,
+            replaysSessionSampleRate: 0.1,
+            replaysOnErrorSampleRate: 1.0,
+          });
+        }
+      };
+
+      // Initialize if consent already exists
+      initSentry();
+
+      // Listen for consent changes via custom event
+      window.addEventListener("cookieConsentChanged", ((e: CustomEvent) => {
+        if (e.detail.consent === "accepted") {
+          initSentry();
+        }
+      }) as EventListener);
     });
   }
 

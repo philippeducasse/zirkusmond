@@ -10,7 +10,6 @@ const CookieConsentBanner = () => {
 
   const handleAccept = () => {
     setConsent("accepted");
-    window.location.reload();
   };
 
   const handleDecline = () => {

@@ -19,6 +19,12 @@ export const setConsent = (value: ConsentValue): void => {
     } else {
       localStorage.setItem(CONSENT_KEY, value);
     }
+    // Dispatch custom event so other parts of the app can react
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("cookieConsentChanged", { detail: { consent: value } })
+      );
+    }
   } catch {
     // localStorage unavailable — consent won't persist
   }
