@@ -56,6 +56,43 @@ const SECTIONS: DsgvoSection[] = [
     ],
   },
   {
+    heading: "2.1 Fehlerüberwachung und Performance-Tracking (Sentry)",
+    paragraphs: [
+      "Wir verwenden Sentry, einen Dienst zur Fehlerüberwachung und Performance-Analyse, um die Stabilität und Funktionalität unserer Website zu verbessern. Sentry erfasst technische Informationen über Fehler, Browsertyp, Betriebssystem und Performance-Metriken.",
+      "Die Verarbeitung erfolgt nur mit Ihrer ausdrücklichen Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO. Sie können Ihre Einwilligung jederzeit über unser Cookie-Banner widerrufen.",
+    ],
+  },
+  {
+    heading: "2.2 Rechtsgrundlage",
+    paragraphs: [
+      "Die Verarbeitung erfolgt auf Basis Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).",
+    ],
+  },
+  {
+    heading: "2.3 Empfänger",
+    paragraphs: [
+      "Empfänger der Daten ist Functional Software, Inc. (Sentry) als Auftragsverarbeiter.",
+    ],
+  },
+  {
+    heading: "2.4 Speicherdauer",
+    paragraphs: [
+      "Sentry speichert Fehlerdaten für 90 Tage. Performance-Daten werden nach 30 Tagen gelöscht.",
+    ],
+  },
+  {
+    heading: "2.5 Drittlandtransfer",
+    paragraphs: [
+      "Sentry verarbeitet Daten in den USA und der EU. Die Datenübertragung erfolgt auf Grundlage von Standardvertragsklauseln der EU-Kommission.",
+    ],
+  },
+  {
+    heading: "2.6 Bereitstellung vorgeschrieben oder erforderlich",
+    paragraphs: [
+      "Die Bereitstellung Ihrer Daten erfolgt freiwillig auf Basis Ihrer Einwilligung. Ohne Sentry können wir technische Probleme möglicherweise nicht so schnell identifizieren und beheben.",
+    ],
+  },
+  {
     heading: "3. Registrierung auf unserer Website",
     paragraphs: [
       "Bei der Registrierung für personalisierte Leistungen erheben wir personenbezogene Daten wie Name, Adresse und E-Mail-Adresse. Registrierte Nutzer haben Zugriff auf exklusive Inhalte und Funktionen.",
