@@ -37,6 +37,8 @@ export const extractGuestFormData = (
 const DRAFT_KEY = "reservation-draft";
 
 export const loadDraft = (): ReservationDraft | null => {
+  if (typeof window === "undefined") return null;
+
   const draftJson = sessionStorage.getItem(DRAFT_KEY);
   if (!draftJson) return null;
 
