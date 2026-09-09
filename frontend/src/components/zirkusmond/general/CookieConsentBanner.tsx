@@ -8,29 +8,33 @@ const CONSENT_STORAGE_KEY = "zm-cookie-consent";
 const CookieConsentBanner = () => {
   const { t } = useTranslation();
 
-  const handleAccept = () => {
-    setConsent("accepted");
-  };
+  const actions = (dismiss: () => void) => {
+    const handleAccept = () => {
+      setConsent("accepted");
+      dismiss();
+    };
 
-  const handleDecline = () => {
-    setConsent("declined");
-  };
+    const handleDecline = () => {
+      setConsent("declined");
+      dismiss();
+    };
 
-  const actions = (
-    <div className="flex flex-col sm:flex-row gap-2">
-      <Button
-        onClick={handleDecline}
-        size="sm"
-        variant="outline"
-        className="flex-1 text-white"
-      >
-        {t("cookie_banner_decline")}
-      </Button>
-      <Button onClick={handleAccept} size="sm" className="flex-1">
-        {t("cookie_banner_accept")}
-      </Button>
-    </div>
-  );
+    return (
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button
+          onClick={handleDecline}
+          size="sm"
+          variant="outline"
+          className="flex-1 text-white"
+        >
+          {t("cookie_banner_decline")}
+        </Button>
+        <Button onClick={handleAccept} size="sm" className="flex-1">
+          {t("cookie_banner_accept")}
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <Popup

@@ -17,7 +17,7 @@ interface PopupProps {
   storageKey: string;
   storageValue: string;
   showCloseButton?: boolean;
-  actions?: ReactNode;
+  actions?: ReactNode | ((dismiss: () => void) => ReactNode);
   shouldShow?: () => boolean;
 }
 
@@ -92,7 +92,7 @@ const Popup = ({
             className="text-sm/relaxed md:text-base/relaxed [&_a]:underline"
             dangerouslySetInnerHTML={{ __html: message }}
           />
-          {actions}
+          {typeof actions === "function" ? actions(dismiss) : actions}
         </CardContent>
       </SectionCard>
     </div>
