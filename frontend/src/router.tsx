@@ -25,6 +25,7 @@ export const getRouter = () => {
     import("#/lib/cookieConsent").then(({ hasConsent }) => {
       const initSentry = () => {
         if (hasConsent() && !Sentry.isInitialized()) {
+          console.info("Cookie accepted, initalising sentry");
           Sentry.init({
             dsn: import.meta.env.VITE_SENTRY_DSN,
             dataCollection: {

@@ -3,7 +3,7 @@ import { Button } from "#/components/ui/button.tsx";
 import Popup from "#/components/zirkusmond/general/Popup";
 import { getConsent, setConsent } from "#/lib/cookieConsent";
 
-const CONSENT_STORAGE_KEY = "zm-cookie-consent";
+const BANNER_DISMISSED_KEY = "zm-cookie-banner-dismissed";
 
 const CookieConsentBanner = () => {
   const { t } = useTranslation();
@@ -40,8 +40,8 @@ const CookieConsentBanner = () => {
     <Popup
       title={t("cookie_banner_title")}
       message={t("cookie_banner_message")}
-      storageKey={CONSENT_STORAGE_KEY}
-      storageValue="dismissed"
+      storageKey={BANNER_DISMISSED_KEY}
+      storageValue="true"
       showCloseButton={false}
       actions={actions}
       shouldShow={() => getConsent() === null}
