@@ -32,7 +32,7 @@ const TeamMemberCard = ({ member, className }: TeamMemberCardProps) => {
     <SectionCard className="p-0! min-w-60">
       <div className={cn("text-center mb-4", className)}>
         <img
-          className="mx-auto aspect-square w-full  object-cover max-w-xs"
+          className="mx-auto aspect-square w-full object-cover object-top max-w-md"
           src={member.image}
           alt={`Photo of ${member.name}`}
         />
