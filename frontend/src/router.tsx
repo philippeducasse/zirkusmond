@@ -19,29 +19,32 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
   });
 
-  // Initialize Sentry on the client side only
+  // Initialize Sentry on the client side only, and only if user has consented
   if (!router.isServer) {
-    Sentry.init({
-      dsn: import.meta.env.VITE_SENTRY_DSN,
-      dataCollection: {
-        // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
-        // https://docs.sentry.io/platforms/javascript/guides/tanstackstart-react/configuration/options/#dataCollection
-        // userInfo: false,
-        // httpBodies: [],
-      },
+    // Dynamic import to avoid bundling on server
+    import("#/lib/cookieConsent").then(({ hasConsent }) => {
+      if (hasConsent()) {
+        Sentry.init({
+          dsn: import.meta.env.VITE_SENTRY_DSN,
+          dataCollection: {
+            userInfo: false,
+            httpBodies: [],
+          },
 
-      integrations: [
-        Sentry.tanstackRouterBrowserTracingIntegration(router),
-        Sentry.replayIntegration(),
-        Sentry.feedbackIntegration({
-          colorScheme: "system",
-        }),
-      ],
+          integrations: [
+            Sentry.tanstackRouterBrowserTracingIntegration(router),
+            Sentry.replayIntegration(),
+            Sentry.feedbackIntegration({
+              colorScheme: "system",
+            }),
+          ],
 
-      enableLogs: true,
-      tracesSampleRate: 1.0,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0,
+          enableLogs: true,
+          tracesSampleRate: 1.0,
+          replaysSessionSampleRate: 0.1,
+          replaysOnErrorSampleRate: 1.0,
+        });
+      }
     });
   }
 

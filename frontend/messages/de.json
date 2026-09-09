@@ -82,6 +82,11 @@
 
   "popup_learn_more": "Mehr erfahren",
 
+  "cookie_banner_title": "Cookies 🍪",
+  "cookie_banner_message": "Wir verwenden Cookies, um unsere Website so magisch wie möglich zu gestalten. Hilfst du uns dabei?",
+  "cookie_banner_accept": "Klar!",
+  "cookie_banner_decline": "Nein, danke",
+
   "page_contact_title": "Kontaktiere uns",
   "page_contact_reservations": "Anfragen zu Reservierungen",
   "page_contact_donate": "Per PayPal spenden",

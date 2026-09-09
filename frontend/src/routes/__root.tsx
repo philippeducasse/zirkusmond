@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import Navbar from "#/components/zirkusmond/general/Navbar";
 import NotFound from "#/components/zirkusmond/general/NotFound";
 import ErrorPage from "#/components/zirkusmond/general/ErrorPage";
+import CookieConsentBanner from "#/components/zirkusmond/general/CookieConsentBanner";
 
 import appCss from "../styles.css?url";
 import Footer from "#/components/zirkusmond/general/Footer";
@@ -45,6 +46,7 @@ const RootDocument = ({ children }: { children: React.ReactNode }) => {
           ]}
         />
         <Footer />
+        <CookieConsentBanner />
         <Scripts />
       </body>
     </html>
