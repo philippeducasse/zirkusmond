@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { postJson } from "#/lib/api";
 import type React from "react";
 import { useState } from "react";
+import { Coins, HandCoins, Send } from "lucide-react";
 
 const SOCIAL_LINKS = [
   {
@@ -83,7 +84,7 @@ export default function ContactSection() {
             className="self-center max-w-sm w-full"
           >
             <a href="https://www.paypal.com/donate?hosted_button_id=AA2ZBHH6JHX9E">
-              {t("page_contact_donate")}
+              <HandCoins /> {t("page_contact_donate")}
             </a>
           </Button>
         </div>
@@ -137,6 +138,7 @@ export default function ContactSection() {
               </p>
             )}
             <Button type="submit" className="mt-4">
+              <Send />
               {t("common_submit")}
             </Button>
           </form>

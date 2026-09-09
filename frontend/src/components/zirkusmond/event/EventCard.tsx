@@ -1,15 +1,30 @@
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MoonStar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
   Card,
   CardDescription,
-  CardHeader,
+  CardContent,
   CardTitle,
 } from "#/components/ui/card.tsx";
 import { Button } from "#/components/ui/button.tsx";
 import { cn } from "#/lib/utils.ts";
+
+interface EventDateProps {
+  date: string;
+  index: number;
+}
+
+const EventDate = ({ date, index }: EventDateProps) => (
+  <CardDescription
+    key={`${date}_${index}`}
+    className="flex items-center gap-2 text-sm sm:text-base md:text-lg text-white/90 w-37 md:w-45"
+  >
+    <span className="text-white/70">•</span>
+    {date}
+  </CardDescription>
+);
 
 interface EventCardProps {
   eventTitle: string;
@@ -34,35 +49,29 @@ const EventCard = ({
         alt="Event cover"
         className="relative z-20 aspect-square w-full"
       />
-      <CardHeader className="py-3 my-auto">
-        <CardTitle className="text-center pb-2 text-primary text-lg sm:text-xl md:text-2xl">
+      <CardContent className="flex flex-col py-3 my-auto justify-center items-center">
+        <CardTitle className="flex items-center justify-center gap-2 pb-2 text-primary text-lg sm:text-xl md:text-2xl">
           {eventTitle}
         </CardTitle>
-        {visibleDates.map((date, i) => (
-          <CardDescription
-            key={`${date}_${i}`}
-            className="w-full text-center text-sm sm:text-base md:text-lg text-white"
-          >
-            {date}
-          </CardDescription>
-        ))}
+        <div className="flex flex-col items-start">
+          {visibleDates.map((date, i) => (
+            <EventDate key={`${date}_${i}`} date={date} index={i} />
+          ))}
+        </div>
         {hiddenDates.length > 0 && (
           <>
             <div
               className={cn(
-                "grid transition-[grid-template-rows] duration-300 ease-in-out",
+                "grid transition-[grid-template-rows] duration-300 ease-in-out w-full",
                 expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
               )}
             >
-              <div className="overflow-hidden">
-                {hiddenDates.map((date, i) => (
-                  <CardDescription
-                    key={`${date}_${i}`}
-                    className="w-full text-center text-sm sm:text-base md:text-lg text-white"
-                  >
-                    {date}
-                  </CardDescription>
-                ))}
+              <div className="overflow-hidden flex flex-col items-center">
+                <div className="flex flex-col items-start">
+                  {hiddenDates.map((date, i) => (
+                    <EventDate key={`${date}_${i}`} date={date} index={i} />
+                  ))}
+                </div>
               </div>
             </div>
             <Button
@@ -88,7 +97,7 @@ const EventCard = ({
             </Button>
           </>
         )}
-      </CardHeader>
+      </CardContent>
     </Card>
   );
 };
