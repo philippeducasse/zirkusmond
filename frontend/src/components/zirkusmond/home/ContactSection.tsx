@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { postJson } from "#/lib/api";
 import type React from "react";
 import { useState } from "react";
-import { Coins, HandCoins, Send } from "lucide-react";
+import { HandCoins, Send } from "lucide-react";
 
 const SOCIAL_LINKS = [
   {
