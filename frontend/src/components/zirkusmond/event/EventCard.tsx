@@ -78,7 +78,7 @@ const EventCard = ({
         className="relative z-20 aspect-square w-full"
       />
       <CardContent className="flex flex-col py-3 my-auto justify-center items-center">
-        <CardTitle className="flex items-center justify-center gap-2 pb-2 text-primary text-lg sm:text-xl md:text-2xl">
+        <CardTitle className="text-center pb-2 text-primary text-lg sm:text-xl md:text-2xl">
           {eventTitle}
         </CardTitle>
         <div className="flex flex-col items-start">

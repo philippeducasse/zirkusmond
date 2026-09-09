@@ -150,8 +150,18 @@ class Command(BaseCommand):
         shows_to_create: list[tuple[Show, bool]] = []
         for i in range(1, 51):
             is_future = i <= 5
+            # Make some titles much longer to test frontend layout
+            if i % 7 == 0:
+                title = f"Show {i:02d} - Eine außergewöhnlich lange Zirkusvorstellung mit spektakulärer Artistik und unvergesslichen Momenten unter dem Sternenhimmel"
+            elif i % 5 == 0:
+                title = f"Show {i:02d} - Der verschwundene Mond: Eine magische Reise durch Raum und Zeit mit Akrobatik, Jonglage und Clownerie"
+            elif i % 3 == 0:
+                title = f"Show {i:02d} - Mondnacht: Wenn die Sterne vom Himmel fallen und die Manege zur Bühne wird"
+            else:
+                title = f"Show {i:02d} - {'Future' if is_future else 'Past'}"
+
             show = Show(
-                title=f"Show {i:02d} - {'Future' if is_future else 'Past'}",
+                title=title,
                 description=SHOW_DESCRIPTIONS[i % len(SHOW_DESCRIPTIONS)],
                 cast=SHOW_CASTS[i % len(SHOW_CASTS)],
                 base_ticket_price=15,
