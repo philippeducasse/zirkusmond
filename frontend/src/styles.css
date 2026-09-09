@@ -135,6 +135,20 @@ body {
   }
 }
 
+@keyframes shadow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 25px -8px rgba(0, 0, 0, 0.5),
+      0 0 18px -6px rgba(246, 174, 66, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 16px 32px -10px rgba(0, 0, 0, 0.6),
+      0 0 35px -4px rgba(246, 174, 66, 0.9);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -152,6 +166,21 @@ body {
   }
   .err_msg {
     @apply font-bold text-destructive;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  a:hover {
+    @apply opacity-80;
+  }
+
+  [data-slot="button"],
+  [data-slot="button"]:hover,
+  a:has([data-slot="card"]),
+  a:has([data-slot="card"]):hover {
+    @apply opacity-100;
   }
 
   /* Typography Defaults */

@@ -51,13 +51,15 @@ export default function MobileNav({ items }: MobileNavProps) {
         </SheetHeader>
         <div className="flex flex-col h-full justify-between">
           <nav className="flex flex-col items-center gap-12 p-4 grow justify-center">
-            {items.map((item) =>
-              item.external ? (
+            {items.map((item) => {
+              const Icon = item.icon;
+              return item.external ? (
                 <SheetClose key={item.href} asChild>
                   <a
                     href={item.href}
-                    className="text-xl sm:text-2xl text-primary"
+                    className="text-xl sm:text-2xl text-primary flex items-center gap-3"
                   >
+                    <Icon className="size-6 sm:size-7" />
                     {t(item.labelKey)}
                   </a>
                 </SheetClose>
@@ -65,13 +67,14 @@ export default function MobileNav({ items }: MobileNavProps) {
                 <SheetClose key={item.href} asChild>
                   <Link
                     to={item.href}
-                    className="text-4xl sm:text-xl text-primary hover:underline"
+                    className="text-4xl sm:text-xl text-primary flex items-center gap-3"
                   >
+                    <Icon className="size-8 sm:size-7" />
                     {t(item.labelKey)}
                   </Link>
                 </SheetClose>
-              ),
-            )}
+              );
+            })}
           </nav>
           <div className="my-6">
             <SectionDivider type="flower" />

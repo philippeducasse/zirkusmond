@@ -24,18 +24,27 @@ export default function DesktopNav({ items }: DesktopNavProps) {
   return (
     <div className="hidden items-center gap-6 md:flex">
       <NavigationMenu viewport={false} className="max-w-none">
-        <NavigationMenuList className="gap-5">
-          {items.map((item) => (
-            <NavigationMenuItem key={item.href}>
-              <NavigationMenuLink asChild className={linkClassName}>
-                {item.external ? (
-                  <a href={item.href}>{t(item.labelKey)}</a>
-                ) : (
-                  <Link to={item.href}>{t(item.labelKey)}</Link>
-                )}
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          ))}
+        <NavigationMenuList className="gap-8">
+          {items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavigationMenuItem key={item.href}>
+                <NavigationMenuLink asChild className={linkClassName}>
+                  {item.external ? (
+                    <a href={item.href} className="flex items-center gap-2">
+                      <Icon className="size-5" />
+                      {t(item.labelKey)}
+                    </a>
+                  ) : (
+                    <Link to={item.href} className="flex items-center gap-2">
+                      <Icon className="size-6" />
+                      {t(item.labelKey)}
+                    </Link>
+                  )}
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            );
+          })}
         </NavigationMenuList>
       </NavigationMenu>
       <LocaleSwitcher />
