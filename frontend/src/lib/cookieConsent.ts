@@ -22,7 +22,7 @@ export const setConsent = (value: ConsentValue): void => {
     // Dispatch custom event so other parts of the app can react
     if (typeof window !== "undefined") {
       window.dispatchEvent(
-        new CustomEvent("cookieConsentChanged", { detail: { consent: value } })
+        new CustomEvent("cookieConsentChanged", { detail: { consent: value } }),
       );
     }
   } catch {
