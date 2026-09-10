@@ -1,14 +1,11 @@
 from typing import Any
 
-from django import forms
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.core.mail import EmailMessage
 from django.db.models import Count, Prefetch, QuerySet
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.http import HttpRequest, HttpResponseRedirect
 from django.template import Context, Template
 from django.template.response import TemplateResponse
-from django.urls import URLPattern, URLResolver, path
 from django.utils import timezone
 from payments import PaymentStatus
 from unfold.admin import ModelAdmin

@@ -1,7 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal
 from io import BytesIO
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from django.core import mail
 from django.test import TestCase
