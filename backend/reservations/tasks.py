@@ -36,7 +36,9 @@ def send_confirmation_email(reservation_id: str):
     except Reservation.DoesNotExist:
         logger.error("Cannot send confirmation email: reservation %s not found", reservation_id)
     except Exception as error:
-        logger.error("Failed to send confirmation email for reservation=%s: %s", reservation_id, error)
+        logger.error(
+            "Failed to send confirmation email for reservation=%s: %s", reservation_id, error
+        )
         raise
 
 

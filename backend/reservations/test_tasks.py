@@ -11,7 +11,11 @@ from PIL import Image
 from events.models import Event
 from reservations.models import Reservation
 from reservations.payments.models import Payment
-from reservations.tasks import cleanup_abandoned_payments, send_confirmation_email, send_refund_email
+from reservations.tasks import (
+    cleanup_abandoned_payments,
+    send_confirmation_email,
+    send_refund_email,
+)
 from shows.models import Show
 
 
