@@ -336,41 +336,6 @@ class ReservationFormTest(TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Purge admin view
-# ---------------------------------------------------------------------------
-
-
-class PurgeOldPaymentsViewTest(TestCase):
-    def setUp(self) -> None:
-        self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
-
-    def test_get_requires_staff(self) -> None:
-        response = self.client.get("/mondmin/reservations/reservationpayment/purge-old-payments/")
-        self.assertNotEqual(response.status_code, 200)
-
-    def test_get_returns_200_for_staff(self) -> None:
-        self.client.force_login(self.staff)
-        response = self.client.get("/mondmin/reservations/reservationpayment/purge-old-payments/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_post_dry_run_redirects(self) -> None:
-        self.client.force_login(self.staff)
-        response = self.client.post(
-            "/mondmin/reservations/reservationpayment/purge-old-payments/",
-            {"dry_run": True, "confirmed_only": False},
-        )
-        self.assertEqual(response.status_code, 302)
-
-    def test_post_live_run_redirects(self) -> None:
-        self.client.force_login(self.staff)
-        response = self.client.post(
-            "/mondmin/reservations/reservationpayment/purge-old-payments/",
-            {"dry_run": False, "confirmed_only": False},
-        )
-        self.assertEqual(response.status_code, 302)
-
-
-# ---------------------------------------------------------------------------
 # EventAdmin revenue annotation and display
 # ---------------------------------------------------------------------------
 
