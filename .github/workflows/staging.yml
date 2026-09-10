@@ -58,6 +58,8 @@ jobs:
           echo "DJANGO_SETTINGS_MODULE=config.settings.staging" >> .env
           echo "API_URL=http://localhost:8010" >> .env
           echo "FRONTEND_URL=https://testing.zirkusmond.de" >> .env
+          echo "CELERY_BROKER_URL=redis://staging_redis:6379/0" >> .env
+          echo "CELERY_RESULT_BACKEND=redis://staging_redis:6379/0" >> .env
 
           echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_TEST_PUBLISHABLE }}" >> .env
           echo "VITE_API_URL=https://testing.zirkusmond.de/api" >> .env
@@ -120,9 +122,9 @@ jobs:
           script: |
             cd ~/staging_zirkusmond
             docker compose pull
-            docker compose up -d postgres
+            docker compose up -d postgres redis
             until docker compose exec -T postgres pg_isready -U mond; do sleep 2; done
-            docker compose stop django || true
+            docker compose stop zm celery_worker celery_beat || true
             docker exec prod_postgres pg_dump -U mond monddb > ~/zirkusmond_latest.sql
             docker compose exec -T postgres psql -U mond -d postgres -c "DROP DATABASE IF EXISTS monddb;"
             docker compose exec -T postgres psql -U mond -d postgres -c "CREATE DATABASE monddb;"

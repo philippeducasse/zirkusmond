@@ -59,6 +59,8 @@ jobs:
           echo "DJANGO_SETTINGS_MODULE=config.settings.production" >> .env
           echo "API_URL=http://localhost:8010" >> .env
           echo "FRONTEND_URL=https://zirkusmond.de" >> .env
+          echo "CELERY_BROKER_URL=redis://prod_redis:6379/0" >> .env
+          echo "CELERY_RESULT_BACKEND=redis://prod_redis:6379/0" >> .env
           echo "SENTRY_DSN_BACKEND=${{ secrets.SENTRY_DSN_BACKEND }}" >> .env
           echo "SENTRY_ORG=zirkusmond" >> .env
           echo "SENTRY_PROJECT=python-django" >> .env

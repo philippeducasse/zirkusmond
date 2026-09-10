@@ -10,7 +10,15 @@ services:
       - POSTGRES_USER=mond
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
-  django:
+  redis:
+    image: redis:7-alpine
+    container_name: staging_redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - zm_redis:/data
+
+  zm:
     hostname: staging_zirkusmond_de
     image: ${DOCKER_USERNAME}/zirkusmond:staging
     env_file:
@@ -20,6 +28,29 @@ services:
       - zm_media:/srv/data
     depends_on:
       - postgres
+      - redis
+
+  celery_worker:
+    image: ${DOCKER_USERNAME}/zirkusmond:staging
+    container_name: staging_celery_worker
+    command: celery -A config worker --loglevel=info --pythonpath /usr/src/backend
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
+  celery_beat:
+    image: ${DOCKER_USERNAME}/zirkusmond:staging
+    container_name: staging_celery_beat
+    command: celery -A config beat --loglevel=info --pythonpath /usr/src/backend
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
 
 networks:
   default:
@@ -29,3 +60,4 @@ networks:
 volumes:
   zm_media:
   zm_db:
+  zm_redis:

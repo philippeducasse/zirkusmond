@@ -142,7 +142,7 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULE = {
     "cleanup-abandoned-payments": {
         "task": "reservations.tasks.cleanup_abandoned_payments",
-        "schedule": 3600.0,  # 6 hours
+        "schedule": 3600.0,  # 1 hours
     },
 }
 
