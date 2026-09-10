@@ -33,7 +33,8 @@ services:
   celery_worker:
     image: ${DOCKER_USERNAME}/zirkusmond:latest
     container_name: prod_celery_worker
-    command: celery -A config worker --loglevel=info --pythonpath /usr/src/backend
+    working_dir: /usr/src/backend
+    command: celery -A config worker --loglevel=info
     env_file:
       - .env
     restart: unless-stopped
