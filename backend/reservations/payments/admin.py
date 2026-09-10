@@ -14,7 +14,6 @@ from payments import PaymentStatus
 from unfold.admin import ModelAdmin
 
 from events.forms import EmailTextForm
-from events.services import purge_old_payments
 from reservations import emails
 from reservations.models import Reservation, ReservationPayment
 from reservations.payments.models import Payment
@@ -79,46 +78,6 @@ def send_email_to_reservants(
     return TemplateResponse(request, "admin/send_email.html", context)
 
 
-class PurgeForm(forms.Form):
-    confirmed_only = forms.BooleanField(
-        required=False, initial=False, label="Only confirmed payments"
-    )
-    dry_run = forms.BooleanField(required=False, initial=True, label="Dry run (no changes)")
-
-
-def purge_old_payments_view(request: HttpRequest) -> HttpResponseRedirect | HttpResponse:
-    if request.method == "POST":
-        form = PurgeForm(request.POST)
-        if form.is_valid():
-            result = purge_old_payments(
-                confirmed_only=form.cleaned_data["confirmed_only"],
-                dry_run=form.cleaned_data["dry_run"],
-            )
-            if result["dry_run"]:
-                messages.info(
-                    request,
-                    f"[Dry-run] Found {result['payments_found']} payments before {result['cutoff']:%Y-%m-%d}; "
-                    f"visitors to add: {result['visitors_to_add']}.",
-                )
-            else:
-                messages.success(
-                    request,
-                    f"Deleted {result['deleted_count']} payments; "
-                    f"+{result['visitors_to_add']} visitors accumulated. "
-                    f"deleted_visitors now {result['final_deleted_visitors']}.",
-                )
-            return redirect("/mondmin/reservations/reservationpayment/purge-old-payments/")
-    else:
-        form = PurgeForm()
-
-    context = {
-        "form": form,
-        "title": "Purge old payments (~6 months)",
-        "subtitle": "Deletes old ReservationPayments and updates deleted_visitors.",
-    }
-    return render(request, "admin_purge_old_payments.html", context)
-
-
 class ReservationPaymentStatusFilter(admin.SimpleListFilter):
     title = "Status"
     parameter_name = "status"
@@ -162,17 +121,6 @@ class ReservationPaymentEventFilter(admin.SimpleListFilter):
 
 
 class ReservationPaymentAdmin(ModelAdmin):
-    change_list_template = "admin/reservations/reservationpayment/change_list.html"
-
-    def get_urls(self) -> list[URLPattern | URLResolver]:
-        return [
-            path(
-                "purge-old-payments/",
-                self.admin_site.admin_view(purge_old_payments_view),
-                name="reservationpayment_purge_old_payments",
-            ),
-        ] + super().get_urls()
-
     list_display = [
         "reservation",
         "status",
@@ -235,6 +183,7 @@ class PaymentStatusFilter(admin.SimpleListFilter):
             (Payment.Status.COMPLETED, "Completed"),
             (Payment.Status.FAILED, "Failed"),
             (Payment.Status.REFUNDED, "Refunded"),
+            (Payment.Status.ABANDONED, "Abandoned"),
         ]
 
     def queryset(self, request: HttpRequest, queryset: QuerySet[Payment]) -> QuerySet[Payment]:

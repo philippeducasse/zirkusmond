@@ -114,6 +114,7 @@ class Payment(models.Model):
         COMPLETED = "completed"
         FAILED = "failed"
         REFUNDED = "refunded"
+        ABANDONED = "abandoned"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     payment_method = models.CharField(

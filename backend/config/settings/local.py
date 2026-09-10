@@ -14,3 +14,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False
+
+# Celery - eager mode for local testing (tasks run synchronously, no broker needed)
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True

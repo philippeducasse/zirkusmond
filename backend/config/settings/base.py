@@ -133,6 +133,19 @@ LOGGING_CONFIG = None
 logging.config.dictConfig(LOGGING)
 
 
+# Celery
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_TIMEZONE = TIME_ZONE
+
+# Celery Beat - cleanup abandoned payments every 6 hours
+CELERY_BEAT_SCHEDULE = {
+    "cleanup-abandoned-payments": {
+        "task": "reservations.tasks.cleanup_abandoned_payments",
+        "schedule": 3600.0,  # 6 hours
+    },
+}
+
 # sentry
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN_BACKEND", ""),
