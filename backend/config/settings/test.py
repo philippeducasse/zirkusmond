@@ -18,6 +18,10 @@ PAYMENT_USES_SSL = False
 # Disable Sentry in tests
 os.environ["SENTRY_DSN_BACKEND"] = ""
 
+# Celery - eager mode for tests (tasks run synchronously)
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
 logging.config.dictConfig(
     {
         "version": 1,
