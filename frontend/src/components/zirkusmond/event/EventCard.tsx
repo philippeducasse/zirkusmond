@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -39,39 +39,11 @@ const EventCard = ({
 }: EventCardProps) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
   const visibleDates = eventDates.slice(0, 3);
   const hiddenDates = eventDates.slice(3);
 
-  useEffect(() => {
-    if (typeof window === "undefined" || window.innerWidth >= 768) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsVisible(entry.isIntersecting);
-    });
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
-      }
-    };
-  }, []);
-
   return (
-    <Card
-      ref={cardRef}
-      className={cn(
-        "relative mx-auto h-full w-[90vw] sm:w-md cursor-pointer justify-between border-[5px] border-double border-[#e7b548] bg-black/20 pt-0 transition-all duration-300 hover:-translate-y-1 hover:border-[#e7b548]/80 hover:bg-black/10",
-        isVisible
-          ? "md:shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)] md:hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_rgba(246,174,66,0.8)] animate-[shadow-pulse_2s_ease-in-out_infinite] md:translate-y-0 -translate-y-1.5"
-          : "shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)] hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_rgba(246,174,66,0.8)]",
-      )}
-    >
+    <Card className="relative mx-auto h-full w-[90vw] sm:w-md cursor-pointer justify-between border-[5px] border-double border-[#e7b548] bg-black/20 pt-0 shadow-[0_10px_25px_-8px_rgba(0,0,0,0.5),0_0_18px_-6px_rgba(246,174,66,0.55)] transition-all duration-300 hover:-translate-y-1 hover:border-[#e7b548]/80 hover:bg-black/10 hover:shadow-[0_16px_32px_-10px_rgba(0,0,0,0.6),0_0_28px_-4px_rgba(246,174,66,0.8)]">
       <img
         src={eventImageUrl}
         alt="Event cover"
