@@ -1,3 +1,5 @@
+import os
+
 from .base import *
 
 DEBUG = True
@@ -12,6 +14,9 @@ DATABASES = {
 SECRET_KEY = "test-secret-key-for-ci"
 PAYMENT_HOST = "localhost:8000"
 PAYMENT_USES_SSL = False
+
+# Disable Sentry in tests
+os.environ["SENTRY_DSN_BACKEND"] = ""
 
 logging.config.dictConfig(
     {
