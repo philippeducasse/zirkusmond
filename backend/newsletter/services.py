@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def register_email_to_mailchimp(email: str) -> None:
     client = mailchimp_marketing.Client()
     client.set_config(
-        {"api_key": settings.NEWSLETTER_TOKEN, "server": settings.MAILCHIMP_SERVER_PREFIX}
+        {"api_key": settings.MAILCHIMP_API_KEY, "server": settings.MAILCHIMP_SERVER_PREFIX}
     )
 
     subscriber_hash = hashlib.md5(email.lower().encode()).hexdigest()

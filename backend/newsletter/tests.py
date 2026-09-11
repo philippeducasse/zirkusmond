@@ -15,7 +15,7 @@ class RegisterEmailToMailchimpTest(TestCase):
     def test_calls_mailchimp_with_correct_config(
         self, mock_settings: MagicMock, mock_client_class: MagicMock
     ) -> None:
-        mock_settings.NEWSLETTER_TOKEN = "test-api-key"
+        mock_settings.MAILCHIMP_API_KEY = "test-api-key"
         mock_settings.MAILCHIMP_SERVER_PREFIX = "us12"
         mock_settings.MAILCHIMP_AUDIENCE_ID = "audience123"
 
@@ -33,7 +33,7 @@ class RegisterEmailToMailchimpTest(TestCase):
     def test_calls_set_list_member_with_correct_params(
         self, mock_settings: MagicMock, mock_client_class: MagicMock
     ) -> None:
-        mock_settings.NEWSLETTER_TOKEN = "test-api-key"
+        mock_settings.MAILCHIMP_API_KEY = "test-api-key"
         mock_settings.MAILCHIMP_SERVER_PREFIX = "us12"
         mock_settings.MAILCHIMP_AUDIENCE_ID = "audience123"
 
@@ -55,7 +55,7 @@ class RegisterEmailToMailchimpTest(TestCase):
     def test_normalizes_email_case_for_hash(
         self, mock_settings: MagicMock, mock_client_class: MagicMock
     ) -> None:
-        mock_settings.NEWSLETTER_TOKEN = "test-api-key"
+        mock_settings.MAILCHIMP_API_KEY = "test-api-key"
         mock_settings.MAILCHIMP_SERVER_PREFIX = "us12"
         mock_settings.MAILCHIMP_AUDIENCE_ID = "audience123"
 

@@ -91,11 +91,11 @@ ASGI_APPLICATION = "config.asgi.application"
 PAYMENT_MODEL = "reservations.ReservationPayment"
 
 # Stripe configuration
-STRIPE_TOKEN = os.environ.get("STRIPE_TOKEN") or os.environ.get(
-    "STRIPE_TEST_TOKEN", ""
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY") or os.environ.get(
+    "STRIPE_TEST_SECRET_KEY", ""
 )
-STRIPE_HOOK_TOKEN = os.environ.get("STRIPE_HOOK_TOKEN") or os.environ.get(
-    "STRIPE_TEST_HOOK_TOKEN", ""
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET") or os.environ.get(
+    "STRIPE_TEST_WEBHOOK_SECRET", ""
 )
 
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
@@ -105,7 +105,7 @@ ANYMAIL = {
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "reservation@zirkusmond.de")
 
 # Mailchimp
-NEWSLETTER_TOKEN = os.environ.get("NEWSLETTER_TOKEN", "")
+MAILCHIMP_API_KEY = os.environ.get("MAILCHIMP_API_KEY", "")
 MAILCHIMP_SERVER_PREFIX = os.environ.get("MAILCHIMP_SERVER_PREFIX", "")
 MAILCHIMP_AUDIENCE_ID = os.environ.get("MAILCHIMP_AUDIENCE_ID", "")
 

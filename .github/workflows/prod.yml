@@ -49,10 +49,10 @@ jobs:
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> .env
           echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "BREVO_API_KEY=${{ secrets.MAILER_TOKEN }}" >> .env
-          echo "STRIPE_TOKEN=${{ secrets.STRIPE_TOKEN }}" >> .env
-          echo "STRIPE_HOOK_TOKEN=${{ secrets.STRIPE_HOOK_TOKEN }}" >> .env
-          echo "NEWSLETTER_TOKEN=${{ secrets.NEWSLETTER_TOKEN }}" >> .env
+          echo "BREVO_API_KEY=${{ secrets.BREVO_API_KEY }}" >> .env
+          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_LIVE_SECRET_KEY }}" >> .env
+          echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> .env
+          echo "MAILCHIMP_API_KEY=${{ secrets.MAILCHIMP_API_KEY }}" >> .env
           echo "MAILCHIMP_SERVER_PREFIX=${{ secrets.MAILCHIMP_SERVER_PREFIX }}" >> .env
           echo "MAILCHIMP_AUDIENCE_ID=${{ secrets.MAILCHIMP_AUDIENCE_ID }}" >> .env
           echo "DB_HOST=prod_postgres" >> .env
@@ -67,14 +67,14 @@ jobs:
           echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .env
 
           # Frontend .env
-          echo "VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }}" >> .env
+          echo "VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_LIVE_PUBLISHABLE_KEY }}" >> .env
           echo "VITE_API_URL=https://zirkusmond.de/api"  >> .env
           echo "VITE_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONTEND }}" >> .env
 
       - name: Build Zirkusmond image
         run: |
           docker build -f deploy/Dockerfile \
-            --build-arg VITE_STRIPE_PUBLISHABLE=${{ secrets.STRIPE_PUBLISHABLE }} \
+            --build-arg VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.STRIPE_LIVE_PUBLISHABLE_KEY }} \
             --build-arg VITE_API_URL=https://zirkusmond.de/api \
             --build-arg VITE_SENTRY_DSN=${{ secrets.SENTRY_DSN_FRONTEND }} \
             --build-arg SENTRY_ORG=zirkusmond \

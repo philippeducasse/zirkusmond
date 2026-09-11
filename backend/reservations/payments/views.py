@@ -49,7 +49,7 @@ class CreatePaymentIntentView(generics.GenericAPIView):
     authentication_classes = []
 
     def post(self, request: Request, reservation_id: uuid.UUID) -> Response:
-        stripe.api_key = settings.STRIPE_TOKEN
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
         reservation = get_object_or_404(Reservation, id=reservation_id)
         serializer = self.get_serializer(data=request.data)
@@ -81,7 +81,7 @@ class CreatePaymentIntentView(generics.GenericAPIView):
 
 def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
     """Handle Stripe redirect after payment attempt."""
-    stripe.api_key = settings.STRIPE_TOKEN
+    stripe.api_key = settings.STRIPE_SECRET_KEY
 
     payment_intent_id = request.GET.get("payment_intent")
     reservation_id = request.GET.get("reservationId")
@@ -156,14 +156,14 @@ class StripeWebhookView(APIView):
     authentication_classes = []
 
     def post(self, request: Request) -> Response | JsonResponse:
-        stripe.api_key = settings.STRIPE_TOKEN
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
         payload = request.body
         sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
 
         try:
             event: stripe.Event = stripe.Webhook.construct_event(
-                payload, sig_header, settings.STRIPE_HOOK_TOKEN
+                payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
             )
         except ValueError as e:
             logger.error("stripe_webhook: invalid payload: %s", e)

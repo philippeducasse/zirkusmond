@@ -3,7 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import type { Appearance, StripeElementsOptions } from "@stripe/stripe-js";
 import StripePaymentForm from "./StripePaymentForm.tsx";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 // Same Google Fonts stylesheet already loaded for Manrope in styles.css -
 // Stripe renders Elements in an iframe so the font has to be handed to it explicitly.
