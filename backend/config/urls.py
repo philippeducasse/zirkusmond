@@ -17,7 +17,7 @@ urlpatterns = [
     path("", include("shows.urls")),
     path("", include("reservations.urls")),
     # Sentry dummy route
-    path("sentry-debug/", views.trigger_error),
+    # path("sentry-debug/", views.trigger_error),
 ]
 
 if settings.DEBUG:
