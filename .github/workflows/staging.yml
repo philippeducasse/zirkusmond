@@ -111,6 +111,6 @@ jobs:
             docker compose exec -T postgres psql -U mond -d postgres -c "CREATE DATABASE monddb;"
             docker compose exec -T postgres psql -U mond monddb < ~/zirkusmond_latest.sql
             docker run --rm -v ubuntu_zm_media:/src:ro -v staging_zirkusmond_zm_media:/dst alpine sh -c "mkdir -p /dst/media && cp -a /src/media/. /dst/media/"
-            docker compose up -d --remove-orphans
+            docker compose up -d --force-recreate --remove-orphans
             docker image prune -f
             docker exec nginx-nginx-1 nginx -s reload || true
