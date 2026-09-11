@@ -85,13 +85,22 @@ jobs:
       - name: Push to registry
         run: docker push ${{ secrets.DOCKER_USERNAME }}/zirkusmond:latest
 
-      - name: Copy files to server
+      - name: Copy .env to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".env,deploy/prod/docker-compose.yml"
+          source: ".env"
+          target: "~/zirkusmond/"
+
+      - name: Copy docker-compose to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "deploy/prod/docker-compose.yml"
           target: "~/zirkusmond/"
           strip_components: 2
 
