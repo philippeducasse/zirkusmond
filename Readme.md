@@ -4,17 +4,68 @@
 
 # Zirkusmond
 
-Website and booking platform for Zirkusmond: show listings, ticket reservations, QR-code ticket scanning, and a newsletter, backed by a Django app with a Tanstack Start frontend.
+Website and booking platform for the touring circus show Zirkusmond.
 
-## Stack
+The app covers show listings, ticket reservations, Stripe payments, QR-code ticket scanning,
+newsletter signup, and rental information.
 
-- **Backend**: Django (`backend/`), managed with [uv](https://docs.astral.sh/uv/), Python 3.12. Key apps: `shows`, `reservations` (incl. payments and QR scanning), `rentals`, `newsletter`, `stats`.
-- **Frontend**: Tanstack Start + Vite (`frontend/`), Tailwind CSS.
-- **Deploy**: Dockerized, deployed via GitHub Actions to `staging` and `prod` branches (see `deploy/` and `.github/workflows/`).
+## Current architecture
+
+This repository is a two-part application:
+
+- **`backend/`** — Django 5 app, managed with [uv](https://docs.astral.sh/uv/)
+- **`frontend/`** — TanStack Start + React 19 app, managed with `pnpm`
+
+The frontend is the user-facing website. It fetches data from Django and proxies browser API
+requests through TanStack Start to avoid CORS issues in development.
+
+### Backend apps
+
+Key Django apps:
+
+- **`events`** — dated performances for a show
+- **`shows`** — show data, descriptions, pricing, images
+- **`reservations`** — reservations, guests, tickets, QR scanning
+- **`reservations/payments`** — Stripe payment flows
+- **`newsletter`** — newsletter signup and sending
+- **`rentals`** — rental information
+- **`stats`** — admin-facing reporting
+- **`homepage_elements`** — homepage content blocks managed in Django
+
+Django settings live in `backend/config/settings/` and are split by environment (`local`, `test`,
+`staging`, `production`).
+
+### Frontend
+
+- File-based routing with TanStack Router in `frontend/src/routes/`
+- React Query for data fetching and caching
+- i18next for translations (`frontend/messages/`)
+- Tailwind CSS 4 for styling
+- Server-side rendering via TanStack Start
+
+## Repository layout
+
+```text
+backend/        Django project and apps
+frontend/       TanStack Start app
+deploy/         Docker and nginx deployment files
+docs/           Project documentation
+.github/        CI/CD workflows
+```
 
 ## Getting started
 
-Backend:
+### Requirements
+
+- Python 3.12
+- [uv](https://docs.astral.sh/uv/)
+- Node.js
+- `pnpm`
+- optionally `direnv` for loading `.envrc`
+
+Environment variables are loaded via `.envrc`/direnv. Do not commit real secrets.
+
+### Backend
 
 ```bash
 cd backend
@@ -23,40 +74,77 @@ uv run manage.py migrate
 uv run manage.py runserver
 ```
 
-Frontend:
+### Frontend
 
 ```bash
 cd frontend
-npm install
-npm run dev       # dev server
-npm run tailwind  # watch & rebuild Tailwind CSS into backend/static/css
+pnpm install
+pnpm run dev
 ```
 
-Required environment variables (Django secret key, DB, email, Stripe/PayPal keys, etc.) are loaded via `.envrc`/direnv — see that file for the full list. Never commit real secret values; use placeholders/local overrides instead.
+The frontend dev server runs on port `3000`.
 
-## Testing
+### Run both
+
+From the repository root:
+
+```bash
+make dev
+```
+
+## Common commands
+
+### Backend
 
 ```bash
 cd backend
 uv run pytest
+uv run pytest -k test_name
+uv run ruff check --fix
+uv run ruff format
 ```
 
-Tests run automatically on every push/PR via the `tests` GitHub Actions workflow.
+### Frontend
+
+```bash
+cd frontend
+pnpm test
+pnpm run lint
+pnpm run format
+pnpm run check
+pnpm exec tsc --noEmit
+pnpm run build
+```
+
+## Payments
+
+The payment code is currently in transition inside `backend/reservations/payments/`:
+
+- `ReservationPayment` is the older `django-payments`-based flow
+- `Payment` is the newer Stripe `PaymentIntent`-based flow
+
+If you are working on payments, check which flow a view, webhook, or template is using before
+making changes.
+
+## Testing and CI
+
+CI runs on every push and pull request:
+
+- **Backend:** `uv run pytest`
+- **Frontend:** `pnpm exec tsc --noEmit`
+
+Pre-commit hooks handle backend Ruff checks plus general whitespace/YAML/JSON safety checks.
+
+## Deployment
+
+- Work from **`main`**
+- **`staging`** and **`prod`** are deployment branches
+- Deployment is Dockerized and configured in `deploy/`
+- GitHub Actions in `.github/workflows/` drive CI and deploys
 
 ## Contributing
 
-- Branch off `main` for new work; `staging` and `prod` are deploy branches driven by their own workflows, don't commit directly to them.
-- Install the pre-commit hooks before making changes: `pre-commit install`. They run `ruff` (lint + format) on the backend, `prettier` + `eslint` on the frontend, and basic whitespace/YAML/JSON/merge-conflict checks on every commit.
-- Backend code is linted/formatted with `ruff` (`uv run ruff check --fix` / `uv run ruff format`); keep to the project's `line-length = 100` and `target-version = "py312"` (see `backend/pyproject.toml`). The `ruff` version is pinned there and mirrored in `.pre-commit-config.yaml` — bump both together.
-- Frontend code is formatted with `prettier` (defaults: double quotes, semicolons) and linted with `eslint` (`func-style` enforces arrow functions); run `npm run check && npm run lint` in `frontend/` before opening a PR.
-- Add or update tests for any backend logic change and make sure `uv run pytest` passes before opening a PR.
-- Keep PRs focused and small where possible; describe _why_ a change is needed, not just what changed.
-- Open a PR against `main`; CI (tests workflow) must pass before merging. It fails on lint or formatting errors (backend `ruff`, frontend `prettier`/`eslint`) as well as test failures.
-
-# cookie popover
-
-# add way for juan to change videos && images
-
-# early bird tickets
-
-# tickets umbuchen
+- Keep changes focused
+- Add or update tests when changing backend behavior
+- Run the relevant lint/test commands before opening a PR
+- Open pull requests against `main`
