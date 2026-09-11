@@ -134,9 +134,13 @@ Wir oeffnen unsere Tore um {reservation.event.admission_time()}, die Show beginn
 Falls du noch nie in unserem Zelt warst, empfehlen wir dir, dir den Weg ueber OpenStreetMap zeigen zu lassen:
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
+Und falls du nicht nur Lust auf Zirkus, sondern auch auf Code hast: Die Website von Zirkus Mond ist auf GitHub oeffentlich einsehbar. Wenn du Fehler findest, Ideen hast oder ein wenig digitalen Glitzer beisteuern moechtest, freuen wir uns sehr ueber deinen Beitrag:
+https://github.com/philippeducasse/zirkusmond
+
 Wir freuen uns auf dich im Zirkus Mond - viel Spass!
 
 Bitte beachte, dass Tickets nicht erstattungsfaehig sind. Falls du verhindert bist, kannst du dein Ticket gerne an jemand anderen weitergeben - gib einfach den QR-Code weiter.
+
 ------------------------------------------------------------
 
 Dear {reservation.first_name},
@@ -152,6 +156,9 @@ We open our gates at {reservation.event.admission_time()}, the Show will start a
 
 If you have not been to our tent yet, you should ask OpenStreetMap for directions.
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
+
+And if you are not only into circus but also into code: the Zirkus Mond website is public on GitHub. If you spot a bug, have an idea, or want to sprinkle in a little digital glitter, we would love your contribution:
+https://github.com/philippeducasse/zirkusmond
 
 See you at Zirkus Mond and have fun!
 
