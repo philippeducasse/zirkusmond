@@ -6,9 +6,8 @@ import ContentSection from "#/components/zirkusmond/general/ContentSection";
 import TeamGrid from "#/components/zirkusmond/general/TeamGrid";
 import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
 import SectionCard from "#/components/zirkusmond/general/SectionCard";
+import OpenSource from "#/components/zirkusmond/home/OpenSource";
 import { useTranslation } from "react-i18next";
-
-const GITHUB_REPO_URL = "https://github.com/philippeducasse/zirkusmond";
 
 const About = () => {
   const { t } = useTranslation();
@@ -64,20 +63,7 @@ const About = () => {
       <TeamGrid members={team} />
 
       <SectionDivider type="flower" />
-      <PageHeader>{t("page_about_open_source_title")}</PageHeader>
-      <ContentSection className="text-center max-w-3xl mx-auto">
-        <SectionCard className="space-y-4">
-          <p>{t("page_about_open_source_content")}</p>
-          <a
-            href={GITHUB_REPO_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="text-base text-primary"
-          >
-            {t("page_about_open_source_link")}
-          </a>
-        </SectionCard>
-      </ContentSection>
+      <OpenSource />
     </PageContainer>
   );
 };

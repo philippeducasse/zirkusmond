@@ -7,9 +7,11 @@ import Hero from "#/components/zirkusmond/home/Hero";
 import { homepageQueryOptions } from "#/lib/api.ts";
 import PageContainer from "#/components/zirkusmond/general/PageContainer";
 import ContactSection from "#/components/zirkusmond/home/ContactSection";
+import OpenSource from "#/components/zirkusmond/home/OpenSource";
 import HomepagePopup from "#/components/zirkusmond/home/django-admin-elements/popup/HomepagePopup";
 import InlineSection from "#/components/zirkusmond/home/django-admin-elements/inline-section/InlineSection";
 import type { InlineSectionElement } from "#/interfaces/homepage-element";
+import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
 
 const App = () => {
   // TanStack Query: resolves instantly from the cache filled by the loader
@@ -30,8 +32,11 @@ const App = () => {
         <EventsSection shows={data.upcomingShows} showAllEventsLink />
         {/* <GallerySection /> */}
         {postShowSection && <InlineSection element={postShowSection} />}
+        <SectionDivider type="kite" />
 
         <ContactSection />
+        <SectionDivider type="flower" />
+        <OpenSource />
       </PageContainer>
       <HomepagePopup elements={data.additionalElements} />
     </>
