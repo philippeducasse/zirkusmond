@@ -14,6 +14,7 @@ import type { InlineSectionElement } from "#/interfaces/homepage-element";
 import SectionDivider from "#/components/zirkusmond/general/SectionDivider";
 
 const App = () => {
+  //
   // TanStack Query: resolves instantly from the cache filled by the loader
   // (no loading state needed); would suspend only on a cache miss.
   const { data } = useSuspenseQuery(homepageQueryOptions);
