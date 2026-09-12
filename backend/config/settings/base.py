@@ -151,9 +151,14 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 # sentry
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN_BACKEND", ""),
-    # Add data like request headers and IP for users,
-    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
-    send_default_pii=True,
-)
+# Only initialize when a DSN is actually configured (e.g. staging/production) -- in local dev
+# this is unset, and initializing anyway registers atexit/shutdown hooks for no benefit, which
+# can race with interpreter teardown when the dev server is killed by a signal.
+SENTRY_DSN_BACKEND = os.environ.get("SENTRY_DSN_BACKEND", "")
+if SENTRY_DSN_BACKEND:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN_BACKEND,
+        # Add data like request headers and IP for users,
+        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+        send_default_pii=True,
+    )
