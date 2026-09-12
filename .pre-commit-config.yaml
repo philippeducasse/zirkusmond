@@ -20,6 +20,15 @@ repos:
 
   - repo: local
     hooks:
+      - id: mypy
+        name: mypy (backend)
+        # Non-blocking for now: the codebase predates type annotations, so this
+        # surfaces issues without failing commits. Tighten once errors are cleared.
+        entry: bash -c 'cd backend && uv run mypy . || true'
+        language: system
+        files: ^backend/.*\.py$
+        exclude: ^backend/.*/migrations/
+        pass_filenames: false
       - id: prettier
         name: prettier (frontend)
         entry: bash -c 'cd frontend && pnpm exec prettier --check .'
