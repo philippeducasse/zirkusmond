@@ -8,6 +8,7 @@ UNFOLD = {
     "SITE_TITLE": "Zirkusmond admin panel",
     "SITE_HEADER": "Zirkusmond",
     "SITE_SUBHEADER": "Admin Panel",
+    "DASHBOARD_CALLBACK": "stats.dashboard.dashboard_callback",
     "SITE_ICON": lambda request: static("images/logo.webp"),
     "SITE_FAVICONS": [
         {

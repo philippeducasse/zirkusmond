@@ -1,0 +1,43 @@
+{% extends 'admin/base.html' %}
+
+{% load i18n unfold %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+  {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block content %}
+  {% component "unfold/components/container.html" %}
+    <div class="flex flex-col gap-6">
+      {% component "unfold/components/navigation.html" with items=range_options %}
+      {% endcomponent %}
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {% for kpi in kpis %}
+          {% component "unfold/components/card.html" %}
+            {% component "unfold/components/text.html" %}
+              {{ kpi.title }}
+            {% endcomponent %}
+            {% component "unfold/components/title.html" %}
+              {{ kpi.metric }}
+            {% endcomponent %}
+          {% endcomponent %}
+        {% endfor %}
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {% component "unfold/components/card.html" with title=visits_chart_title %}
+          {% component "unfold/components/chart/line.html" with component_class="VisitorsLineChart" %}
+          {% endcomponent %}
+        {% endcomponent %}
+
+        {% component "unfold/components/card.html" with title=device_chart_title %}
+          {% component "unfold/components/chart/bar.html" with component_class="DeviceBreakdownBarChart" %}
+          {% endcomponent %}
+        {% endcomponent %}
+      </div>
+    </div>
+  {% endcomponent %}
+{% endblock %}
