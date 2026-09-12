@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import ContentSection from "#/components/zirkusmond/general/ContentSection";
 import SectionCard from "#/components/zirkusmond/general/SectionCard";
 
-const GITHUB_REPO_URL = "https://github.com/philippeducasse/zirkusmond";
+const GITHUB_REPO_URL = "https://github.com/zirkusmond/zirkusmond";
 
 export default function OpenSource() {
   const { t } = useTranslation();

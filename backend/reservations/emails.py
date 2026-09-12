@@ -145,7 +145,7 @@ Falls du noch nie in unserem Zelt warst, empfehlen wir dir, dir den Weg ueber Op
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
 Und falls du nicht nur Lust auf Zirkus, sondern auch auf Code hast: Die Website von Zirkus Mond ist auf GitHub oeffentlich einsehbar. Wenn du Fehler findest, Ideen hast oder ein wenig digitalen Glitzer beisteuern moechtest, freuen wir uns sehr ueber deinen Beitrag:
-https://github.com/philippeducasse/zirkusmond
+https://github.com/zirkusmond/zirkusmond
 
 Wir freuen uns auf dich im Zirkus Mond - viel Spass!
 
@@ -168,7 +168,7 @@ If you have not been to our tent yet, you should ask OpenStreetMap for direction
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
 
 And if you are not only into circus but also into code: the Zirkus Mond website is public on GitHub. If you spot a bug, have an idea, or want to sprinkle in a little digital glitter, we would love your contribution:
-https://github.com/philippeducasse/zirkusmond
+https://github.com/zirkusmond/zirkusmond
 
 See you at Zirkus Mond and have fun!
 

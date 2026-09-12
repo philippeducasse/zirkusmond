@@ -1,6 +1,6 @@
-[![tests](https://github.com/philippeducasse/zirkusmond/actions/workflows/tests.yml/badge.svg)](https://github.com/philippeducasse/zirkusmond/actions/workflows/tests.yml)
-[![staging](https://github.com/philippeducasse/zirkusmond/actions/workflows/staging.yml/badge.svg)](https://github.com/philippeducasse/zirkusmond/actions/workflows/staging.yml)
-[![prod](https://github.com/philippeducasse/zirkusmond/actions/workflows/prod.yml/badge.svg)](https://github.com/philippeducasse/zirkusmond/actions/workflows/prod.yml)
+[![tests](https://github.com/zirkusmond/zirkusmond/actions/workflows/tests.yml/badge.svg)](https://github.com/zirkusmond/zirkusmond/actions/workflows/tests.yml)
+[![staging](https://github.com/zirkusmond/zirkusmond/actions/workflows/staging.yml/badge.svg)](https://github.com/zirkusmond/zirkusmond/actions/workflows/staging.yml)
+[![prod](https://github.com/zirkusmond/zirkusmond/actions/workflows/prod.yml/badge.svg)](https://github.com/zirkusmond/zirkusmond/actions/workflows/prod.yml)
 
 # Zirkusmond
 
