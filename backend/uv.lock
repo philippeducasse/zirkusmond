@@ -678,6 +678,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-debug-toolbar"
+version = "8.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "sqlparse" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4f/3d/aa093a841f32837311538e7952f5548b1a9c605a5aba5395163fbc54ac59/django_debug_toolbar-8.0.0.tar.gz", hash = "sha256:cae32d3e441e608f39f3f1ca6b3f028c38d5d04d74c98d8ab96d46022dee3163", size = 1239141, upload-time = "2026-09-01T18:27:56.934Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/22/bd/ffd3f171940c58cca7971d1e5b81d6ab67b85a9569fe9d9fe13f7fbd1c99/django_debug_toolbar-8.0.0-py3-none-any.whl", hash = "sha256:329dfd6e1c26d9b4501a5cc69294c8bb734206ccb1bd36e96afc4d14128b630a", size = 437877, upload-time = "2026-09-01T18:27:55.018Z" },
+]
+
+[[package]]
 name = "django-extensions"
 version = "4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2366,6 +2379,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "django-debug-toolbar" },
     { name = "pytest-cov" },
     { name = "pytest-django" },
     { name = "ruff" },
@@ -2399,6 +2413,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "django-debug-toolbar", specifier = ">=8.0.0" },
     { name = "pytest-cov", specifier = "==5.0.0" },
     { name = "pytest-django", specifier = "==4.12.0" },
     { name = "ruff", specifier = "==0.15.18" },
