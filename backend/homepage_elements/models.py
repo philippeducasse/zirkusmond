@@ -10,6 +10,11 @@ class HomePageElement(models.Model):
     active = models.BooleanField(default=False)
     link = models.CharField(max_length=255, blank=True)
 
+    # Declared explicitly so subclasses (and this base class itself, via
+    # type(self) in save()) have a statically known manager - Django would
+    # otherwise add the same default manager to each concrete subclass anyway.
+    objects: models.Manager["HomePageElement"] = models.Manager()
+
     class Meta:
         abstract = True
 

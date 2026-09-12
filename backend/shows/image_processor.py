@@ -9,7 +9,7 @@ def process_show_image(
     image_field: ImageFieldFile, max_width: int, quality: int = 65, crop: bool = True
 ) -> ContentFile:
     """Crop to specific ratio, resize, and covert to webp for maximum performance."""
-    img = Image.open(image_field)
+    img: Image.Image = Image.open(image_field)
     img = ImageOps.exif_transpose(img)  # respect camera rotation
     img = img.convert("RGB")
 
@@ -31,7 +31,7 @@ def process_show_image(
 
     if img.width > max_width:
         new_height = int(max_width * img.height / img.width)
-        img = img.resize((max_width, new_height), Image.LANCZOS)
+        img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
 
     buffer = BytesIO()
     img.save(buffer, format="WEBP", quality=quality, method=6)

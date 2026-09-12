@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib import admin
 from django.db import models
@@ -73,7 +73,7 @@ class Show(models.Model):
     CARD_IMAGE_MAX_WIDTH = 900
 
     def save(self, *args, **kwargs):
-        if self.card_image and not self.card_image.name.endswith(".webp"):
+        if self.card_image.name and not self.card_image.name.endswith(".webp"):
             content = process_show_image(
                 self.card_image,
                 max_width=self.CARD_IMAGE_MAX_WIDTH,
@@ -81,7 +81,7 @@ class Show(models.Model):
             self.card_image.save(
                 f"{self.card_image.name.rsplit('.', 1)[0]}.webp", content, save=False
             )
-        if self.banner_image and not self.banner_image.name.endswith(".webp"):
+        if self.banner_image.name and not self.banner_image.name.endswith(".webp"):
             content = process_show_image(self.banner_image, max_width=1600, crop=False)
             self.banner_image.save(
                 f"{self.banner_image.name.rsplit('.', 1)[0]}.webp", content, save=False
@@ -135,7 +135,7 @@ class Show(models.Model):
 
 
 class UpcomingShow(Show):
-    objects = UpcomingShowManager()
+    objects: ClassVar[UpcomingShowManager] = UpcomingShowManager()
 
     class Meta:
         proxy = True
@@ -146,7 +146,7 @@ class UpcomingShow(Show):
 
 
 class UnscheduledShow(Show):
-    objects = UnscheduledShowManager()
+    objects: ClassVar[UnscheduledShowManager] = UnscheduledShowManager()
 
     class Meta:
         proxy = True
@@ -155,7 +155,7 @@ class UnscheduledShow(Show):
 
 
 class PastShow(Show):
-    objects = PastShowManager()
+    objects: ClassVar[PastShowManager] = PastShowManager()
 
     class Meta:
         proxy = True

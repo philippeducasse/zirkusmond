@@ -45,8 +45,13 @@ class ReservationPayment(BasePayment):
         )
 
     def get_purchased_items(self) -> Iterator[PurchasedItem]:
+        if self.reservation is None or self.reservation.event is None:
+            return
+        show = self.reservation.event.show
+        if show is None:
+            return
         yield PurchasedItem(
-            name=f"{self.reservation.event.show.title} {self.reservation.event}",
+            name=f"{show.title} {self.reservation.event}",
             sku=self.reservation.event.pk,
             quantity=self.reservation.ticket_count(),
             price=self.ticket_price,
@@ -57,8 +62,8 @@ class ReservationPayment(BasePayment):
     def ticket_price(self) -> Decimal:
         if self.custom_ticket_price is not None:
             return Decimal(self.custom_ticket_price)
-        show = self.reservation.event.show
-        price = show.base_ticket_price if show.base_ticket_price else show.reservation_price
+        show = self.reservation.event.show if self.reservation and self.reservation.event else None
+        price = (show.base_ticket_price or show.reservation_price) if show else None
         if not price:
             price = Decimal(15.0)
         return price
@@ -66,7 +71,9 @@ class ReservationPayment(BasePayment):
     def validate_custom_price(self, base_price: int | None) -> bool:
         if self.custom_ticket_price is None:
             return True
-        show = self.reservation.event.show
+        show = self.reservation.event.show if self.reservation and self.reservation.event else None
+        if show is None:
+            return False
         min_price = show.get_effective_min_price(base_price)
         max_price = show.get_effective_max_price(base_price)
         return min_price <= self.custom_ticket_price <= max_price
@@ -100,6 +107,11 @@ class ReservationPayment(BasePayment):
 
 
 class Payment(models.Model):
+    if TYPE_CHECKING:
+        # Set on the instance after Stripe intent creation (CreatePaymentIntentView) to
+        # pass the client secret through to PaymentIntentResponseSerializer - not a DB field.
+        _client_secret: str | None
+
     class PaymentMethod(models.TextChoices):
         CARD = "card"
         PAYPAL = "paypal"
@@ -143,7 +155,9 @@ class Payment(models.Model):
         from reservations.models import Reservation
 
         reservation = Reservation.objects.select_related("event__show").get(pk=reservation.pk)
-        show = reservation.event.show
+        show = reservation.event.show if reservation.event else None
+        if show is None:
+            raise ValueError("Reservation has no associated show")
         base = show.base_ticket_price
         min_price = show.get_effective_min_price(base)
         max_price = show.get_effective_max_price(base)

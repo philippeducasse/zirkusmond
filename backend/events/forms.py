@@ -31,7 +31,7 @@ class ReservationForm(ModelForm):
         )
 
     def clean(self) -> None:
-        cleaned_data = super().clean()
+        cleaned_data = super().clean() or {}
         event = cleaned_data.get("event")
         if event and not event.reservation_open():
             self.add_error("event", "Sorry, Reservation for this Event is closed")
@@ -48,7 +48,7 @@ class GuestForm(ModelForm):
         return ((self["first_name"], self["last_name"]),)
 
     def clean(self) -> None:
-        cleaned_data = super().clean()
+        cleaned_data = super().clean() or {}
         for field in self.Meta.name_fields:
             if not cleaned_data.get(field):
                 self.add_error(field, "Please give the names of your guests")

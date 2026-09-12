@@ -1,9 +1,8 @@
+from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
-from .models import HomePageElement
 
-
-def homepage_element_serializer(model: type[HomePageElement]) -> type[ModelSerializer]:
+def homepage_element_serializer(model: type[Model]) -> type[ModelSerializer]:
     """Build a ModelSerializer for a concrete HomePageElement subclass.
 
     HomePageElement is abstract, so each concrete element type (PopUpElement,

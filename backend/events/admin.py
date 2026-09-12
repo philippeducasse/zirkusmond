@@ -94,9 +94,10 @@ class BaseEventAdmin(ModelAdmin):
 
     @admin.display(description="Revenue", ordering="total_revenue")
     def revenue(self, obj: Event) -> str:
-        if obj.total_revenue is None:
+        total_revenue = getattr(obj, "total_revenue", None)
+        if total_revenue is None:
             return "—"
-        return f"€ {obj.total_revenue:.2f}"
+        return f"€ {total_revenue:.2f}"
 
     @admin.action(description="Print Reservation List")
     def print_reservations(
@@ -106,7 +107,7 @@ class BaseEventAdmin(ModelAdmin):
             payments = Payment.objects.filter(
                 reservation__event=event, status=Payment.Status.COMPLETED
             ).order_by(Lower("reservation__last_name"))
-            reservations = [payment.reservation for payment in payments]
+            reservations = [payment.reservation for payment in payments if payment.reservation]
 
             output = BytesIO()
             workbook = xlsxwriter.Workbook(output)
@@ -157,6 +158,7 @@ class BaseEventAdmin(ModelAdmin):
             )
             response.write(xlsx_data)
             return response
+        return None
 
     @admin.action(description="Send mail to Reservants")
     def send_to_reservants(self, request: HttpRequest, queryset: QuerySet[Event]) -> HttpResponse:
@@ -165,7 +167,11 @@ class BaseEventAdmin(ModelAdmin):
             all_payments += list(
                 Payment.objects.filter(status=Payment.Status.COMPLETED, reservation__event=event)
             )
-        dicts = [reservation_to_dict(payment.reservation) for payment in all_payments]
+        dicts = [
+            reservation_to_dict(payment.reservation)
+            for payment in all_payments
+            if payment.reservation
+        ]
         return send_email_to_reservants(request, dicts, self)
 
     @action(description="Send mail to Reservants", url_path="send-mail", icon="mail")
@@ -173,7 +179,7 @@ class BaseEventAdmin(ModelAdmin):
         payments = Payment.objects.filter(
             status=Payment.Status.COMPLETED, reservation__event_id=object_id
         )
-        dicts = [reservation_to_dict(p.reservation) for p in payments]
+        dicts = [reservation_to_dict(p.reservation) for p in payments if p.reservation]
         return send_email_to_reservants(request, dicts, self)
 
 
@@ -186,7 +192,7 @@ class UpcomingEventAdmin(BaseEventAdmin):
 
 
 class PastEventAdmin(BaseEventAdmin):
-    list_filter = []
+    list_filter: list[str] = []
 
 
 admin.site.register(Event, EventAdmin)

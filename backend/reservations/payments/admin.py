@@ -17,9 +17,11 @@ from reservations.payments.models import Payment
 
 
 def reservation_to_dict(reservation: Reservation) -> dict[str, Any]:
+    event = reservation.event
+    show = event.show if event else None
     return {
-        "show_title": reservation.event.show.title,
-        "event_time": reservation.event.time_and_date(),
+        "show_title": show.title if show else "",
+        "event_time": event.time_and_date() if event else "",
         "firstname": reservation.first_name,
         "surname": reservation.last_name,
         "email": reservation.email,
@@ -27,9 +29,9 @@ def reservation_to_dict(reservation: Reservation) -> dict[str, Any]:
 
 
 def render_mail(subject: str, body: str, context: dict[str, Any]) -> tuple[str, str]:
-    context = Context(context)
-    rendered_subject = Template(subject).render(context)
-    rendered_body = Template(body).render(context)
+    template_context = Context(context)
+    rendered_subject = Template(subject).render(template_context)
+    rendered_body = Template(body).render(template_context)
     return rendered_subject, rendered_body
 
 
@@ -157,13 +159,16 @@ class ReservationPaymentAdmin(ModelAdmin):
         self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
     ) -> None:
         for payment in queryset:
-            emails.send_confirmation_mail(payment.reservation)
+            if payment.reservation:
+                emails.send_confirmation_mail(payment.reservation)
 
     @admin.action(description="Send mail to Reservants")
     def send_to_reservants(
         self, request: HttpRequest, queryset: QuerySet[ReservationPayment]
     ) -> HttpResponseRedirect | TemplateResponse:
-        dicts = [reservation_to_dict(payment.reservation) for payment in queryset]
+        dicts = [
+            reservation_to_dict(payment.reservation) for payment in queryset if payment.reservation
+        ]
         return send_email_to_reservants(request, dicts, self)
 
 

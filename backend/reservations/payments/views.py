@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from rest_framework import generics, status
+from rest_framework.authentication import BaseAuthentication
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -46,7 +47,7 @@ def set_payment_method_from_charge(payment: Payment, charge) -> None:
 
 class CreatePaymentIntentView(generics.GenericAPIView):
     serializer_class = CreatePaymentIntentSerializer
-    authentication_classes = []
+    authentication_classes: list[type[BaseAuthentication]] = []
 
     def post(self, request: Request, reservation_id: uuid.UUID) -> Response:
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -87,7 +88,7 @@ def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
     reservation_id = request.GET.get("reservationId")
 
     if not payment_intent_id or not reservation_id:
-        frontend_base = settings.FRONTEND_URL
+        frontend_base = settings.FRONTEND_URL  # type: ignore[misc]  # custom setting, not in django-stubs
         return redirect(f"{frontend_base}/payment/failure")
 
     try:
@@ -108,7 +109,7 @@ def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
         except Payment.DoesNotExist:
             logger.warning("stripe_return: payment not found for intent %s", payment_intent_id)
 
-        frontend_base = settings.FRONTEND_URL
+        frontend_base = settings.FRONTEND_URL  # type: ignore[misc]  # custom setting, not in django-stubs
         if intent.status == "succeeded":
             return redirect(f"{frontend_base}/payment/success?reservationId={reservation_id}")
         else:
@@ -146,14 +147,14 @@ def stripe_return(request: HttpRequest) -> HttpResponseRedirect:
             return redirect(failure_url)
     except stripe.error.StripeError as e:
         logger.error("stripe_return: error retrieving payment intent: %s", e)
-        frontend_base = settings.FRONTEND_URL
+        frontend_base = settings.FRONTEND_URL  # type: ignore[misc]  # custom setting, not in django-stubs
         return redirect(f"{frontend_base}/payment/failure")
 
 
 class StripeWebhookView(APIView):
     """Handle Stripe webhook events for PaymentIntent confirmations."""
 
-    authentication_classes = []
+    authentication_classes: list[type[BaseAuthentication]] = []
 
     def post(self, request: Request) -> Response | JsonResponse:
         stripe.api_key = settings.STRIPE_SECRET_KEY

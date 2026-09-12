@@ -1,7 +1,6 @@
 import uuid
 from typing import Any
 
-from django.db.models import QuerySet
 from django.utils import timezone
 
 from reservations.models import Guest, Reservation
@@ -80,7 +79,7 @@ def check_in_ticket(
         return {"error": "Ticket not found"}, 404
 
 
-def get_upcoming_events() -> QuerySet[dict[str, Any]]:
+def get_upcoming_events():
     from events.models import Event
 
     today = timezone.now().date()

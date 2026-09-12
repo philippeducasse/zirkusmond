@@ -11,8 +11,8 @@ from shows.serializers import ShowCardSerializer
 
 
 def _upcoming_shows(limit: int | None = None) -> list[Show]:
-    upcoming_shows = Show.objects.prefetch_related("events").all()
-    upcoming_shows = list(filter(lambda x: x.show_in_preview(), upcoming_shows))
+    shows_qs = Show.objects.prefetch_related("events").all()
+    upcoming_shows = [show for show in shows_qs if show.show_in_preview()]
     upcoming_shows = sorted(
         upcoming_shows,
         key=lambda x: (

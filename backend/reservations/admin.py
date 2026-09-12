@@ -93,7 +93,11 @@ class ReservationAdmin(ModelAdmin):
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[Reservation]:
         queryset = super().get_queryset(request)
-        is_detail_view = request.resolver_match.url_name.endswith("_change")
+        is_detail_view = bool(
+            request.resolver_match
+            and request.resolver_match.url_name
+            and request.resolver_match.url_name.endswith("_change")
+        )
         if not request.GET.get("event_status") and not is_detail_view:
             queryset = queryset.filter(event__begin__gte=timezone.now())
         queryset = queryset.select_related("event__show").annotate(
@@ -124,11 +128,9 @@ class ReservationAdmin(ModelAdmin):
     def email(self, obj: Reservation) -> str:
         return obj.email
 
-    @admin.display(ordering="checked_in")
+    @admin.display(ordering="checked_in", boolean=True)
     def checked_in(self, obj: Reservation) -> bool:
         return obj.checked_in
-
-    checked_in.boolean = True
 
     @admin.action(description="Resend Reservation confirmation mail")
     def resend_confirmation_mail(
@@ -165,11 +167,9 @@ class GuestAdmin(ModelAdmin):
     def first_name(self, obj: Guest) -> str:
         return obj.first_name
 
-    @admin.display(ordering="checked_in")
+    @admin.display(ordering="checked_in", boolean=True)
     def checked_in(self, obj: Guest) -> bool:
         return obj.checked_in
-
-    checked_in.boolean = True
 
 
 admin.site.register(Reservation, ReservationAdmin)

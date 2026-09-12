@@ -6,7 +6,9 @@ from django.db import models
 from events.models import Event
 
 
-class Reservation(models.Model):
+# The reverse relation from the legacy ReservationPayment (django-payments' BasePayment
+# has no type stubs, so django-stubs can't resolve its default manager).
+class Reservation(models.Model):  # type: ignore[django-manager-missing]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey(
         Event, on_delete=models.SET_NULL, null=True, related_name="reservations"

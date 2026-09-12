@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django.contrib import admin
 from django.db import models
 from django.utils import timezone
@@ -20,7 +22,8 @@ class Event(models.Model):
         verbose_name_plural = "all events"
 
     def __str__(self) -> str:
-        return f"{self.show.title} on {self.date_str()}"
+        show_title = self.show.title if self.show else "Unknown Show"
+        return f"{show_title} on {self.date_str()}"
 
     def clean(self) -> None:
         from django.core.exceptions import ValidationError
@@ -76,7 +79,7 @@ class Event(models.Model):
 
 
 class UpcomingEvent(Event):
-    objects = UpcomingEventManager()
+    objects: ClassVar[UpcomingEventManager] = UpcomingEventManager()
 
     class Meta:
         proxy = True
@@ -87,7 +90,7 @@ class UpcomingEvent(Event):
 
 
 class PastEvent(Event):
-    objects = PastEventManager()
+    objects: ClassVar[PastEventManager] = PastEventManager()
 
     class Meta:
         proxy = True

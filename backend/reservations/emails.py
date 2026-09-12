@@ -26,10 +26,15 @@ def _make_qr_buffer(data: dict[str, Any]) -> BytesIO:
 
 
 def _build_tickets_pdf(reservation: Reservation, tickets: list[tuple[str, BytesIO]]) -> BytesIO:
+    event = reservation.event
+    if event is None:
+        raise ValueError("Reservation has no event to build tickets for")
+    show = event.show
+    if show is None:
+        raise ValueError("Event has no show to build tickets for")
     pdf_buffer = BytesIO()
     width, height = A4
     canvas = rl_canvas.Canvas(pdf_buffer, pagesize=A4)
-    show = reservation.event.show
     center_x = width / 2
 
     for name, qr_buffer in tickets:
@@ -54,13 +59,13 @@ def _build_tickets_pdf(reservation: Reservation, tickets: list[tuple[str, BytesI
         canvas.line(72, qr_y - 16, width - 72, qr_y - 16)
 
         canvas.setFont("Helvetica-Bold", 13)
-        canvas.drawCentredString(center_x, qr_y - 36, reservation.event.date_str())
+        canvas.drawCentredString(center_x, qr_y - 36, event.date_str())
 
         canvas.setFont("Helvetica", 12)
         canvas.drawCentredString(
             center_x,
             qr_y - 54,
-            f"Einlass {reservation.event.admission_time()}  ·  Beginn {reservation.event.show_time()}",
+            f"Einlass {event.admission_time()}  ·  Beginn {event.show_time()}",
         )
         canvas.drawCentredString(
             center_x,
@@ -83,14 +88,19 @@ def send_confirmation_mail(reservation: Reservation) -> None:
         reservation.email,
         reservation.ticket_count(),
     )
-    show = reservation.event.show
+    event = reservation.event
+    if event is None:
+        raise ValueError("Reservation has no event to send a confirmation mail for")
+    show = event.show
+    if show is None:
+        raise ValueError("Event has no show to send a confirmation mail for")
     guests = list(reservation.guests.all())
     payment = Payment.objects.filter(reservation=reservation).order_by("-created_at").first()
 
     tickets = [
         (
             f"{reservation.first_name} {reservation.last_name}",
-            _make_qr_buffer({"ticket": str(reservation.id), "event": reservation.event.id}),
+            _make_qr_buffer({"ticket": str(reservation.id), "event": event.id}),
         )
     ]
     for guest in guests:
@@ -99,7 +109,7 @@ def send_confirmation_mail(reservation: Reservation) -> None:
         tickets.append(
             (
                 f"{guest.first_name} {guest.last_name}",
-                _make_qr_buffer({"ticket": str(guest.ticket_id), "event": reservation.event.id}),
+                _make_qr_buffer({"ticket": str(guest.ticket_id), "event": event.id}),
             )
         )
 
@@ -121,7 +131,7 @@ def send_confirmation_mail(reservation: Reservation) -> None:
         payment_en = f"\nPrice per ticket: {ticket_price:.2f} EUR\nTotal paid: {total:.2f} EUR\n"
 
     body = f"""Liebe*r {reservation.first_name},
-vielen Dank fuer deine Buchung fuer {show.title} am {reservation.event.date_str()}!
+vielen Dank fuer deine Buchung fuer {show.title} am {event.date_str()}!
 
 Deine Reservierung:
 Name: {reservation.first_name} {reservation.last_name}
@@ -129,7 +139,7 @@ Reservierungs-ID: {reservation.id}
 Tickets: {reservation.ticket_count()}{guests_de}{payment_de}
 Im Anhang findest du das PDF mit deinen Tickets - fuer jede Person gibt es einen eigenen QR-Code. Falls ihr nicht gemeinsam ankommt, leite bitte den jeweiligen QR-Code an deine Gaeste weiter.
 
-Wir oeffnen unsere Tore um {reservation.event.admission_time()}, die Show beginnt um {reservation.event.show_time()}.
+Wir oeffnen unsere Tore um {event.admission_time()}, die Show beginnt um {event.show_time()}.
 
 Falls du noch nie in unserem Zelt warst, empfehlen wir dir, dir den Weg ueber OpenStreetMap zeigen zu lassen:
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
@@ -144,7 +154,7 @@ Bitte beachte, dass Tickets nicht erstattungsfaehig sind. Falls du verhindert bi
 ------------------------------------------------------------
 
 Dear {reservation.first_name},
-thank you for your booking to {show.title} on the {reservation.event.date_str()}!
+thank you for your booking to {show.title} on the {event.date_str()}!
 
 Your reservation:
 Name: {reservation.first_name} {reservation.last_name}
@@ -152,7 +162,7 @@ Reservation ID: {reservation.id}
 Tickets: {reservation.ticket_count()}{guests_en}{payment_en}
 The attached PDF contains a individual QR code for each person in your booking. If you're not arriving together, please forward the relevant QR code to your guests.
 
-We open our gates at {reservation.event.admission_time()}, the Show will start at {reservation.event.show_time()}.
+We open our gates at {event.admission_time()}, the Show will start at {event.show_time()}.
 
 If you have not been to our tent yet, you should ask OpenStreetMap for directions.
 https://www.openstreetmap.org/directions?from=&to=52.54226,13.43250
@@ -183,7 +193,12 @@ def send_refund_mail(reservation: Reservation) -> None:
         reservation.event,
         reservation.email,
     )
-    show = reservation.event.show
+    event = reservation.event
+    if event is None:
+        raise ValueError("Reservation has no event to send a refund mail for")
+    show = event.show
+    if show is None:
+        raise ValueError("Event has no show to send a refund mail for")
     payment = Payment.objects.filter(reservation=reservation).order_by("-created_at").first()
 
     payment_de = ""
@@ -194,7 +209,7 @@ def send_refund_mail(reservation: Reservation) -> None:
         payment_en = f"\nRefunded amount: {total:.2f} EUR\n"
 
     body = f"""Liebe*r {reservation.first_name},
-deine Zahlung fuer {show.title} am {reservation.event.date_str()} wurde vollstaendig erstattet.
+deine Zahlung fuer {show.title} am {event.date_str()} wurde vollstaendig erstattet.
 
 Details:
 Reservierungs-ID: {reservation.id}{payment_de}
@@ -207,7 +222,7 @@ Das Zirkus Mond Team
 ------------------------------------------------------------
 
 Dear {reservation.first_name},
-your payment for {show.title} on the {reservation.event.date_str()} has been fully refunded.
+your payment for {show.title} on the {event.date_str()} has been fully refunded.
 
 Details:
 Reservation ID: {reservation.id}{payment_en}

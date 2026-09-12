@@ -92,7 +92,7 @@ class EventInlineForm(forms.ModelForm):
         return dtime(hour=20, minute=0)
 
     def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
+        cleaned_data = super().clean() or {}
         event_date = cleaned_data.get("event_date")
         show_time = cleaned_data.get("show_time")
         if not event_date:
@@ -125,7 +125,7 @@ class EventInlineForm(forms.ModelForm):
             self.instance.begin = begin
         if admission:
             self.instance.admission = admission
-        super()._post_clean()
+        super()._post_clean()  # type: ignore[misc]  # Django-internal, not in django-stubs
 
     def has_changed(self) -> bool:
         if not self.instance.pk and self.data:
@@ -184,7 +184,7 @@ class ShowAdmin(ModelAdmin):
     list_display = ["title", "next_event_date", "dates_text", "reservation_open", "show_in_preview"]
     list_filter = ["private", "last_modified"]
     search_fields = ["title", "description", "cast"]
-    ordering = []
+    ordering: list[str] = []
     default_ordering = [F("next_event_begin").desc(nulls_last=True), "-title"]
     inlines = [EventInline]
 

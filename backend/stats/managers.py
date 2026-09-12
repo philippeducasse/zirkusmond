@@ -5,7 +5,7 @@ class PageViewManager(models.Manager):
     def bounce_rate(self, since=None):
         qs = self.get_queryset()
         if since:
-            qs = qs.filet(entered_at__gte=since)
+            qs = qs.filter(entered_at__gte=since)
 
         sessions = qs.values("session_key").annotate(views=models.Count("id"))
 

@@ -16,7 +16,7 @@ def parse_custom_price(show: Show, raw_custom_price: str | None) -> Decimal | No
         price = Decimal(raw_custom_price)
     except Exception:
         return None
-    base_price = show.base_ticket_price or Decimal(5.0)
+    base_price = show.base_ticket_price
     if not (
         show.get_effective_min_price(base_price)
         <= price
