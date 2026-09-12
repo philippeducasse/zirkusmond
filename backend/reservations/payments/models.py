@@ -156,16 +156,20 @@ class Payment(models.Model):
 
         reservation = Reservation.objects.select_related("event__show").get(pk=reservation.pk)
         show = reservation.event.show if reservation.event else None
+
         if show is None:
             raise ValueError("Reservation has no associated show")
+
         base = show.base_ticket_price
         min_price = show.get_effective_min_price(base)
         max_price = show.get_effective_max_price(base)
+
         if not (min_price <= custom_ticket_price <= max_price):
             raise ValueError(f"Custom price must be between {min_price} and {max_price}")
 
         ticket_price = Decimal(str(custom_ticket_price))
         total = reservation.ticket_count() * ticket_price
+
         return cls.objects.create(
             reservation=reservation,
             payment_method=payment_method,
