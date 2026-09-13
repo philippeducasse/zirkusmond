@@ -118,13 +118,19 @@ pnpm run build
 
 ## Payments
 
-The payment code is currently in transition inside `backend/reservations/payments/`:
+All active payments run through Stripe directly inside `backend/reservations/payments/`.
 
-- `ReservationPayment` is the older `django-payments`-based flow
-- `Payment` is the newer Stripe `PaymentIntent`-based flow
+The current flow is:
 
-If you are working on payments, check which flow a view, webhook, or template is using before
-making changes.
+1. the backend creates a `Reservation`
+2. `CreatePaymentIntentView` creates a local `Payment` record and a Stripe `PaymentIntent`
+3. the frontend confirms the payment with Stripe Elements
+4. `StripeWebhookView` updates the payment to `completed`, `failed`, or `refunded`
+5. signals/tasks send confirmation or refund emails and cleanup stale pending payments
+
+See `docs/stripe-payment-system.md` for the full payment-flow documentation. Legacy
+`ReservationPayment` / `django-payments` code may still exist in the repo for historical reasons,
+but it is no longer the active payment path.
 
 ## Testing and CI
 

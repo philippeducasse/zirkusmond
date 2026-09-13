@@ -17,7 +17,7 @@ uv sync                                    # install deps
 uv run manage.py migrate
 uv run manage.py runserver
 uv run pytest                              # all tests
-uv run pytest reservations/payments/tests.py::StripePaymentRejectionEmailTest  # single test class
+uv run pytest reservations/payments/tests.py::StripeWebhookViewTest  # single test class
 uv run pytest -k test_name                 # single test by name
 uv run ruff check --fix                    # lint
 uv run ruff format                         # format
@@ -66,7 +66,7 @@ whitespace/YAML/JSON/merge-conflict checks on every commit.
 
 - **`events`** — an `Event` is one dated performance (date/time, admission time, reservation
   capacity, `open_for_reservation` flag) belonging to a `Show`. `reservation_count()` /
-  `reservation_open()` query confirmed `ReservationPayment`s to compute capacity.
+  `reservation_open()` query confirmed `Payment`s (`status=COMPLETED`) to compute capacity.
 - **`shows`** — a `Show` is the production itself (title, description, images, ticket pricing).
   Ticket pricing is a sliding scale: `base_ticket_price` plus optional `min_ticket_price` /
   `max_ticket_price` bounds (defaulting to ±10 from base). `UpcomingShow`/`PastShow`/
@@ -82,24 +82,29 @@ whitespace/YAML/JSON/merge-conflict checks on every commit.
   `production.py` / `test.py`. Most config is env-var driven (see `.envrc`).
 - Django admin is customized with `django-unfold` and mounted at `/mondmin/` (not `/admin/`).
 
-### Payment system — mid-migration, two models coexist
+### Payment system — Stripe-only flow
 
-The codebase is actively migrating off `django-payments` to a simpler custom flow. Both live in
+All active payments run through Stripe directly via the custom `Payment` model in
 `reservations/payments/`:
 
-- **`ReservationPayment`** (extends django-payments' `BasePayment`) — the *old* flow, driven by
-  `StripeProviderV3` (`stripe_provider.py`) using Stripe Checkout Sessions and django-payments'
-  status machine (`WAITING`/`CONFIRMED`/`REJECTED`/`ERROR`/...). Documented in detail in
-  `docs/stripe-payment-system.md` (webhook event → status → email flow, event types, testing).
-  Treat that doc as describing the *old* path only.
-- **`Payment`** — the *new* model, driven directly by a Stripe `PaymentIntent` (not Checkout) via
-  `CreatePaymentIntentView` / `stripe_return` / `StripeWebhookView` in `payments/views.py`, with its
-  own simple `Status` enum (`PENDING`/`COMPLETED`/`FAILED`/`REFUNDED`). `custom_ticket_price` here
-  holds the guest's chosen sliding-scale price.
-- Plans for finishing this migration (replacing `ReservationPayment` outright) are tracked in
-  `.claude/*.md` in this repo — check there before assuming which model a change should target.
-- When touching payment code, check which model/flow a given view or template actually uses before
-  assuming `docs/stripe-payment-system.md` still applies — it does not describe the `Payment` path.
+- **`Payment`** — the canonical payment record. It stores the reservation link, selected sliding-
+  scale `custom_ticket_price`, Stripe PaymentIntent ID, detected payment method, and lifecycle
+  status (`PENDING`/`COMPLETED`/`FAILED`/`REFUNDED`/`ABANDONED`).
+- **`CreatePaymentIntentView`** — creates a local `Payment`, validates the custom ticket price
+  against the show's allowed range, creates a Stripe `PaymentIntent`, stores its ID, and returns
+  the client secret to the frontend.
+- **`stripe_return`** — handles Stripe's return redirect, refreshes payment-method details from the
+  PaymentIntent's latest charge when available, and redirects the customer to the frontend success
+  or failure page.
+- **`StripeWebhookView`** — the source of truth for final payment state. It marks payments as
+  `COMPLETED`, `FAILED`, or `REFUNDED` from Stripe webhook events.
+- **Signals/tasks** — `post_save` on `Payment` queues confirmation emails for completed payments and
+  refund emails for refunded payments; a Celery task marks stale `PENDING` payments as
+  `ABANDONED`.
+
+`docs/stripe-payment-system.md` documents the current Stripe PaymentIntent flow. Legacy
+`ReservationPayment` / `django-payments` code may still exist in the repository for historical
+reasons, but it is not part of the active payment path and should not be used for new work.
 
 ### Frontend: TanStack Start + React 19
 

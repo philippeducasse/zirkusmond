@@ -2,373 +2,364 @@
 
 ## Overview
 
-The reservation system integrates Stripe for payment processing. This document covers the complete payment flow from initialization through confirmation or failure.
+Zirkusmond now uses a single Stripe-based payment flow.
+
+The active path does **not** go through `django-payments`. Instead, the backend creates its own
+`Payment` records, creates Stripe `PaymentIntent`s directly, and uses Stripe webhooks as the source
+of truth for final payment state.
+
+At a high level:
+
+1. a reservation is created in Django
+2. the backend creates a local `Payment` plus a Stripe `PaymentIntent`
+3. the frontend renders Stripe Elements and confirms the payment
+4. Stripe sends webhook events back to Django
+5. Django updates the `Payment` status and queues emails
 
 ## Architecture
 
-### Components
+### Main components
 
-1. **StripeProviderV3** (`stripe_provider.py`)
-   - Custom provider extending django-payments
-   - Handles checkout session creation and webhook processing
+1. **Reservation creation**
+   - `reservations/views.py`
+   - `reserve()` creates the `Reservation` and its `Guest` records before payment starts.
 
-2. **ReservationPayment Model** (`reservations/models.py`)
-   - Stores payment information and status
-   - Tracks reservation association
+2. **Payment model**
+   - `backend/reservations/payments/models.py`
+   - `Payment` is the canonical payment record used by the active flow.
 
-3. **Signal Handler** (`signals.py`)
-   - Listens for payment status changes
-   - Sends confirmation/rejection emails
+3. **Payment intent creation**
+   - `backend/reservations/payments/views.py`
+   - `CreatePaymentIntentView` validates the selected ticket price, creates a `Payment`, creates a
+     Stripe `PaymentIntent`, stores its ID, and returns the client secret.
 
-4. **Webhook Endpoint** (`views.py`)
-   - Receives Stripe webhook events
-   - Routes to provider for processing
+4. **Stripe confirmation in the frontend**
+   - `frontend/src/components/zirkusmond/reserve/components/StripePaymentForm.tsx`
+   - Stripe Elements collects the payment details and calls `stripe.confirmPayment(...)`.
 
-## Payment Initialization Flow
+5. **Return endpoint**
+   - `backend/reservations/payments/views.py`
+   - `stripe_return()` handles the redirect back from Stripe and sends the customer to the frontend
+     success or failure page.
 
-### 1. Create Payment
-```python
-reservation = Reservation.objects.create(...)
-payment = ReservationPayment.objects.create(
-    reservation=reservation,
-    variant='stripe',
-    description='Show ticket',
-    total=reservation.price,
-    currency='EUR',
-    billing_email=reservation.email
-)
+6. **Webhook endpoint**
+   - `backend/reservations/payments/views.py`
+   - `StripeWebhookView` verifies the webhook signature and updates the `Payment` status.
+
+7. **Signals and tasks**
+   - `backend/reservations/payments/signals.py`
+   - `backend/reservations/tasks.py`
+   - Completed payments queue confirmation emails, refunded payments queue refund emails, and stale
+     pending payments are marked as abandoned.
+
+## Active payment model
+
+`Payment` stores the state for the live Stripe integration.
+
+Relevant fields:
+
+- `reservation`
+- `stripe_payment_intent_id`
+- `payment_method`
+- `status`
+- `total`
+- `custom_ticket_price`
+- `created_at`
+
+### Payment statuses
+
+| Status | Meaning |
+|---|---|
+| `PENDING` | Local payment record created, waiting for Stripe outcome |
+| `COMPLETED` | Stripe confirmed the payment |
+| `FAILED` | Stripe reported a failed or canceled payment |
+| `REFUNDED` | Stripe reported a refund |
+| `ABANDONED` | Payment stayed pending long enough to be treated as abandoned |
+
+## Endpoints
+
+### `POST /payments/<reservation_id>/intent`
+
+Creates a Stripe `PaymentIntent` for an existing reservation.
+
+Handled by: `CreatePaymentIntentView`
+
+Request body:
+
+```json
+{
+  "custom_ticket_price": 20
+}
 ```
 
-Initial status: `WAITING`
+Behavior:
 
-### 2. Display Checkout Form
-```python
-# In payment view
-form = payment.get_form()  # Calls StripeProviderV3.get_form()
+- loads the `Reservation`
+- validates that the chosen sliding-scale price is within the show's allowed range
+- creates a local `Payment` row with status `PENDING`
+- creates a Stripe `PaymentIntent` with:
+  - `amount` in cents
+  - `currency="eur"`
+  - metadata including `reservation_id`, customer name, and email
+- stores `stripe_payment_intent_id`
+- returns the `Payment` ID and Stripe client secret
+
+Response shape:
+
+```json
+{
+  "id": "<payment-uuid>",
+  "client_secret": "<stripe-client-secret>"
+}
 ```
 
-**What happens in get_form():**
-- Creates a Stripe checkout session with:
-  - Line items (tickets/products)
-  - Success/cancel URLs
-  - Customer email
-  - Client reference ID (payment token for webhook lookup)
-- Raises `RedirectNeeded` to send user to Stripe checkout
+### `GET /payments/return/stripe`
 
-### 3. User Completes/Abandons Checkout
-- **Success**: User completes payment on Stripe
-- **Abandon**: User closes browser or session expires (24 hours)
-- **Cancel**: User clicks cancel button
+Handled by: `stripe_return`
 
-Stripe sends webhook events for all outcomes.
+Query params used:
 
-## Webhook Processing
+- `payment_intent`
+- `reservationId`
 
-### Webhook Flow
+Behavior:
 
+- retrieves the Stripe `PaymentIntent`
+- looks up the matching local `Payment`
+- attempts to infer the payment method from `latest_charge.payment_method_details`
+- redirects to the frontend:
+  - success page if Stripe reports `succeeded`
+  - failure page otherwise
+
+The return endpoint improves the user experience, but the webhook remains the authoritative source
+for final payment state.
+
+### `POST /payments/webhook/stripe`
+
+Handled by: `StripeWebhookView`
+
+Behavior:
+
+- verifies the Stripe webhook signature using `STRIPE_WEBHOOK_SECRET`
+- reads the event type
+- updates the matching `Payment`
+- returns `{"status": "ok"}` on success
+
+## Payment flow
+
+### 1. Create reservation
+
+The frontend first posts reservation data to Django.
+
+`reserve()` creates:
+
+- one `Reservation`
+- one or more `Guest` records
+- optional newsletter signup
+
+No Stripe object exists yet at this point.
+
+### 2. Create local payment and Stripe PaymentIntent
+
+The frontend then calls:
+
+```text
+POST /payments/<reservation_id>/intent
 ```
-Stripe Event → Django View (/payments/stripe-webhook/)
-  ↓
-static_callback() routes to StripeProviderV3.process_data()
-  ↓
-Event type determines payment status change
-  ↓
-Payment status changes → Signal triggered
-  ↓
-Signal handler sends email (if applicable)
-```
 
-### Event Types and Handling
+`Payment.create_for_reservation(...)`:
 
-#### Success Events
+- requires a custom ticket price
+- reloads the reservation with its event and show
+- validates the custom price against the show's effective min/max price
+- computes the total from ticket count × selected ticket price
+- creates the `Payment`
 
-**`checkout.session.completed`**
-- Triggered when checkout session completes
-- Checks `payment_status` field in session object
-- If `"paid"`: Payment status → `CONFIRMED`
-- Triggers: ✅ Confirmation email sent
+After that, the backend creates the Stripe `PaymentIntent` and stores its ID on the payment record.
 
-#### Failure Events
+### 3. Confirm payment in Stripe Elements
 
-**`charge.failed`**
-- Triggered when card charge fails
-- Examples: Insufficient funds, card blocked, etc.
-- Payment status → `REJECTED`
-- Triggers: ✅ Rejection email sent
+The frontend uses Stripe Elements and calls `stripe.confirmPayment(...)`.
+
+Current behavior in the app:
+
+- uses the client secret returned by the backend
+- submits payment details through Stripe's `PaymentElement`
+- sets a return URL pointing to `/payments/return/stripe?reservationId=...`
+- uses `redirect: "if_required"`
+
+### 4. Handle redirect back from Stripe
+
+`stripe_return()` checks the `PaymentIntent` status and redirects the customer to the frontend's
+success or failure route.
+
+It also tries to store the detected payment method, including:
+
+- card
+- Apple Pay
+- Google Pay
+- Link
+- PayPal
+- Klarna
+- unknown
+
+### 5. Process webhook events
+
+Stripe sends webhook events to Django. This is what finalizes the payment state.
+
+#### Success
+
+**`payment_intent.succeeded`**
+
+- finds `Payment` by `stripe_payment_intent_id`
+- sets `status = COMPLETED`
+- tries to populate `payment_method` from the latest Stripe charge if it is still missing
+- saves the payment
+
+#### Failure
 
 **`payment_intent.payment_failed`**
-- Triggered when payment intent fails
-- Examples: 3D Secure/SCA denied, issuer declined, etc.
-- Payment status → `REJECTED`
-- Triggers: ✅ Rejection email sent
 
-**`checkout.session.async_payment_failed`**
-- Triggered when async payment explicitly fails
-- Examples: Bank transfer rejected, etc.
-- Payment status → `REJECTED`
-- Triggers: ✅ Rejection email sent
+- sets `status = FAILED`
 
-#### Abandoned Session
+**`payment_intent.canceled`**
 
-**`checkout.session.expired`**
-- Triggered when checkout session expires (24 hours default)
-- Indicates user abandoned payment, NOT a payment failure
-- Payment status → `ERROR`
-- Triggers: ❌ **NO email sent** (intentional - don't email about abandoned sessions)
+- sets `status = FAILED`
 
-## Payment Status States
+#### Refund
 
-| Status | Meaning | Email Sent | Next States |
-|--------|---------|-----------|------------|
-| `WAITING` | Awaiting payment | ❌ | CONFIRMED, REJECTED, ERROR |
-| `CONFIRMED` | Payment succeeded | ✅ Confirmation | (final) |
-| `REJECTED` | Payment failed | ✅ Rejection | (final) |
-| `ERROR` | Session expired/abandoned | ❌ | (final) |
-| `PREAUTH` | Preauthorized (unused) | ❌ | |
-| `REFUNDED` | Refunded | ❌ | |
+**`charge.refunded`**
 
-## Email Notifications
+- finds the payment by the refunded charge's `payment_intent`
+- sets `status = REFUNDED`
 
-### Confirmation Email
-- **Triggered**: Payment status → `CONFIRMED`
-- **Recipient**: `reservation.email`
-- **Handler**: `on_payment_status_changed` signal
-- **Action**: Calls `services.send_confirmation_mail(reservation)`
+## Emails and async work
 
-### Rejection Email
-- **Triggered**: Payment status → `REJECTED`
-- **Recipient**: `reservation.email`
-- **Subject**: "Payment Failed - Please Try Again"
-- **Body**: Includes:
-  - Show title
-  - Admission date
-  - Order ID (payment PK)
-  - Request to retry or contact support
+### Confirmation email
 
-Example rejection email:
-```
-Subject: Payment Failed - Please Try Again
+Triggered when a `Payment` is saved with status `COMPLETED`.
 
-Your payment for "Circus Show" on 2026-06-15 failed.
+Path:
 
-Please try again or contact us for assistance.
+- `post_save` signal on `Payment`
+- `send_confirmation_email.delay(reservation_id)`
+- `reservations.emails.send_confirmation_mail(reservation)`
 
-Order ID: a1a7027a-f89c-4706-9ac1-f9815e8c7c8f
-```
+### Refund email
 
-## Error Handling
+Triggered when a `Payment` is saved with status `REFUNDED`.
 
-### Webhook Error Handling
+Path:
 
-The webhook endpoint in `views.py` catches exceptions and:
-1. Logs the error with full traceback
-2. Extracts payment token from webhook payload (if available)
-3. Sends "Payment Processing" notification email to customer
-4. Returns HTTP 500 to Stripe (Stripe will retry)
+- `post_save` signal on `Payment`
+- `send_refund_email.delay(reservation_id)`
+- `reservations.emails.send_refund_mail(reservation)`
 
-```python
-except Exception as e:
-    logger.error("stripe webhook error: %s", e, exc_info=True)
-    # Extract payment and send notification email
-    send_mail(
-        subject="Payment Processing - Please Wait",
-        message="We're processing your payment. If you don't receive..."
-    )
-    return HttpResponse(status=500)
-```
+### Abandoned payments cleanup
 
-### Expected Exceptions
+Handled by the Celery task:
 
-- Missing session in webhook: `PaymentError(code=400, message="session not present")`
-- Missing object in webhook: `PaymentError(code=400, message="object not present in event")`
+- `cleanup_abandoned_payments()`
+
+Behavior:
+
+- finds `PENDING` payments older than 1 hour
+- updates them to `ABANDONED`
+
+This is not driven by Stripe webhooks.
+
+## Event capacity and reporting
+
+Confirmed reservations now depend on `Payment.Status.COMPLETED`.
+
+For example, `Event.reservation_count()` counts completed `Payment` records linked to the event's
+reservations and guests. Admin revenue/reporting code also reads from the `Payment` model.
+
+## Error handling
+
+### Intent creation
+
+`CreatePaymentIntentView` returns `400` when:
+
+- the reservation does not provide a valid custom ticket price
+- the selected price is outside the allowed range
+
+It returns `404` if the reservation does not exist.
+
+### Webhook errors
+
+`StripeWebhookView` returns:
+
+- `400` for invalid payloads
+- `401` for invalid signatures
+- `404` if the Stripe object cannot be matched to a local `Payment`
+- `500` for unexpected processing errors
+
+### Return flow errors
+
+`stripe_return()` redirects to the frontend failure page when:
+
+- `payment_intent` is missing
+- `reservationId` is missing
+- Stripe retrieval fails
+- the PaymentIntent status is not `succeeded`
 
 ## Testing
 
-### Test Class: `StripePaymentRejectionEmailTest`
+The current payment flow is covered in `backend/reservations/payments/tests.py`.
 
-**Setup**: Creates test payment and provides webhook event posting
+Useful test classes:
 
-#### Test Cases
+- `CreatePaymentIntentViewTest`
+- `StripeWebhookViewTest`
+- `StripeReturnViewTest`
 
-**1. `test_confirmed_payment_sends_confirmation_email`**
-- Posts `checkout.session.completed` event with `payment_status="paid"`
-- Asserts: Payment status → `CONFIRMED`
-- Asserts: Confirmation email sent
-
-**2. `test_rejected_payment_sends_failure_email`**
-- Posts `checkout.session.async_payment_failed` event
-- Asserts: Payment status → `REJECTED`
-- Asserts: Rejection email sent with "Failed" in subject
-
-**3. `test_expired_session_does_not_send_email`**
-- Posts `checkout.session.expired` event
-- Asserts: NO email sent
-- Asserts: Payment status → `ERROR`
-
-**4. `test_charge_failed_sends_rejection_email`**
-- Posts `charge.failed` event
-- Asserts: Payment status → `REJECTED`
-- Asserts: Rejection email sent
-
-**5. `test_payment_intent_payment_failed_sends_rejection_email`**
-- Posts `payment_intent.payment_failed` event
-- Asserts: Payment status → `REJECTED`
-- Asserts: Rejection email sent
-
-**6. `test_rejection_email_includes_order_id`**
-- Verifies rejection email body includes payment ID
-
-**7. `test_rejection_email_includes_event_info`**
-- Verifies rejection email body includes show title
-
-### Running Tests
+Run the whole payment test module:
 
 ```bash
-python manage.py test reservations.payments.tests.StripePaymentRejectionEmailTest
+cd backend
+uv run pytest reservations/payments/tests.py
 ```
 
-All tests should pass: 7 tests, 0 failures
+Run one test class:
 
-## Stripe Dashboard Configuration
-
-### 1. API Keys
-- Navigate: Developers → API Keys
-- Copy "Secret key" and "Publishable key"
-- Set in environment: `STRIPE_TOKEN`, `STRIPE_PUBLIC_KEY`
-
-### 2. Webhook Endpoint
-- Navigate: Developers → Webhooks
-- Click "Add endpoint"
-- URL: `https://your-domain.com/payments/stripe-webhook/`
-- Events to enable:
-  - `checkout.session.completed`
-  - `checkout.session.async_payment_succeeded`
-  - `checkout.session.expired`
-  - `checkout.session.async_payment_failed`
-  - `charge.failed`
-  - `payment_intent.payment_failed`
-
-### 3. Signing Secret
-- Copy webhook signing secret
-- Set in environment: `STRIPE_HOOK_TOKEN`
-- Used to verify webhook authenticity
-
-### 4. Testing Webhooks
-- Use Stripe CLI for local testing:
-  ```bash
-  stripe listen --forward-to localhost:8000/payments/stripe-webhook/
-  stripe trigger checkout.session.completed
-  ```
-
-## Implementation Files
-
-### `stripe_provider.py`
-- Custom StripeProviderV3 class
-- `get_form()`: Creates checkout session
-- `process_data()`: Handles webhook events
-
-### `signals.py`
-- `on_payment_status_changed()`: Signal handler
-- Sends emails based on status change
-- Only sends rejection email for `REJECTED` status (not `ERROR`)
-
-### `views.py`
-- `stripe_webhook()`: Webhook endpoint
-- Routes to `static_callback()` for processing
-- Error handling and fallback notifications
-
-### `tests.py`
-- `StripePaymentRejectionEmailTest`: Comprehensive webhook tests
-
-## Payment Flow Diagram
-
-```
-┌─────────────────────────┐
-│ Create ReservationPayment│
-│ Status: WAITING         │
-└────────────┬────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│ Get Payment Form        │
-│ (StripeProviderV3)      │
-└────────────┬────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│ Redirect to Stripe      │
-│ Checkout Session        │
-└────────────┬────────────┘
-             │
-     ┌───────┴───────┐
-     │               │
-     ▼               ▼
-┌──────────┐  ┌──────────────┐
-│ Success  │  │ Failure/     │
-│          │  │ Abandon      │
-└────┬─────┘  └────┬─────────┘
-     │             │
-     ▼             ▼
-┌──────────────────────────┐
-│ Stripe Webhook Event     │
-│ (checkout.session.*)     │
-└────┬─────────────────────┘
-     │
-     ▼
-┌──────────────────────────┐
-│ StripeProviderV3         │
-│ .process_data()          │
-└────┬─────────────────────┘
-     │
-   ┌─┴─────────────┬──────────────┐
-   │               │              │
-   ▼               ▼              ▼
-CONFIRMED      REJECTED        ERROR
-(paid)      (charge failed) (session expired)
-   │               │              │
-   ▼               ▼              ▼
-✅ Confirm    ✅ Rejection    ❌ No Email
-   Email         Email
+```bash
+cd backend
+uv run pytest reservations/payments/tests.py::StripeWebhookViewTest
 ```
 
-## Key Design Decisions
+## Stripe configuration
 
-### 1. ERROR Status for Abandoned Sessions
-- **Why**: Abandoned sessions are not payment failures - they're just incomplete transactions
-- **Result**: `ERROR` status doesn't trigger rejection email
-- **Alternative rejected**: Using `REJECTED` status would send confusing failure emails
+Required settings/env vars used by the active flow:
 
-### 2. Signal-Based Email Dispatch
-- **Why**: Decouples webhook handling from email logic
-- **Result**: Email is sent when status changes, not during webhook processing
-- **Benefit**: Can send emails for other status changes in future (e.g., refunds)
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `FRONTEND_URL`
+- `PAYMENT_HOST`
+- `PAYMENT_USES_SSL`
 
-### 3. Explicit Event Types for Failures
-- **Why**: Need to distinguish between "payment failed" and "session abandoned"
-- **Result**: Handle `charge.failed`, `payment_intent.payment_failed`, and `checkout.session.async_payment_failed` separately from `checkout.session.expired`
-- **Benefit**: Send rejection email only for real failures
+### Local webhook testing
 
-## Troubleshooting
+```bash
+stripe listen --forward-to localhost:8000/payments/webhook/stripe
+```
 
-### Webhooks Not Received
-1. Check webhook endpoint URL in Stripe Dashboard
-2. Verify domain is publicly accessible (webhooks won't work on localhost without tunnel)
-3. Use `stripe listen` command locally for testing
-4. Check Django logs for webhook errors
+You can then trigger or replay events from Stripe CLI or the Stripe dashboard.
 
-### Email Not Sent
-1. Check SMTP settings in Django settings
-2. Check signal logs for email sending attempts
-3. Verify reservation has valid email address
-4. Check spam/junk folder
+## Relevant files
 
-### Payment Status Not Changing
-1. Verify webhook is being received (check logs)
-2. Check `process_data()` logic for event type
-3. Verify `change_status()` is being called
-4. Check for exceptions in webhook processing
+- `backend/reservations/payments/models.py`
+- `backend/reservations/payments/views.py`
+- `backend/reservations/payments/signals.py`
+- `backend/reservations/payments/serializers.py`
+- `backend/reservations/payments/services.py`
+- `backend/reservations/tasks.py`
+- `backend/reservations/views.py`
+- `frontend/src/lib/payments.ts`
+- `frontend/src/components/zirkusmond/reserve/components/StripePaymentForm.tsx`
 
-### Wrong Email Sent
-1. Verify event type in webhook (check Stripe Dashboard event logs)
-2. Check `payment_status` field in session object (for success events)
-3. Verify signal handler conditions
+## Legacy note
+
+Some legacy `ReservationPayment` / `django-payments` code may still exist in the repository for
+historical data, migrations, or admin compatibility. It is not the active customer payment flow.
+New payment work should target the `Payment` + Stripe `PaymentIntent` path documented above.
