@@ -47,23 +47,23 @@ def dashboard_callback(request, context):
             "kpis": [
                 {
                     # a "visitor" = one session, however many pages it looked at
-                    "title": f"Visitors ({range_spec.label.lower()}, excluding bots)",
+                    "title": "Visitors (excluding bots)",
                     "metric": human_views.values("session_key").distinct().count(),
                 },
                 {
-                    "title": f"Payments ({range_spec.label.lower()})",
+                    "title": "Payments",
                     "metric": completed_payments.count(),
                 },
                 {
-                    "title": f"Revenue ({range_spec.label.lower()})",
+                    "title": "Revenue",
                     "metric": total_revenue,
                 },
                 {
-                    "title": f"Tickets sold ({range_spec.label.lower()})",
+                    "title": "Tickets sold",
                     "metric": total_guests,
                 },
                 {
-                    "title": f"Page views ({range_spec.label.lower()}, excluding bots)",
+                    "title": "Page views (excluding bots)",
                     "metric": human_views.count(),
                 },
                 {
@@ -75,12 +75,12 @@ def dashboard_callback(request, context):
                     "metric": _format_duration(PageView.objects.avg_time_on_site(since=since)),
                 },
                 {
-                    "title": f"Bot views ({range_spec.label.lower()})",
+                    "title": "Bot views",
                     "metric": page_views.filter(device_type=PageView.DeviceChoices.BOT).count(),
                 },
             ],
-            "visits_chart_title": f"Visits ({range_spec.label.lower()}, excluding bots)",
-            "device_chart_title": f"Sessions by device ({range_spec.label.lower()})",
+            "visits_chart_title": "Visits, excluding bots)",
+            "device_chart_title": "Sessions by device",
         }
     )
     return context
