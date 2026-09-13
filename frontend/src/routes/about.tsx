@@ -54,6 +54,9 @@ const About = () => {
           <div className="p-6 md:px-24 md:pb-12">
             <p>{t("page_about_content_p1")}</p>
             <p>{t("page_about_content_p2")}</p>
+            <p className="mt-6 font-bold text-xl text-primary text-center">
+              {t("page_about_content_p3")}
+            </p>
           </div>
         </SectionCard>
       </ContentSection>
