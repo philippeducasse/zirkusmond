@@ -393,14 +393,14 @@ class DashboardCallbackTest(TestCase):
 
     def test_kpis_are_empty_with_no_data(self) -> None:
         kpis = self._kpis(self._callback())
-        self.assertEqual(kpis["Visitors (last 24 hours, excluding bots)"], 0)
-        self.assertEqual(kpis["Payments (last 24 hours)"], 0)
-        self.assertIsNone(kpis["Revenue (last 24 hours)"])
-        self.assertEqual(kpis["Tickets sold (last 24 hours)"], 0)
-        self.assertEqual(kpis["Page views (last 24 hours, excluding bots)"], 0)
+        self.assertEqual(kpis["Visitors (excluding bots)"], 0)
+        self.assertEqual(kpis["Payments"], 0)
+        self.assertIsNone(kpis["Revenue"])
+        self.assertEqual(kpis["Tickets sold"], 0)
+        self.assertEqual(kpis["Page views (excluding bots)"], 0)
         self.assertEqual(kpis["Bounce rate"], "0.0%")
         self.assertEqual(kpis["Avg. time on site"], "–")
-        self.assertEqual(kpis["Bot views (last 24 hours)"], 0)
+        self.assertEqual(kpis["Bot views"], 0)
 
     def test_counts_only_completed_payments_within_range(self) -> None:
         reservation = make_reservation(self.event)
@@ -409,9 +409,9 @@ class DashboardCallbackTest(TestCase):
         make_payment(pending_reservation, total=Decimal("50.00"), status=Payment.Status.PENDING)
 
         kpis = self._kpis(self._callback())
-        self.assertEqual(kpis["Payments (last 24 hours)"], 1)
-        self.assertEqual(kpis["Revenue (last 24 hours)"], Decimal("30.00"))
-        self.assertEqual(kpis["Tickets sold (last 24 hours)"], 1)
+        self.assertEqual(kpis["Payments"], 1)
+        self.assertEqual(kpis["Revenue"], Decimal("30.00"))
+        self.assertEqual(kpis["Tickets sold"], 1)
 
     def test_tickets_sold_counts_purchaser_and_guests(self) -> None:
         reservation = make_reservation(self.event)
@@ -420,7 +420,7 @@ class DashboardCallbackTest(TestCase):
         make_payment(reservation, total=Decimal("45.00"))
 
         kpis = self._kpis(self._callback())
-        self.assertEqual(kpis["Tickets sold (last 24 hours)"], 3)
+        self.assertEqual(kpis["Tickets sold"], 3)
 
     def test_excludes_payments_outside_range(self) -> None:
         reservation = make_reservation(self.event)
@@ -428,8 +428,8 @@ class DashboardCallbackTest(TestCase):
         make_payment(reservation, total=Decimal("30.00"), created_at=old)
 
         kpis = self._kpis(self._callback())
-        self.assertEqual(kpis["Payments (last 24 hours)"], 0)
-        self.assertIsNone(kpis["Revenue (last 24 hours)"])
+        self.assertEqual(kpis["Payments"], 0)
+        self.assertIsNone(kpis["Revenue"])
 
     def test_visitors_and_page_views_exclude_bots(self) -> None:
         make_page_view(session_key="human-1")
@@ -438,20 +438,20 @@ class DashboardCallbackTest(TestCase):
         make_page_view(session_key="bot-1", device_type=PageView.DeviceChoices.BOT)
 
         kpis = self._kpis(self._callback())
-        self.assertEqual(kpis["Visitors (last 24 hours, excluding bots)"], 2)
-        self.assertEqual(kpis["Page views (last 24 hours, excluding bots)"], 3)
-        self.assertEqual(kpis["Bot views (last 24 hours)"], 1)
+        self.assertEqual(kpis["Visitors (excluding bots)"], 2)
+        self.assertEqual(kpis["Page views (excluding bots)"], 3)
+        self.assertEqual(kpis["Bot views"], 1)
 
-    def test_range_query_param_switches_window_and_labels(self) -> None:
+    def test_range_query_param_switches_window(self) -> None:
         old = timezone.now() - timedelta(days=10)
         make_page_view(session_key="old-visitor", entered_at=old)
 
         day_kpis = self._kpis(self._callback())
-        self.assertEqual(day_kpis["Visitors (last 24 hours, excluding bots)"], 0)
+        self.assertEqual(day_kpis["Visitors (excluding bots)"], 0)
 
         month_context = self._callback({"range": "month"})
         month_kpis = self._kpis(month_context)
-        self.assertEqual(month_kpis["Visitors (last 30 days, excluding bots)"], 1)
+        self.assertEqual(month_kpis["Visitors (excluding bots)"], 1)
         self.assertTrue(
             any(
                 item["active"]
@@ -462,8 +462,8 @@ class DashboardCallbackTest(TestCase):
 
     def test_includes_chart_titles(self) -> None:
         context = self._callback({"range": "week"})
-        self.assertEqual(context["visits_chart_title"], "Visits (last 7 days, excluding bots)")
-        self.assertEqual(context["device_chart_title"], "Sessions by device (last 7 days)")
+        self.assertEqual(context["visits_chart_title"], "Visits, excluding bots)")
+        self.assertEqual(context["device_chart_title"], "Sessions by device")
 
 
 # ---------------------------------------------------------------------------
@@ -585,8 +585,8 @@ class AdminDashboardTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode()
         self.assertIn("Bounce rate", content)
-        self.assertIn("Visits (last 24 hours, excluding bots)", content)
-        self.assertIn("Sessions by device (last 24 hours)", content)
+        self.assertIn("Visits, excluding bots)", content)
+        self.assertIn("Sessions by device", content)
         self.assertIn("Last 7 days", content)  # range switcher navigation item
 
     def test_dashboard_requires_authentication(self) -> None:
