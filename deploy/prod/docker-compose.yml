@@ -45,7 +45,8 @@ services:
   celery_beat:
     image: ${DOCKER_USERNAME}/zirkusmond:latest
     container_name: prod_celery_beat
-    command: celery -A config beat --loglevel=info --pythonpath /usr/src/backend
+    working_dir: /usr/src/backend
+    command: celery -A config beat --loglevel=info
     env_file:
       - .env
     restart: unless-stopped
