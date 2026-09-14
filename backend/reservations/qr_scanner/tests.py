@@ -197,6 +197,24 @@ class CheckInViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
 
+    def test_refunded_payment_blocks_reservation_check_in(self) -> None:
+        self._make_payment(Payment.Status.REFUNDED)
+        response = self.client.post(self._url(self.reservation.id))
+        self.assertEqual(response.status_code, 402)
+        self.assertIn("refund", response.json()["error"].lower())
+
+    def test_refunded_payment_blocks_guest_check_in(self) -> None:
+        self._make_payment(Payment.Status.REFUNDED)
+        response = self.client.post(self._url(self.guest.ticket_id))
+        self.assertEqual(response.status_code, 402)
+        self.assertIn("refund", response.json()["error"].lower())
+
+    def test_refunded_payment_does_not_mark_checked_in(self) -> None:
+        self._make_payment(Payment.Status.REFUNDED)
+        self.client.post(self._url(self.reservation.id))
+        self.reservation.refresh_from_db()
+        self.assertFalse(self.reservation.checked_in)
+
     def test_no_payment_allows_check_in(self) -> None:
         response = self.client.post(self._url(self.reservation.id))
         self.assertEqual(response.status_code, 200)

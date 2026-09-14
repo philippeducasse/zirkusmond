@@ -7,49 +7,60 @@ from reservations.models import Guest, Reservation
 from reservations.payments.models import Payment
 
 
-def _payment_failed(reservation: Reservation) -> bool:
+def _payment_invalid(reservation: Reservation) -> bool:
+    """Check if the payment is failed or refunded."""
     payment = reservation.payment_set.order_by("-created_at").first()
-    return payment is not None and payment.status == Payment.Status.FAILED
+    return payment is not None and payment.status in (
+        Payment.Status.FAILED,
+        Payment.Status.REFUNDED,
+    )
 
 
-def _do_check_in(
+def _validate_check_in(
     entity: Reservation | Guest,
     reservation: Reservation,
+    event_id: int | None,
     ticket_id: uuid.UUID | None,
     names: list[str],
-    **extra: Any,
-) -> tuple[dict[str, Any], int]:
-    if _payment_failed(reservation):
+) -> tuple[dict[str, Any], int] | None:
+    """Run all validations. Returns error tuple if validation fails, None if all checks pass."""
+    # Check if ticket is for the correct event
+    if event_id is not None and reservation.event_id != event_id:
         return {
-            "error": "Payment failed",
+            "error": "Ticket is for a different event",
+            "reservation_number": str(ticket_id),
+            "guests": names,
+        }, 409
+
+    # Check if payment is invalid (failed or refunded)
+    if _payment_invalid(reservation):
+        return {
+            "error": "Payment failed or refunded",
             "reservation_number": str(ticket_id),
             "guests": names,
         }, 402
+
+    # Check if already checked in
     if entity.checked_in:
         return {
             "error": "Ticket already checked in",
             "reservation_number": str(ticket_id),
             "guests": names,
         }, 400
+
+    return None
+
+
+def _do_check_in(
+    entity: Reservation | Guest,
+    ticket_id: uuid.UUID | None,
+    names: list[str],
+    **extra: Any,
+) -> tuple[dict[str, Any], int]:
+    """Perform the check-in action. Assumes all validations have passed."""
     entity.checked_in = True
     entity.save()
     return {"success": True, "reservation_number": str(ticket_id), "guests": names, **extra}, 200
-
-
-def _wrong_event_response(
-    reservation: Reservation,
-    event_id: int | None,
-    ticket_id: uuid.UUID | None,
-    names: list[str],
-) -> tuple[dict[str, Any], int] | None:
-    """409 response if the ticket's reservation is not for ``event_id`` (when given)."""
-    if event_id is None or reservation.event_id == event_id:
-        return None
-    return {
-        "error": "Ticket is for a different event",
-        "reservation_number": str(ticket_id),
-        "guests": names,
-    }, 409
 
 
 def check_in_ticket(
@@ -60,21 +71,28 @@ def check_in_ticket(
         reservation = Reservation.objects.get(id=ticket_id)
         names = [f"{reservation.first_name} {reservation.last_name}"]
         names.extend(str(g) for g in reservation.guests.all())
-        wrong_event = _wrong_event_response(reservation, event_id, reservation.id, names)
-        if wrong_event:
-            return wrong_event
-        return _do_check_in(reservation, reservation, reservation.id, names, is_group=True)
+
+        validation_error = _validate_check_in(
+            reservation, reservation, event_id, reservation.id, names
+        )
+        if validation_error:
+            return validation_error
+
+        return _do_check_in(reservation, reservation.id, names, is_group=True)
     except Reservation.DoesNotExist:
         pass
 
     try:
         guest = Guest.objects.get(ticket_id=ticket_id)
-        wrong_event = _wrong_event_response(
-            guest.reservation, event_id, guest.ticket_id, [str(guest)]
+        names = [str(guest)]
+
+        validation_error = _validate_check_in(
+            guest, guest.reservation, event_id, guest.ticket_id, names
         )
-        if wrong_event:
-            return wrong_event
-        return _do_check_in(guest, guest.reservation, guest.ticket_id, [str(guest)])
+        if validation_error:
+            return validation_error
+
+        return _do_check_in(guest, guest.ticket_id, names)
     except Guest.DoesNotExist:
         return {"error": "Ticket not found"}, 404
 
