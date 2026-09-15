@@ -17,7 +17,7 @@ const App = () => {
   //
   // TanStack Query: resolves instantly from the cache filled by the loader
   // (no loading state needed); would suspend only on a cache miss.
-  const { data } = useSuspenseQuery(homepageQueryOptions);
+  const { data } = useSuspenseQuery(homepageQueryOptions());
   const preShowSection = data.additionalElements.find(
     (el): el is InlineSectionElement => el.type === "preshowselement",
   );
@@ -45,11 +45,15 @@ const App = () => {
 };
 
 export const Route = createFileRoute("/")({
-  // TanStack Query: `ensureQueryData` fetches into the cache unless the data
-  // is already there. On the server this runs during SSR and the result is
+  // TanStack Query: `query` (with staleTime: "static") fetches into the cache
+  // unless the data is already there — the non-deprecated replacement for
+  // `ensureQueryData`. On the server this runs during SSR and the result is
   // dehydrated into the HTML; useSuspenseQuery below then reads it from cache.
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(homepageQueryOptions),
+  loader: ({ context: { queryClient }, preload }) =>
+    queryClient.query({
+      ...homepageQueryOptions({ preload }),
+      staleTime: "static",
+    }),
   head: () => ({
     meta: [
       { title: "Zirkus Mond" },

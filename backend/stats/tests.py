@@ -164,6 +164,24 @@ class PageViewDetectDeviceTest(TestCase):
     def test_empty_user_agent_defaults_to_desktop(self) -> None:
         self.assertEqual(PageView.detect_device(""), PageView.DeviceChoices.DESKTOP)
 
+    def test_detects_bots_regardless_of_case(self) -> None:
+        # Real crawler UAs capitalize "Bot"; matching must not be case-sensitive.
+        for ua in ["AhrefsBot", "SemrushBot", "PetalBot", "GPTBot", "ClaudeBot", "Applebot"]:
+            with self.subTest(ua=ua):
+                self.assertEqual(PageView.detect_device(ua), PageView.DeviceChoices.BOT)
+
+    def test_detects_non_browser_http_clients_as_bots(self) -> None:
+        for ua in [
+            "python-requests/2.31.0",
+            "curl/8.4.0",
+            "Wget/1.21.3",
+            "okhttp/4.12.0",
+            "Go-http-client/1.1",
+            "PostmanRuntime/7.36.0",
+        ]:
+            with self.subTest(ua=ua):
+                self.assertEqual(PageView.detect_device(ua), PageView.DeviceChoices.BOT)
+
 
 # ---------------------------------------------------------------------------
 # PageViewManager
@@ -629,6 +647,14 @@ class PageViewMiddlewareTest(TestCase):
 
     def test_skips_admin_paths(self) -> None:
         self.client.get("/mondmin/")
+        self.assertEqual(PageView.objects.count(), 0)
+
+    def test_skips_stripe_webhook_path(self) -> None:
+        self.client.post("/payments/webhook/stripe", HTTP_USER_AGENT="Stripe/1.0")
+        self.assertEqual(PageView.objects.count(), 0)
+
+    def test_skips_preload_requests(self) -> None:
+        self.client.get("/", HTTP_X_PRELOAD="1")
         self.assertEqual(PageView.objects.count(), 0)
 
     def test_records_referer_header(self) -> None:

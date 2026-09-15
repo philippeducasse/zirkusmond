@@ -1,4 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
+import { createServerOnlyFn } from "@tanstack/react-start";
+import {
+  getRequestHeader,
+  setResponseHeader,
+} from "@tanstack/react-start/server";
 
 import type { ReservationDetail } from "#/interfaces/reservation.ts";
 import type {
@@ -30,8 +35,43 @@ export class ApiError extends Error {
   }
 }
 
-export const fetchJson = async <T>(path: string): Promise<T> => {
-  const res = await fetch(apiUrl(path));
+/**
+ * SSR-only: a Node-to-Django fetch has no cookie jar of its own, so without this
+ * Django would mint a brand-new session on every server-rendered page load. Forward
+ * the visitor's own Cookie header, and relay back whatever Set-Cookie Django sends
+ * (e.g. a freshly minted session on a first visit) so the browser ends up sharing
+ * that same Django session instead of getting its own separate one on hydration.
+ */
+const fetchFromDjangoServer = createServerOnlyFn(
+  async (path: string, headers: Record<string, string>) => {
+    const cookie = getRequestHeader("cookie");
+    if (cookie) headers["Cookie"] = cookie;
+
+    const res = await fetch(`${SERVER_API_URL}${path}`, { headers });
+
+    const setCookieValues = res.headers.getSetCookie();
+    if (setCookieValues.length > 0) {
+      setResponseHeader("set-cookie", setCookieValues);
+    }
+
+    return res;
+  },
+);
+
+export const fetchJson = async <T>(
+  path: string,
+  opts?: { preload?: boolean },
+): Promise<T> => {
+  const headers: Record<string, string> = {};
+  // Marks TanStack Router's hover/touch-intent preloads so the backend doesn't
+  // count a page the visitor never actually looked at as a page view.
+  if (opts?.preload) headers["X-Preload"] = "1";
+
+  const res =
+    typeof window === "undefined"
+      ? await fetchFromDjangoServer(path, headers)
+      : await fetch(apiUrl(path), { headers });
+
   if (!res.ok) {
     throw new ApiError(res.status, path);
   }
@@ -77,30 +117,42 @@ export const postJson = async <T>(path: string, body: unknown): Promise<T> => {
 
 /**
  * TanStack Query: `queryOptions` bundles a cache key with its fetch function
- * so the same definition can be used by route loaders (ensureQueryData) and
+ * so the same definition can be used by route loaders (queryClient.query) and
  * components (useSuspenseQuery). Sharing one definition guarantees both sides
  * hit the same cache entry.
  */
-export const homepageQueryOptions = queryOptions({
-  // Cache key: all consumers of ['homepage'] share one cached response.
-  queryKey: ["homepage"],
-  queryFn: () => fetchJson<HomepageResponse>("/"),
-});
+// `opts.preload` is passed by route loaders when this is a router hover/touch
+// "intent" preload rather than a real navigation (see fetchJson) — it never
+// affects the query key, so loader and component consumers still share one
+// cache entry.
+export const homepageQueryOptions = (opts?: { preload?: boolean }) =>
+  queryOptions({
+    // Cache key: all consumers of ['homepage'] share one cached response.
+    queryKey: ["homepage"],
+    queryFn: () => fetchJson<HomepageResponse>("/", opts),
+  });
 
-export const allShowsQueryOptions = queryOptions({
-  queryKey: ["allShows"],
-  queryFn: () => fetchJson<HomepageResponse>("/shows/"),
-});
+export const allShowsQueryOptions = (opts?: { preload?: boolean }) =>
+  queryOptions({
+    queryKey: ["allShows"],
+    queryFn: () => fetchJson<HomepageResponse>("/shows/", opts),
+  });
 
 /**
  * TanStack Query: parameterised query — a factory because the cache key must
  * include the showId, giving each show its own cache entry.
  */
-export const showQueryOptions = (showId: string) =>
+export const showQueryOptions = (
+  showId: string,
+  opts?: { preload?: boolean },
+) =>
   queryOptions({
     queryKey: ["show", showId],
     queryFn: async () => {
-      const data = await fetchJson<ShowDetailResponse>(`/shows/${showId}`);
+      const data = await fetchJson<ShowDetailResponse>(
+        `/shows/${showId}`,
+        opts,
+      );
       return data.show;
     },
   });

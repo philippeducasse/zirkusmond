@@ -23,9 +23,12 @@ const RouteComponent = () => {
 export const Route = createFileRoute("/reserve/$showId")({
   // TanStack Query: same query as /show/$showId, so a user coming from the
   // show page gets an instant render from cache; a 404 becomes notFound.
-  loader: async ({ context: { queryClient }, params }) => {
+  loader: async ({ context: { queryClient }, params, preload }) => {
     try {
-      return await queryClient.ensureQueryData(showQueryOptions(params.showId));
+      return await queryClient.query({
+        ...showQueryOptions(params.showId, { preload }),
+        staleTime: "static",
+      });
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) throw notFound();
       throw error;

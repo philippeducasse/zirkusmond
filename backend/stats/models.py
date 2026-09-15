@@ -25,24 +25,36 @@ class PageView(models.Model):
 
     objects = PageViewManager()
 
+    BOT_KEYWORDS = (
+        "bot",
+        "spider",
+        "crawl",
+        "slurp",
+        "facebookexternalhit",
+        "whatsapp",
+        "telegram",
+        "headlesschrome",
+        "phantomjs",
+        "python-requests",
+        "python-httpx",
+        "curl/",
+        "wget/",
+        "okhttp",
+        "go-http-client",
+        "postmanruntime",
+        "node-fetch",
+        "axios/",
+        "scrapy",
+    )
+
     @classmethod
     def detect_device(cls, user_agent: str) -> str:
-        if any(
-            kw in user_agent
-            for kw in (
-                "bot",
-                "spider",
-                "crawl",
-                "Googlebot",
-                "bingbot",
-                "facebookexternalhit",
-                "Slurp",
-            )
-        ):
+        ua = user_agent.lower()
+        if any(kw in ua for kw in cls.BOT_KEYWORDS):
             return cls.DeviceChoices.BOT
-        if any(kw in user_agent for kw in ("iPad", "Tablet")):
+        if any(kw in ua for kw in ("ipad", "tablet")):
             return cls.DeviceChoices.TABLET
-        if any(kw in user_agent for kw in ("Mobi", "Android", "iPhone")):
+        if any(kw in ua for kw in ("mobi", "android", "iphone")):
             return cls.DeviceChoices.MOBILE
 
         return cls.DeviceChoices.DESKTOP

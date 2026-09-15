@@ -66,9 +66,12 @@ export const Route = createFileRoute("/show/$showId")({
   // TanStack Query: prefetch the show into the cache during SSR / navigation.
   // The data is also returned so `head` can use it as loaderData; a 404 from
   // the API is translated into the router's notFound page.
-  loader: async ({ context: { queryClient }, params }) => {
+  loader: async ({ context: { queryClient }, params, preload }) => {
     try {
-      return await queryClient.ensureQueryData(showQueryOptions(params.showId));
+      return await queryClient.query({
+        ...showQueryOptions(params.showId, { preload }),
+        staleTime: "static",
+      });
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) throw notFound();
       throw error;

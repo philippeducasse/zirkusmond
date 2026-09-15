@@ -122,8 +122,10 @@ Every file in `src/routes/` follows the same shape — match it for new routes:
    `src/components/zirkusmond/...`; route files stay thin.
 3. `export const Route = createFileRoute("/path")({ ... })` at the bottom, referencing
    `RouteComponent` declared above it (safe due to hoisting) with whichever of these keys apply:
-   - `loader` — prefetches via `queryClient.ensureQueryData(someQueryOptions(...))`; a 404 from the
-     API (`ApiError` with `status === 404`) is converted to `throw notFound()`.
+   - `loader` — prefetches via `queryClient.query({ ...someQueryOptions(...), staleTime: "static" })`
+     (the non-deprecated replacement for `ensureQueryData`, which returns cached data without
+     refetching when `staleTime` is `"static"`); a 404 from the API (`ApiError` with
+     `status === 404`) is converted to `throw notFound()`.
    - `component` — always present.
    - `notFoundComponent` — paired with a loader that can throw `notFound()`.
    - `head` — returns `{ meta: [...] }` for SEO: `title`, and usually `description`/`keywords` in
@@ -142,7 +144,7 @@ Every file in `src/routes/` follows the same shape — match it for new routes:
    `page_<route>_<part>` convention), not hardcoded strings — copy is German-first.
 
 Data fetching uses TanStack Query `queryOptions` factories in `frontend/src/lib/api.ts`, shared
-  between route `loader`s (`ensureQueryData`) and components (`useSuspenseQuery`) so both hit the
+  between route `loader`s (`queryClient.query`) and components (`useSuspenseQuery`) so both hit the
   same cache entry — see `router.tsx` for the SSR/query hydration wiring.
 - **API access is dual-mode** (`frontend/src/lib/api.ts`): on the server (SSR loaders), requests go
   straight to Django at `API_URL`; in the browser, requests go through the `/api/$` catch-all route

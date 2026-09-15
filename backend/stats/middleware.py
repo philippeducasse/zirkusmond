@@ -2,6 +2,9 @@ from django.utils import timezone
 
 from .models import PageView
 
+# Server-to-server callers that never represent a visitor looking at a page.
+_NON_PAGE_VIEW_PATHS = ("/payments/webhook/stripe",)
+
 
 class PageViewMiddleware:
     # run once at server startup
@@ -14,6 +17,15 @@ class PageViewMiddleware:
         response = self.get_response(request)
 
         if request.path.startswith(("/mondmin", "/static", "/media")):
+            return response
+
+        if request.path in _NON_PAGE_VIEW_PATHS:
+            return response
+
+        # TanStack Router's hover/touch "intent" preloading fires a real loader
+        # request ahead of navigation; the frontend marks these so they don't get
+        # counted as a page the visitor actually looked at.
+        if request.META.get("HTTP_X_PRELOAD") == "1":
             return response
 
         if not request.session.session_key:

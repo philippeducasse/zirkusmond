@@ -7,7 +7,7 @@ import { allShowsQueryOptions } from "#/lib/api.ts";
 
 const RouteComponent = () => {
   // TanStack Query: reads the cache entry the loader ensured; no loading state.
-  const { data } = useSuspenseQuery(allShowsQueryOptions);
+  const { data } = useSuspenseQuery(allShowsQueryOptions());
 
   return (
     <PageContainer>
@@ -18,8 +18,11 @@ const RouteComponent = () => {
 
 export const Route = createFileRoute("/shows")({
   // TanStack Query: prefetch into the cache during SSR / navigation.
-  loader: ({ context: { queryClient } }) =>
-    queryClient.ensureQueryData(allShowsQueryOptions),
+  loader: ({ context: { queryClient }, preload }) =>
+    queryClient.query({
+      ...allShowsQueryOptions({ preload }),
+      staleTime: "static",
+    }),
   head: () => ({
     meta: [
       { title: "Zirkus Mond – Shows & Events" },
